@@ -33,10 +33,13 @@ Testing this control involves **reperforming** the review: reconcile the NetSuit
 ## Constraints
 
 - You can use any language, framework, models, APIs, or technologies you feel best suited for the task. We have [developed our own harness](https://github.com/bead-ai/zeitlich/) if you need a starting point.
-- There are no cost or performance requirements. Accuracy is the only objective for now.
-- We will let you decide how generic your solution should be. For this task, it is enough if it can cover this particular control with various inputs.
+- You can use any AI tooling or coding agents you are familiar with. If you do, it is helpful to share session recordings, prompts, plans or threads to show us how you work.
+- There are no cost, performance or data privacy requirements. Accuracy is the only objective for now.
+- We will let you decide how generic your solution should be. For this task, it is enough if it can cover this particular controls with various inputs (we will test it with a set of different inputs).
+- Aim for a generic solution that can handle both controls by using the context provided, without specific prompting for either
 - Auditing often means making judgments with imperfect input. A good auditor balances detail and efficiency.
 - The more detailed and auditable the output, the better.
+- We can provide you with API keys with resonable token budgets if needed
 
 ## Submission
 
