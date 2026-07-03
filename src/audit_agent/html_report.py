@@ -80,25 +80,24 @@ body {
 .container {
   max-width: 920px;
   margin: 0 auto;
-  padding: 64px 40px 96px;
+  padding: 0 40px 96px;
 }
 
 /* --- Header (deep forest hero, Bead-brand-forward) --- */
 .hero-wrap {
   background: linear-gradient(180deg, #052b22 0%, #0b362c 100%);
-  margin: -64px -40px 52px;   /* bleed past the container padding */
-  padding: 64px 40px 52px;
+  margin: 0 -40px 0;   /* flush top; bleed to sides */
+  padding: 56px 40px 96px;   /* extra bottom padding — the BLUF card overlaps up into it */
   position: relative;
   overflow: hidden;
-  border-radius: 0 0 4px 4px;
 }
 .hero-wrap::before {
   /* Subtle mint glow in the top-right corner */
   content: "";
   position: absolute;
-  top: -120px; right: -120px;
-  width: 320px; height: 320px;
-  background: radial-gradient(circle, rgba(136, 217, 141, 0.18) 0%, transparent 70%);
+  top: -140px; right: -140px;
+  width: 380px; height: 380px;
+  background: radial-gradient(circle, rgba(136, 217, 141, 0.20) 0%, transparent 70%);
   pointer-events: none;
 }
 .hero-wrap .hero-inner {
@@ -113,7 +112,7 @@ header.hero .eyebrow {
   letter-spacing: 0.20em;
   text-transform: uppercase;
   font-weight: 400;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -128,7 +127,7 @@ header.hero .eyebrow::before {
 header.hero h1 {
   font-family: var(--font-display);
   margin: 0;
-  font-size: 44px;
+  font-size: 42px;
   font-weight: 500;
   letter-spacing: -0.03em;
   color: #f5f2ea;
@@ -143,32 +142,26 @@ header.hero .meta {
 }
 header.hero .meta strong { color: var(--accent-2); font-weight: 400; }
 
-/* Hero-integrated verdict badge (sits inside the green band) */
-.hero-wrap .badge {
-  margin-top: 22px;
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(136, 217, 141, 0.35);
-  color: var(--accent-2);
-}
-.hero-wrap .badge.pass { color: #a5e6a8; background: rgba(136, 217, 141, 0.12); border-color: rgba(136, 217, 141, 0.45); }
-.hero-wrap .badge.fail { color: #f4b5ad; background: rgba(246, 176, 170, 0.10); border-color: rgba(246, 176, 170, 0.35); }
-.hero-wrap .badge.warn { color: #ecd39a; background: rgba(232, 192, 122, 0.10); border-color: rgba(232, 192, 122, 0.40); }
-
-/* --- BLUF (bottom-line-up-front) verdict banner --- */
+/* --- BLUF (bottom-line-up-front) verdict card — overlaps up into the hero --- */
 .bluf {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 32px;
   align-items: center;
-  padding: 40px 44px;
+  padding: 32px 40px;
   border-radius: 4px;
-  margin-bottom: 52px;
   border: 1px solid;
   border-left-width: 4px;
+  background: var(--card);
+  margin: -60px auto 48px;   /* overlap the hero-bottom by 60px */
+  position: relative;
+  z-index: 2;
+  max-width: 840px;
+  box-shadow: 0 12px 32px rgba(11, 54, 44, 0.10), 0 2px 6px rgba(11, 54, 44, 0.05);
 }
-.bluf.pass { background: var(--pass-soft); border-color: var(--pass-border); }
-.bluf.fail { background: var(--fail-soft); border-color: var(--fail-border); }
-.bluf.warn { background: var(--warn-soft); border-color: var(--warn-border); }
+.bluf.pass { border-color: var(--pass-border); }
+.bluf.fail { border-color: var(--fail-border); }
+.bluf.warn { border-color: var(--warn-border); }
 .bluf .verdict-icon-lg {
   width: 76px; height: 76px;
   border-radius: 50%;
@@ -1154,9 +1147,6 @@ def build_report(run_dir: Path) -> Path:
         f"Tested by <strong>{_esc(model)}</strong> across "
         f"<strong>{len(assessments)}</strong> sample{'s' if len(assessments) != 1 else ''}",
         "</div>",
-        # Verdict badge inside the green hero.
-        f'<span class="badge {_BADGE_CLASS[run_verdict]}"><span class="dot"></span>'
-        f"{run_verdict.replace('_', ' ')}</span>",
         "</header>",
         "</div></div>",
         # BLUF banner
