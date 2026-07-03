@@ -24,6 +24,8 @@ Trade-off I accept: this repo doesn't compose directly with zeitlich. A TS port 
 
 UAR isn't a reading-comprehension task. It's a reperformance — join NetSuite × Workday HRIS, find users whose employment status contradicts their access. I wrote this deterministically in code (`evidence/reconciler.py`). On the first live run, it correctly identified that reviewer Priya Nadkarni marked **Kevin Lewis** "Retain" despite HRIS showing him terminated. A real finding the review missed. Only Danielle Goodwin was flagged in the Summary sheet.
 
+**Full-population, not sampling.** The reconciler tests every row of the in-scope population (all 334 accounts on Bead's UAR sample, not a 25-row sample). This maps directly to Bead's marketed positioning of "full-population testing over sampling" and is the audit-defensible advantage of deterministic reconciliation over an LLM-only workflow.
+
 ### Per-attribute isolation over "one call per sample"
 
 One LLM call per `(sample × attribute)`, not one aggregate. Golden-set evaluatable at the atomic unit. Parallelisable if latency matters. Attribute-bleed doesn't contaminate reasoning across attributes. Matches how a real auditor writes a workpaper.

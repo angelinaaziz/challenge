@@ -12,7 +12,7 @@ I hand-labelled 15 correct answers across three controls (Bead's two + one I inv
 
 | Model | Independent Code Review | User Access Review | Change Management | **Overall** |
 | --- | :-: | :-: | :-: | :-: |
-| **Claude Opus 4.7** | **6/6 (100%)** | **3/3 (100%)** | **6/6 (100%)** | **15/15 · 100%** ✅ |
+| **Claude Opus 4.8** | **6/6 (100%)** | **3/3 (100%)** | **6/6 (100%)** | **15/15 · 100%** ✅ |
 | GPT-5.4 *(stale prompt)* | 4/6 (67%) | 3/3 (100%) | 3/6 (50%) | 10/15 · 67% |
 | Gemini 3.1 Pro Preview *(stale prompt)* | 5/6 (83%) | 1/3 (33%) | 4/6 (67%) | 10/15 · 67% |
 
@@ -131,7 +131,7 @@ Every command has `--help`.
 
 | Var | Required for | Default model ID |
 | --- | --- | --- |
-| `ANTHROPIC_API_KEY` | `--model claude` | `claude-opus-4-7` |
+| `ANTHROPIC_API_KEY` | `--model claude` | `claude-opus-4-8` |
 | `OPENAI_API_KEY` | `--model openai` | `gpt-5.4` |
 | `GOOGLE_API_KEY` | `--model gemini` | `gemini-3.1-pro-preview` |
 
@@ -163,6 +163,8 @@ Five steps for each sample. Every step is the same for every control.
 ```
 
 **The bit that matters most is step 2 for User Access Review.** LLMs are unreliable at cross-referencing 334 users against 720 HR records. `openpyxl` isn't. So the code does the join, finds terminated staff whose access wasn't revoked, and hands the findings to the LLM as ground truth. On Bead's UAR sample this caught **Kevin Lewis** — flagged as terminated in HRIS, but the reviewer left his access active. The original review missed it.
+
+**Full-population reperformance, not sampling.** The reconciler tests 100% of the in-scope account population — every one of the 334 accounts on Bead's UAR sample, not a 25-row auditor sample. This maps directly to Bead's marketed positioning of *"full-population testing over sampling"* and is the audit-defensible advantage of deterministic reconciliation over LLM-only judgment.
 
 ---
 

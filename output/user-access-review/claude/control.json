@@ -3,37 +3,35 @@
   "description": "User access to systems and data is periodically reviewed to ensure access remains appropriate and aligned with each individual's role. User access reviews reduce the risk of unauthorised or excessive access by confirming that only authorised individuals retain access and that access is revoked when no longer required.",
   "attributes": [
     {
-      "id": "periodic-review-cadence",
+      "id": "access-reviews-performed-periodically",
       "text": "Access reviews are performed on a periodic basis (e.g. quarterly)",
       "testable_criteria": [
-        "A user access review was performed during the period under audit.",
-        "The review was performed at the defined periodic cadence (e.g. quarterly).",
-        "The date the review was performed is documented in the evidence.",
-        "The review covers the in-scope system(s) and its user population as of the review date."
+        "Is there evidence that a user access review was performed for the period under review?",
+        "Was the access review performed at the defined frequency (e.g. quarterly)?",
+        "Is the date the review was performed documented?",
+        "Did the review occur within the expected period (no missed or overdue review cycles)?"
       ],
       "relevant_policies": []
     },
     {
-      "id": "reviewed-approved-by-owner",
+      "id": "access-reviewed-approved-by-owner",
       "text": "Access is reviewed and approved by an appropriate system or data owner",
       "testable_criteria": [
-        "The reviewer is identified by name in the evidence.",
-        "The reviewer is an appropriate system or data owner for the system in scope.",
-        "The reviewer is independent of the users being reviewed (i.e. not self-reviewing their own access).",
-        "The reviewer provided documented approval (e.g. sign-off, ticket approval, signed attestation) of the access list.",
-        "Approval evidence is dated on or after the review was performed."
+        "Was the access review performed/approved by an identified individual?",
+        "Is the reviewer/approver an appropriate system or data owner for the system in scope?",
+        "Is there documented evidence of the reviewer's approval (e.g. sign-off, signature, ticket)?",
+        "Was the approval performed by someone independent of the access being reviewed (approver is not self-approving their own access)?"
       ],
       "relevant_policies": []
     },
     {
-      "id": "timely-remediation",
+      "id": "inappropriate-access-remediated-timely",
       "text": "Inappropriate or excessive access identified during the review is remediated in a timely manner",
       "testable_criteria": [
-        "Any access flagged as inappropriate or excessive during the review is identified in the evidence.",
-        "For each flagged item, remediation action (e.g. access removal or adjustment) is documented.",
-        "Evidence confirms the flagged access was actually removed or modified in the system.",
-        "Remediation occurred in a timely manner following identification.",
-        "If no inappropriate or excessive access was identified, the evidence explicitly states this."
+        "Were any instances of inappropriate or excessive access identified during the review documented?",
+        "IF inappropriate or excessive access was identified THEN is there evidence the access was remediated (e.g. removed or modified)?",
+        "Was the remediation completed in a timely manner following identification?",
+        "Is there evidence of the remediation date to confirm timeliness?"
       ],
       "relevant_policies": []
     }

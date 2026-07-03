@@ -1,5 +1,5 @@
 # Independent Code Review — sample-1
-_generated: 2026-07-03T03:49:45.902370+00:00 · model: claude:claude-opus-4-7_
+_generated: 2026-07-03T04:17:11.441811+00:00 · model: claude:claude-opus-4-8_
 
 ## ✅ Control conclusion: `CONTROL_PASS`
 
@@ -14,47 +14,43 @@ _generated: 2026-07-03T03:49:45.902370+00:00 · model: claude:claude-opus-4-7_
 ## ✅ Code Reviews are performed prior to committing a change to the main branch
 **Verdict**: `SUCCESS`  · confidence `0.85`
 
-A pull request (#62754) exists for the change and shows a human approval from RyanCavanaugh recorded at "17 hours ago", while the merge to microsoft:main occurred "16 hours ago" — i.e. the approval preceded the merge. The PR page shows the change was merged via the PR (merge commit ea48ded into microsoft:main), not committed directly to main, satisfying the 4-eyes / no-direct-commit criterion for this attribute. Independence of the reviewer is a separate attribute and is not judged here.
+A pull request review record exists for PR #62754: RyanCavanaugh (a different human from author/committer jakebailey) approved the changes. The approval event appears in the timeline at "17 hours ago" while the merge into microsoft:main occurred at "16 hours ago", so approval preceded the merge. Auto-merge (squash) was enabled and the branch only merged after the approval and checks completed, consistent with review being required prior to committing to main.
 
 **Evidence:**
-- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `PR header and Merged status badge` — PR #62754 exists in microsoft/TypeScript with status 'Merged'; header states 'jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller 16 hours ago'.
-- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Timeline — approval event` — 'RyanCavanaugh approved these changes 17 hours ago' with a green check, and Reviewers sidebar shows RyanCavanaugh with a green check.
-- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Merge event line` — 'jakebailey merged commit ea48ded into microsoft:main 16 hours ago' — merge occurred one hour after the approval, i.e. after approval was recorded.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Timeline — 'RyanCavanaugh approved these changes 17 hours ago' (green check, 'View reviewed changes' link)` — A human reviewer, RyanCavanaugh, approved the PR; this is the code review record and its approval event.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `PR header line + merge event` — Header shows jakebailey merged into microsoft:main '16 hours ago' and merge event 'jakebailey merged commit ea48ded into microsoft:main 16 hours ago' — later than the '17 hours ago' approval, so approval preceded merge.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Timeline — 'jakebailey enabled auto-merge (squash) 17 hours ago' and Reviewers side panel` — Auto-merge was enabled and RyanCavanaugh shows a green approval checkmark; the branch merged only after approval, indicating the review gated the merge to main.
 
 **Exceptions considered:**
-- Copilot AI review — not counted toward this attribute since the human approval by RyanCavanaugh already satisfies the 'code review completed before merge' criterion; independence of reviewer is judged under a separate attribute.
+- Copilot AI review is present but was not relied upon — an AI reviewer is not an independent human; the independent human approval came from RyanCavanaugh, which satisfies this attribute (approval-timing/existence). Reviewer-independence nuances belong to a separate attribute.
 
 ## ✅ Code Review approvals are performed by independent code reviewers
 **Verdict**: `SUCCESS`  · confidence `0.90`
 
-The PR was authored and merged by jakebailey, and the approving reviewer is RyanCavanaugh — a different named human — whose approval (green check) is recorded in the timeline prior to the merge event. Copilot's review is not counted as an independent human approval, but RyanCavanaugh's approval satisfies the 4-eyes requirement on its own. No evidence indicates RyanCavanaugh committed or co-authored the change (single commit 9e76dd2 attributed to jakebailey).
+The change author/committer/merger is jakebailey, and the approving review ("RyanCavanaugh approved these changes") was given by RyanCavanaugh — a different named human — satisfying the 4-eyes principle. RyanCavanaugh has no authorship or committer role on the PR (author, assignee, and merger are all jakebailey). The other listed "reviewer", Copilot, is an AI and is correctly disregarded as a non-independent human reviewer; the independent human approval from RyanCavanaugh still stands.
 
 **Evidence:**
-- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `PR header` — 'jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller' — identifies jakebailey as both author and merger.
-- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Timeline — approval event` — 'RyanCavanaugh approved these changes 17 hours ago' with green check, occurring before the merge event 16 hours ago.
-- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Reviewers sidebar` — RyanCavanaugh listed with green check (✓); Copilot listed without a check — Copilot is a bot, not an independent human reviewer.
-- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Commit reference in timeline` — Single commit 9e76dd2 for 'Shrink_relationComplexityError_test_size' is associated with the PR (authored by jakebailey per branch context); no indication RyanCavanaugh co-authored or committed.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Timeline event with green check` — 'RyanCavanaugh approved these changes 17 hours ago' — an independent human approval, distinct from the author.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `PR header / Assignees side panel` — jakebailey is the author, committer, assignee, and the person who merged the PR; RyanCavanaugh is not in any author/committer role.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Reviewers side panel` — Reviewers list shows Copilot (AI, not independent human) and RyanCavanaugh (green checkmark, human approver).
 
 **Exceptions considered:**
-- Copilot AI review — rejected as an independent reviewer because it is not a human; however RyanCavanaugh provides an independent human approval, so the criterion is still met.
+- Copilot as reviewer — rejected as an independent reviewer because it is an AI, not a human; independence is instead established by RyanCavanaugh's human approval.
+- Author self-approval — not applicable; the approval came from RyanCavanaugh, not the author jakebailey.
 
 ## ✅ Testing is performed in accordance with the testing policy
-**Verdict**: `SUCCESS`  · confidence `0.78`
+**Verdict**: `SUCCESS`  · confidence `0.83`
 
-The change is a test-size reduction (+10/-10 in a test file, "Shrink relationComplexityError test size"), which is a behavior-preserving refactor of test code — an exception category under the policy, but even without invoking it the coverage report shows Statements 94.62%, Branches 89.48%, Functions 94.79% (all above the 80%/70%/80% thresholds). CI ran the full test matrix (15 jobs across Node 14–24, coverage, lint, knip, format, browser-integration, typecheck, smoke, baselines) with status Success and 36 of 37 checks passed, and results are visible as PR status checks. A coverage report artifact (39.2 MB) was generated by the coverage job and a coverage dashboard screenshot was captured as part of the review. No line-coverage percentage is directly shown (only Bytes/Statements/Branches/Functions) but Statements is the standard proxy and comfortably exceeds 80%.
+This PR is test-only maintenance: all 4 changed files are under tests/cases/ and tests/baselines/, and the description ("Shrink relationComplexityError test size... Getting tired of this test timing out on slower builders") confirms no production code is touched. The testing policy's exception for refactoring/test-only maintenance applies, so the coverage thresholds do not gate this specific change. Independent of the exception, CI ran and passed the 15-job matrix (Status: Success, 17m 44s) with a coverage artifact generated, so tests demonstrably ran in the pipeline before merge. The standalone coverage report screenshot cannot be tied to this PR (no repo/branch/commit visible), but that is not needed given the exception.
 
 **Policy references:**
-- `testing-policy.md` § Minimum Test Coverage Requirements — Code Coverage Thresholds: “Unit Tests: Minimum 80% code coverage for all new code”
-- `testing-policy.md` § Coverage Metrics: “Line coverage (primary metric); Branch coverage (minimum 70%); Function coverage (minimum 80%)”
-- `testing-policy.md` § Test Execution Environment: “Tests must run in CI/CD pipeline before merge... Test results must be visible in pull request status checks”
-- `testing-policy.md` § Exceptions and Waivers: “Refactoring with No Behavioral Changes: Code refactoring that maintains exact functional behavior and is verified through existing test coverage”
+- `testing-policy.md` § Exceptions and Waivers > Exception Process (7. Refactoring with No Behavioral Changes): “Code refactoring that maintains exact functional behavior and is verified through existing test coverage”
+- `testing-policy.md` § Test Execution Environment: “Tests must run in CI/CD pipeline before merge”
 
 **Evidence:**
-- `Screenshot 2025-11-14 at 14-27-50 Coverage Report.png` @ `Summary row (top of table)` — Statements 94.62%, Branches 89.48%, Functions 94.79% — all above policy thresholds of 80/70/80.
-- `Screenshot 2025-11-14 at 14-29-21 Shrink relationComplexityError test size · microsoft_TypeScript@9e76dd2.png` @ `Workflow run header and Jobs sidebar` — CI run #34653 status Success, 17m 44s, 15 matrix jobs plus coverage/lint/knip/format/browser-integration/typecheck/smoke/baselines all green; coverage artifact 39.2 MB produced.
-- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Merge status bar / checks summary` — '36 of 37 checks passed' shown on the merged PR; PR title 'Shrink relationComplexityError test size', +10/-10 across 4 files — a test-shrinking refactor.
-- `Screenshot 2025-11-14 at 14-27-50 Coverage Report.png` @ `Page header` — 'Coverage Report' dashboard was generated and captured, evidencing that a coverage report exists for review.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Reviewed Changes table (Files changed = 4) and opening comment` — All 4 changed files are under tests/cases/compiler/ and tests/baselines/reference/; diff is +10 -10; author comment says the change shrinks a test that was timing out on slower builders — test-only maintenance, no production code.
+- `Screenshot 2025-11-14 at 14-29-21 Shrink relationComplexityError test size · microsoft_TypeScript@9e76dd2.png` @ `Workflow run status/duration header and Jobs sidebar` — CI workflow run for this PR shows Status: Success, total duration 17m 44s, 15 matrix jobs completed with green checks, plus coverage/lint/smoke/baselines jobs — tests ran in the pipeline before merge.
+- `Screenshot 2025-11-14 at 14-27-50 Coverage Report.png` @ `Summary row and ambiguities note` — A coverage report exists (Statements 94.62%, Branches 89.48%, Functions 94.79%) but shows no repo/branch/commit/build ID, so it cannot be tied to this specific PR; not required here because the test-only exception applies.
 
 **Exceptions considered:**
-- Refactoring with No Behavioral Changes: the PR shrinks the size of an existing test (relationComplexityError) to avoid timeouts on slower builders — behavior-preserving test refactor. Accepted as applicable, though not required because measured coverage already exceeds thresholds.
-- Line coverage column is not shown in the coverage report (only Bytes/Statements/Branches/Functions). Statements coverage 94.62% is treated as the practical equivalent for the 80% line-coverage criterion; noted as a minor ambiguity but not fatal given the large margin above threshold.
+- Refactoring with No Behavioral Changes / test-only maintenance — ACCEPTED: all 4 touched files are under tests/cases/ and tests/baselines/, the change only reduces the size of an existing compiler test (Digits literals 10→8, combinations 10,000→4,096), and no production/application code is modified. Coverage thresholds therefore do not gate this change.

@@ -455,8 +455,14 @@ def _compute_evidence_coverage(
 
 
 def _summary_from_reconciliation(recon: dict) -> str:
+    # Full-population coverage callout — the reperformance tested EVERY row,
+    # not a sample. This is directly aligned with Bead's marketed positioning
+    # ("full-population testing over sampling") and is the audit-defensible
+    # advantage of deterministic reconciliation over LLM-only judgment.
+    export_rows = recon["system_export_rows"]
     lines = [
-        f"System export: {recon['system_export_rows']} rows",
+        f"Full-population reperformance — 100% of the {export_rows} in-scope account(s) tested, not a sample",
+        f"System export: {export_rows} rows",
         f"HRIS roster: {recon['hris_rows']} rows",
         f"Reviewer sheet: {recon['reviewer_sheet_rows']} rows",
         f"Matched to HRIS: {recon['matched_users']}",

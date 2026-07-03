@@ -3,13 +3,13 @@
   "description": "Changes are reviewed by an independent code reviewer prior to code being merged and released to production. Independent code review restricts the ability for anyone individual from taking a change production without involving an independent party (4-eyes principle).",
   "attributes": [
     {
-      "id": "code-review-prior-to-merge",
+      "id": "code-review-before-commit-to-main",
       "text": "Code Reviews are performed prior to committing a change to the main branch",
       "testable_criteria": [
-        "A code review record (e.g. pull request) exists for the change.",
-        "The code review was completed (approved) before the change was merged to the main branch.",
-        "The merge commit timestamp to main is on or after the code review approval timestamp.",
-        "No changes were committed directly to the main branch bypassing the code review process."
+        "Does a code review record (e.g. pull request review) exist for the change?",
+        "Is there evidence the code review was approved before the change was merged/committed to the main branch?",
+        "Is the code review approval timestamp before the merge/commit timestamp to the main branch?",
+        "Was the change prevented from merging to main until the review was completed?"
       ],
       "relevant_policies": []
     },
@@ -17,34 +17,34 @@
       "id": "independent-reviewer-approval",
       "text": "Code Review approvals are performed by independent code reviewers",
       "testable_criteria": [
-        "The approving reviewer is a different individual than the author of the change.",
-        "The approving reviewer did not commit or co-author any of the code changes in the pull request.",
-        "At least one approval from an independent reviewer was recorded prior to merge."
+        "Is the code reviewer(s) a different individual from the change author?",
+        "Does the approving reviewer have no authorship/committer role in the change under review?",
+        "Was the approval given by a party independent of the change author (4-eyes principle satisfied)?"
       ],
       "relevant_policies": []
     },
     {
-      "id": "testing-per-policy",
+      "id": "testing-per-testing-policy",
       "text": "Testing is performed in accordance with the testing policy",
       "testable_criteria": [
-        "Unit tests for new code achieve minimum 80% line coverage.",
-        "Branch coverage is ≥ 70%.",
-        "Function coverage is ≥ 80%.",
-        "Integration tests achieve minimum 60% coverage for critical integration points.",
-        "IF the change touches security-sensitive, payment, or authentication flows THEN coverage for those paths = 100%.",
-        "IF the change modifies legacy code THEN coverage is maintained or improved relative to prior levels.",
-        "A coverage report was generated and reviewed as part of the code review.",
-        "All unit tests passed with zero failures prior to merge/release.",
-        "All integration tests passed prior to merge/release.",
-        "End-to-end tests covering critical user journeys passed prior to release.",
-        "IF applicable, performance tests met defined benchmarks.",
-        "Security test/scan results were reviewed and approved prior to release.",
-        "Tests were executed in the CI/CD pipeline before merge.",
-        "Test results are visible as pull request status checks.",
-        "No flaky tests were left unresolved (fixed or removed) before release.",
-        "No known critical or high-severity bugs are outstanding at release.",
-        "Manual smoke tests were completed for critical features prior to release.",
-        "IF the change qualifies for a documented exception (legacy integration, third-party config, PoC, documentation-only, build/deployment scripts, dependency version bump, or behavior-preserving refactor) THEN the exception is explicitly identified and justified."
+        "Do all unit tests pass with zero failures?",
+        "Do all integration tests pass?",
+        "Do critical user journey end-to-end tests pass?",
+        "Are performance benchmarks met (if applicable)?",
+        "Have security scan/test results been reviewed and approved?",
+        "Is unit test code coverage ≥ 80% for all new code?",
+        "Is integration test coverage ≥ 60% for critical integration points?",
+        "IF the change touches security-sensitive, payment, or authentication flows THEN is coverage = 100% for those critical paths?",
+        "For legacy code, is existing coverage maintained or improved?",
+        "Is branch coverage ≥ 70%?",
+        "Is function coverage ≥ 80%?",
+        "Was a coverage report generated and reviewed as part of the code review process?",
+        "Did tests run in the CI/CD pipeline before merge?",
+        "Are test results visible in the pull request status checks?",
+        "Were flaky tests fixed or removed before release?",
+        "Does the pre-release checklist confirm no known critical or high-severity bugs?",
+        "Were manual smoke tests completed for critical features?",
+        "IF the change qualifies for a documented policy exception (legacy integration, third-party dependency, POC/experimental, documentation-only, build/deployment scripts, dependency version bumps, or refactoring with no behavioral change) THEN is the exception applicable and documented?"
       ],
       "relevant_policies": [
         "testing-policy.md"

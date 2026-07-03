@@ -1,53 +1,55 @@
 # User Access Review — sample-1
-_generated: 2026-07-03T04:02:58.042871+00:00 · model: claude:claude-opus-4-7_
+_generated: 2026-07-03T04:23:01.968133+00:00 · model: claude:claude-opus-4-8_
 
 ## ❌ Control conclusion: `CONTROL_FAIL`
 
 ### Reperformance summary
-System export: 334 rows | HRIS roster: 720 rows | Reviewer sheet: 334 rows | Matched to HRIS: 332 | Orphans (no HRIS record): 2 | Terminated but active in system: 2 | On leave but active in system: 8 | Reviewer missed (terminated + retained): 1
+Full-population reperformance — 100% of the 334 in-scope account(s) tested, not a sample | System export: 334 rows | HRIS roster: 720 rows | Reviewer sheet: 334 rows | Matched to HRIS: 332 | Orphans (no HRIS record): 2 | Terminated but active in system: 2 | On leave but active in system: 8 | Reviewer missed (terminated + retained): 1
 
-### Evidence coverage — 100%
+### Evidence coverage — 50%
 - All files provided: 2
-- Cited in at least one verdict: 2
+- Cited in at least one verdict: 1
+- **Uncited:** `hris-employee-export.xlsx`
 
 ---
 
 ## Attribute-level verdicts
 
 ## ✅ Access reviews are performed on a periodic basis (e.g. quarterly)
-**Verdict**: `SUCCESS`  · confidence `0.92`
-
-The Cover sheet positively identifies the Review Type as "Periodic (Quarterly) User Access Review" for Review Period Q2 2026, with Review Completed 2026-06-30. All 334 reviewer decision rows on the Access Review sheet carry a single Review Date of 2026-06-30, consistent with a single quarterly cycle, and IPE checks reconcile the population (334 accounts; 332 in-scope + 2 service) to the Cover totals. The review covered the in-scope NetSuite Production user population as of the review date.
-
-**Evidence:**
-- `uar-netsuite-q2-2026.xlsx` @ `Cover!Review Type / Review Period / Review Completed` — Cover sheet declares Review Type: 'Periodic (Quarterly) User Access Review', Review Period: 'Q2 2026', Review Completed: '2026-06-30', System: 'NetSuite (Production)', Scope: 'All human user accounts with access to NetSuite Production.'
-- `uar-netsuite-q2-2026.xlsx` @ `Access Review!H2:H335 (Review Date column)` — unique_review_dates = ['2026-06-30']; every one of the 334 reviewer decision rows is dated 2026-06-30, indicating a single quarterly review cycle.
-- `uar-netsuite-q2-2026.xlsx` @ `Cover!Reviewer Sign-off` — 'Approved electronically by Priya Nadkarni on 2026-06-30.' — completion date documented and signed.
-- `uar-netsuite-q2-2026.xlsx` @ `IPE checks (reperformance)` — IPE reconciliation passes: 334 export rows = 332 in-scope + 2 service accounts, matching Cover totals; population as of review date is fully covered.
-
-## ✅ Access is reviewed and approved by an appropriate system or data owner
 **Verdict**: `SUCCESS`  · confidence `0.90`
 
-The reviewer is named as Priya Nadkarni, Director, Finance Systems (System Owner) on the Cover sheet, an appropriate owner role for NetSuite (Production). She is distinct from the preparer (Marcus Bell) and is not on the reviewed access list (she is not among the 334 usernames), so she is independent of the users reviewed. Sign-off is documented ("Approved electronically by Priya Nadkarni on 2026-06-30") and dated the same day as the Review Completed date, satisfying the documented, on-or-after approval criterion.
+The Cover sheet declares the review as a "Periodic (Quarterly) User Access Review" for Review Period "Q2 2026", with "Review Completed: 2026-06-30" and an electronic sign-off dated 2026-06-30 — positively evidencing that a review was performed at the defined quarterly frequency with a documented date. All 334 reviewer decision rows carry a single Review Date of 2026-06-30, and the reperformance confirms exactly one unique review date, consistent with a single Q2 2026 cycle completed within the period. The reperformance findings about missed/inappropriate access relate to the review's accuracy, not its periodicity, so they do not bear on this attribute.
 
 **Evidence:**
-- `uar-netsuite-q2-2026.xlsx` @ `Cover!Reviewer / Approver` — Reviewer / Approver identified as 'Priya Nadkarni, Director, Finance Systems (System Owner)'.
-- `uar-netsuite-q2-2026.xlsx` @ `Cover!Reviewer Sign-off and Review Completed` — 'Approved electronically by Priya Nadkarni on 2026-06-30.' with Review Completed 2026-06-30.
-- `uar-netsuite-q2-2026.xlsx` @ `Access Review!G2:G335 (Reviewed By column)` — All 334 rows show 'Priya Nadkarni' as the reviewer with Review Date 2026-06-30.
-- `uar-netsuite-q2-2026.xlsx` @ `Cover!Prepared By vs Reviewer` — Preparer (Marcus Bell) is distinct from Reviewer (Priya Nadkarni); Priya Nadkarni does not appear in the list of 334 in-scope usernames, confirming she is not reviewing her own access.
+- `uar-netsuite-q2-2026.xlsx` @ `Cover sheet (Review Type / Review Period / Review Completed / Reviewer Sign-off)` — Review Type = 'Periodic (Quarterly) User Access Review'; Review Period = 'Q2 2026'; Review Completed = '2026-06-30'; Reviewer Sign-off = 'Approved electronically by Priya Nadkarni on 2026-06-30.'
+- `uar-netsuite-q2-2026.xlsx` @ `Access Review!H2:H335 (Review Date column)` — Every reviewer decision row is dated 2026-06-30, consistent with a single quarterly review cycle.
+- `reperformance (deterministic)` @ `unique_review_dates` — Exactly one unique review date across all rows: 2026-06-30T00:00:00, confirming a single Q2 2026 cycle.
 
-## ❌ Inappropriate or excessive access identified during the review is remediated in a timely manner
-**Verdict**: `FAIL`  · confidence `0.90`
+## ✅ Access is reviewed and approved by an appropriate system or data owner
+**Verdict**: `SUCCESS`  · confidence `0.85`
 
-Deterministic reperformance identified a terminated employee, Kevin Lewis (HRIS status: terminated), whose NetSuite account remains Active and whom the reviewer marked "Retain" — inappropriate access exists that was neither flagged nor remediated. While the one item the reviewer did flag (Danielle Goodwin) has a documented remediation path via ITSM-48217, the reperformance surfaces at least one additional case of inappropriate access that was missed and left in place, contradicting the criterion that all flagged inappropriate access be remediated. Evidence of actual system removal (deprovisioning confirmation for Danielle Goodwin) is also not present — only a ticket reference.
+The Cover sheet identifies the reviewer/approver as Priya Nadkarni, Director, Finance Systems, explicitly designated "(System Owner)" for NetSuite Production, satisfying the identified-individual and appropriate-owner criteria. Documented approval exists via the sign-off line "Approved electronically by Priya Nadkarni on 2026-06-30," and all 334 review rows are attributed to Priya Nadkarni. Priya Nadkarni does not appear as a subject account in the NetSuite access export, so there is no self-approval concern. Note: reviewer-missed findings (e.g. Kevin Lewis) and remediation timeliness belong to separate attributes and do not bear on reviewer appropriateness/approval.
 
 **Evidence:**
-- `uar-netsuite-q2-2026.xlsx` @ `Access Review!E187 (Kevin Lewis row)` — Reviewer Decision = 'Retain' for kevin.lewis@northpeakfinancial.com despite HRIS showing him terminated.
-- `hris-employee-export.xlsx` @ `Employees!D127 (Kevin Lewis)` — HRIS record for Kevin Lewis shows employment status terminated, contradicting the retained decision.
-- `uar-netsuite-q2-2026.xlsx` @ `Cover sheet — Observation 1 / Conclusion` — Only 1 observation raised (Danielle Goodwin) with remediation via ITSM-48217; no mention of Kevin Lewis or any other terminated-but-active user.
-- `reperformance` @ `reviewer_missed_findings (count=1)` — Reconciliation flagged Kevin Lewis as terminated-in-HRIS but retained by the reviewer — a case of inappropriate access not identified and not remediated.
-- `uar-netsuite-q2-2026.xlsx` @ `Cover sheet — Observation 1 remediation text` — Remediation for Danielle Goodwin is only a raised ticket (ITSM-48217, due within 5 business days); no evidence provided that the account was actually deprovisioned in NetSuite.
+- `uar-netsuite-q2-2026.xlsx` @ `Cover!Reviewer / Approver` — Reviewer/Approver identified as 'Priya Nadkarni, Director, Finance Systems (System Owner)' for NetSuite (Production).
+- `uar-netsuite-q2-2026.xlsx` @ `Cover!Reviewer Sign-off` — Documented approval: 'Approved electronically by Priya Nadkarni on 2026-06-30.'
+- `uar-netsuite-q2-2026.xlsx` @ `Access Review!G2:G335 (Reviewed By)` — All in-scope review rows attributed to reviewer Priya Nadkarni, dated 2026-06-30.
+- `reperformance` @ `reviewer_names / system_export subject list` — Sole reviewer is Priya Nadkarni; she does not appear as a subject account in the 334-row NetSuite access export, so no self-approval of her own access.
 
 **Exceptions considered:**
-- Considered whether the two service accounts (svc-bank-recon, svc-netsuite-integration) constitute inappropriate access — Cover sheet explicitly scopes them out as integration accounts, so they are not an exception issue for this attribute.
-- Considered whether Danielle Goodwin's ticketed remediation alone satisfies the criterion — rejected because the reperformance surfaces an additional un-remediated case (Kevin Lewis) and no evidence confirms actual system removal for Danielle Goodwin.
+- Self-approval check: Priya Nadkarni is not among the reviewed subject accounts, so four-eyes/independence is not compromised for this attribute.
+- Reviewer-missed findings and remediation timeliness (Kevin Lewis, Danielle Goodwin) were considered but excluded as they pertain to separate attributes (review completeness / remediation), not reviewer appropriateness.
+
+## ❌ Inappropriate or excessive access identified during the review is remediated in a timely manner
+**Verdict**: `FAIL`  · confidence `0.85`
+
+The deterministic reperformance surfaced a second terminated-but-still-active user, Kevin Lewis (A/P Clerk, terminated in HRIS, system account still Active), whom the reviewer marked "retain" — a reviewer_missed finding. This is inappropriate access identified by the audit that was neither flagged nor remediated, contradicting the criterion. Separately, the one case the reviewer did catch (Danielle Goodwin) was flagged with ITSM-48217 due within 5 business days, but no completed remediation date is evidenced (the account was still Active at export). Because at least one instance of inappropriate access exists with no evidence of remediation, this attribute fails.
+
+**Evidence:**
+- `uar-netsuite-q2-2026.xlsx (reperformance)` @ `reviewer_missed_findings / terminated_but_active_in_system — kevin.lewis@northpeakfinancial.com` — Kevin Lewis is terminated in HRIS but his NetSuite account is still Active, and the reviewer decision is 'retain'. Access should have been revoked but was not identified or remediated.
+- `uar-netsuite-q2-2026.xlsx` @ `Access Review!E187 / System Access Export!C187 / HRIS Employees!D127` — Kevin Lewis row: Account Status Active, reviewer decision Retain — no revocation, no remediation ticket, no remediation date.
+- `uar-netsuite-q2-2026.xlsx` @ `Cover sheet — Observation 1 / Conclusion` — Only Danielle Goodwin was flagged for revocation via ITSM-48217 (due within 5 business days). Ticket raised but no completed remediation date is provided, and the account remained Active at time of export.
+
+**Exceptions considered:**
+- Danielle Goodwin was flagged and a remediation ticket (ITSM-48217) raised, but this does not compensate for the missed Kevin Lewis case; and no evidence of a completed remediation date exists even for Danielle.
+- On-leave-but-active users (8) treated as policy-dependent and not counted as clear inappropriate access; the terminated-but-active cases are the definitive finding.
