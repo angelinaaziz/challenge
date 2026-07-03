@@ -49,24 +49,28 @@ CONSOLE = Console()
 
 # --- Shared helpers ---------------------------------------------------------
 
+# Bead palette (from usebead.ai): mint accents, warm cream neutrals, warm coral for FAIL.
 _VERDICT_STYLE = {
-    "SUCCESS": "bold green",
-    "FAIL": "bold red",
-    "FURTHER_EVIDENCE_REQUIRED": "bold yellow",
+    "SUCCESS": "bold #88d98d",
+    "FAIL": "bold #f6b0aa",
+    "FURTHER_EVIDENCE_REQUIRED": "bold #e8c07a",
 }
 _VERDICT_EMOJI = {
-    "SUCCESS": "✅",
-    "FAIL": "❌",
-    "FURTHER_EVIDENCE_REQUIRED": "⚠️",
-    "CONTROL_PASS": "✅",
-    "CONTROL_FAIL": "❌",
-    "CONTROL_INCONCLUSIVE": "⚠️",
+    "SUCCESS": "●",
+    "FAIL": "●",
+    "FURTHER_EVIDENCE_REQUIRED": "●",
+    "CONTROL_PASS": "●",
+    "CONTROL_FAIL": "●",
+    "CONTROL_INCONCLUSIVE": "●",
 }
 _CONCLUSION_STYLE = {
-    "CONTROL_PASS": "bold green",
-    "CONTROL_FAIL": "bold red",
-    "CONTROL_INCONCLUSIVE": "bold yellow",
+    "CONTROL_PASS": "bold #88d98d",
+    "CONTROL_FAIL": "bold #f6b0aa",
+    "CONTROL_INCONCLUSIVE": "bold #e8c07a",
 }
+_ACCENT = "#88d98d"          # Bead mint
+_PAPER = "#dbdad4"           # Bead cream
+_MUTED = "#bab8b0"
 
 
 def _short_rationale(text: str, max_chars: int = 220) -> str:
@@ -183,9 +187,11 @@ def _render_audit_summary(assessments, provider, out: Path) -> None:
     """
     CONSOLE.print()
     header = Text.assemble(
-        ("Audit complete", "bold"),
-        ("  ·  ", "dim"),
-        (f"{provider.name}:{provider.model}", "cyan"),
+        ("BEAD AUDIT ", f"{_ACCENT} bold"),
+        ("· ", "dim"),
+        ("run complete", _PAPER),
+        ("  ", ""),
+        (f"[{provider.name}:{provider.model}]", "dim"),
     )
     CONSOLE.print(Padding(header, (0, 2)))
     CONSOLE.print()
@@ -303,22 +309,22 @@ def _render_cost_footer(out: Path) -> None:
     if not summary:
         return
     text = Text.assemble(
-        ("Cost: ", "dim"),
-        (f"${summary['cost']:.4f}", "bold"),
+        ("Cost ", "dim"),
+        (f"${summary['cost']:.4f}", f"bold {_PAPER}"),
         ("   ", ""),
-        ("Calls: ", "dim"),
-        (f"{summary['calls']}", "bold"),
+        ("Calls ", "dim"),
+        (f"{summary['calls']}", f"bold {_PAPER}"),
         ("   ", ""),
-        ("Tokens: ", "dim"),
-        (f"{summary['input_tokens']:,} in / {summary['output_tokens']:,} out", "bold"),
+        ("Tokens ", "dim"),
+        (f"{summary['input_tokens']:,} in / {summary['output_tokens']:,} out", f"bold {_PAPER}"),
         ("   ", ""),
-        ("Cache-hit: ", "dim"),
-        (f"{summary['cache_hit_pct']:.0f}%", "bold green"),
-        (f" ({summary['cache_read_tokens']:,} tokens)", "dim"),
+        ("Cache-hit ", "dim"),
+        (f"{summary['cache_hit_pct']:.0f}%", f"bold {_ACCENT}"),
+        (f" ({summary['cache_read_tokens']:,} tok)", "dim"),
     )
-    CONSOLE.print(Rule(style="dim"))
+    CONSOLE.print(Rule(style=f"{_ACCENT} dim"))
     CONSOLE.print(Padding(text, (0, 2)))
-    CONSOLE.print(Rule(style="dim"))
+    CONSOLE.print(Rule(style=f"{_ACCENT} dim"))
 
 
 # --- info -------------------------------------------------------------------

@@ -18,213 +18,360 @@ from audit_agent.schemas import SampleAssessment, rollup_verdicts
 
 
 _CSS = """
+/* Bead-themed audit report — light mode. Warm paper background, deep forest ink,
+   restrained mint accent. Palette pulled from usebead.ai. No external assets. */
 :root {
-  --bg: #0e1116;
-  --card: #161a22;
-  --card-hover: #1c2130;
-  --border: #232936;
-  --text: #d5dae4;
-  --muted: #7a8598;
-  --accent: #6c8fff;
-  --success: #4bcf87;
-  --success-bg: rgba(75, 207, 135, 0.10);
-  --fail: #ff6b6b;
-  --fail-bg: rgba(255, 107, 107, 0.10);
-  --warn: #f5c265;
-  --warn-bg: rgba(245, 194, 101, 0.10);
-  --code-bg: #0a0c11;
+  --paper: #faf8f3;          /* warm cream page background */
+  --paper-soft: #f2efe6;
+  --card: #ffffff;
+  --border: #e5e0d2;         /* soft warm border */
+  --border-strong: #d1cbba;
+  --ink: #0b362c;            /* deep forest — headings + primary text */
+  --ink-2: #1c6151;          /* softer forest for body */
+  --muted: #6f6a5f;
+  --muted-2: #928c7c;
+  --accent: #148f72;         /* Bead deep mint — high contrast on paper */
+  --accent-2: #88d98d;       /* Bead bright mint — badges and highlights */
+  --accent-soft: rgba(20, 143, 114, 0.08);
+
+  --pass: #148f72;
+  --pass-soft: rgba(20, 143, 114, 0.10);
+  --pass-border: rgba(20, 143, 114, 0.28);
+
+  --fail: #b83a2e;
+  --fail-soft: rgba(184, 58, 46, 0.06);
+  --fail-border: rgba(184, 58, 46, 0.24);
+
+  --warn: #a17321;
+  --warn-soft: rgba(161, 115, 33, 0.06);
+  --warn-border: rgba(161, 115, 33, 0.24);
 }
 * { box-sizing: border-box; }
+html, body { background: var(--paper); }
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.55;
-  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink-2);
+  line-height: 1.6;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.mono {
+  font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 }
 .container {
-  max-width: 960px;
+  max-width: 880px;
   margin: 0 auto;
-  padding: 48px 32px 96px;
+  padding: 72px 40px 96px;
 }
+
+/* --- Header --- */
 header.hero {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-bottom: 32px;
+  padding-bottom: 40px;
+  margin-bottom: 56px;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 32px;
 }
 header.hero .eyebrow {
-  color: var(--muted);
-  font-size: 13px;
-  letter-spacing: 0.06em;
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 0.20em;
   text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-header.hero h1 { margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.01em; }
+header.hero .eyebrow::before {
+  content: "";
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+header.hero h1 {
+  margin: 0;
+  font-size: 44px;
+  font-weight: 500;
+  letter-spacing: -0.028em;
+  color: var(--ink);
+  line-height: 1.15;
+}
 header.hero .meta {
   color: var(--muted);
   font-size: 13px;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  margin-top: 12px;
 }
+header.hero .meta strong { color: var(--ink); font-weight: 500; }
+
+/* --- Badges --- */
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-.badge.pass    { color: var(--success); background: var(--success-bg); }
-.badge.fail    { color: var(--fail);    background: var(--fail-bg); }
-.badge.warn    { color: var(--warn);    background: var(--warn-bg); }
-.badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
-.sample-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 28px;
-  margin-bottom: 24px;
-}
-.sample-card h2 { margin: 0 0 16px 0; font-size: 20px; font-weight: 600; }
-.sample-card .sample-meta {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-  color: var(--muted);
-  font-size: 13px;
-  margin-top: 8px;
-}
-.sample-card .sample-meta strong { color: var(--text); }
-.section-title {
-  color: var(--muted);
+  padding: 6px 12px 6px 10px;
+  border-radius: 4px;
   font-size: 11px;
+  font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  margin: 24px 0 12px;
+  border: 1px solid;
+  margin-top: 24px;
 }
+.badge.pass { color: var(--pass); background: var(--pass-soft); border-color: var(--pass-border); }
+.badge.fail { color: var(--fail); background: var(--fail-soft); border-color: var(--fail-border); }
+.badge.warn { color: var(--warn); background: var(--warn-soft); border-color: var(--warn-border); }
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* --- Sample sections --- */
+.sample-card {
+  padding: 40px 0 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+.sample-card:last-of-type { border-bottom: none; margin-bottom: 24px; }
+.sample-card .sample-header {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  margin-bottom: 8px;
+}
+.sample-card .sample-label {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.sample-card h2 {
+  margin: 8px 0 0 0;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.sample-card .sample-meta {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 12px;
+}
+.sample-card .sample-meta strong { color: var(--ink); font-weight: 500; }
+
+/* --- Section titles --- */
+.section-title {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 40px 0 16px;
+}
+
+/* --- Reperformance callout --- */
 .reperformance {
-  background: rgba(108, 143, 255, 0.06);
-  border: 1px solid rgba(108, 143, 255, 0.25);
-  border-radius: 10px;
-  padding: 16px 20px;
-  color: var(--text);
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  background: var(--accent-soft);
+  border: 1px solid rgba(20, 143, 114, 0.16);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 20px 24px;
+  color: var(--ink);
   font-size: 13px;
-  line-height: 1.7;
+  line-height: 1.75;
   overflow-x: auto;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
 }
+.reperformance-label {
+  color: var(--accent);
+  font-size: 10px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, Inter, sans-serif;
+}
+
+/* --- Coverage strip --- */
+.coverage {
+  display: flex;
+  gap: 40px;
+  padding: 16px 0;
+  color: var(--muted);
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+.coverage .label { color: var(--muted); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; }
+.coverage .value { color: var(--ink); font-size: 15px; font-weight: 500; margin-top: 2px; }
+.coverage .uncited .value { color: var(--warn); }
+
+/* --- Attribute cards --- */
 details.attribute {
   background: var(--card);
   border: 1px solid var(--border);
-  border-left: 3px solid transparent;
-  border-radius: 10px;
+  border-radius: 8px;
   margin-bottom: 12px;
   overflow: hidden;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-details.attribute[data-verdict="SUCCESS"] { border-left-color: var(--success); }
-details.attribute[data-verdict="FAIL"]    { border-left-color: var(--fail); }
-details.attribute[data-verdict="FURTHER_EVIDENCE_REQUIRED"] { border-left-color: var(--warn); }
+details.attribute:hover { border-color: var(--border-strong); }
+details.attribute[open] { box-shadow: 0 1px 2px rgba(11, 54, 44, 0.04); }
 details.attribute > summary {
   list-style: none;
   cursor: pointer;
-  padding: 18px 22px;
+  padding: 20px 24px;
   display: grid;
   grid-template-columns: auto 1fr auto;
-  gap: 16px;
+  gap: 20px;
   align-items: center;
 }
 details.attribute > summary::-webkit-details-marker { display: none; }
-details.attribute > summary:hover { background: var(--card-hover); }
-details.attribute .verdict-icon { font-size: 20px; line-height: 1; }
-details.attribute .verdict-text {
-  font-size: 11px;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-  font-weight: 600;
+details.attribute > summary:hover { background: var(--paper-soft); }
+details.attribute[open] > summary { background: var(--paper-soft); }
+details.attribute .verdict-icon {
+  font-size: 12px;
+  font-weight: 700;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1.5px solid;
+  line-height: 1;
 }
-details.attribute[data-verdict="SUCCESS"] .verdict-text { color: var(--success); }
-details.attribute[data-verdict="FAIL"] .verdict-text { color: var(--fail); }
+details.attribute[data-verdict="SUCCESS"] .verdict-icon { color: var(--pass); border-color: var(--pass); background: var(--pass-soft); }
+details.attribute[data-verdict="FAIL"] .verdict-icon    { color: var(--fail); border-color: var(--fail); background: var(--fail-soft); }
+details.attribute[data-verdict="FURTHER_EVIDENCE_REQUIRED"] .verdict-icon { color: var(--warn); border-color: var(--warn); background: var(--warn-soft); }
+details.attribute .attr-title {
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+  line-height: 1.45;
+}
+details.attribute .verdict-text {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-top: 4px;
+}
+details.attribute[data-verdict="SUCCESS"] .verdict-text { color: var(--pass); }
+details.attribute[data-verdict="FAIL"] .verdict-text    { color: var(--fail); }
 details.attribute[data-verdict="FURTHER_EVIDENCE_REQUIRED"] .verdict-text { color: var(--warn); }
-details.attribute .attr-title { font-weight: 500; font-size: 15px; color: var(--text); }
 details.attribute .attr-meta {
   color: var(--muted);
-  font-size: 12px;
-  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 11px;
   white-space: nowrap;
+  text-align: right;
+  line-height: 1.4;
+  font-family: ui-monospace, Menlo, monospace;
 }
+details.attribute .attr-meta strong { color: var(--ink); font-weight: 600; }
 details.attribute .body {
-  padding: 4px 22px 24px;
+  padding: 4px 28px 28px;
   border-top: 1px solid var(--border);
+  background: var(--card);
 }
-details.attribute[open] > summary { border-bottom: 1px solid var(--border); }
 details.attribute .body h4 {
   color: var(--muted);
-  font-size: 11px;
-  letter-spacing: 0.12em;
+  font-size: 10px;
+  letter-spacing: 0.20em;
   text-transform: uppercase;
   font-weight: 600;
-  margin: 20px 0 8px;
+  margin: 24px 0 10px;
 }
-details.attribute .body p { margin: 12px 0 0; }
-details.attribute .body ul { list-style: none; padding: 0; margin: 8px 0 0; }
-details.attribute .body ul li {
-  padding: 10px 0 10px 0;
-  border-bottom: 1px solid var(--border);
-  color: var(--text);
+details.attribute .body p {
+  margin: 0;
+  color: var(--ink-2);
   font-size: 14px;
+  line-height: 1.65;
 }
-details.attribute .body ul li:last-child { border-bottom: none; }
-details.attribute .body .file  { color: var(--accent); font-family: ui-monospace, monospace; font-size: 13px; }
-details.attribute .body .loc   { color: #d38dff; font-family: ui-monospace, monospace; font-size: 13px; }
-details.attribute .body .obs   { color: var(--muted); font-size: 13px; margin-top: 4px; }
-details.attribute .body .quote { color: var(--text); font-style: italic; padding-left: 12px; border-left: 2px solid var(--border); margin-top: 6px; font-size: 13px; }
-.coverage {
-  display: flex;
-  gap: 24px;
-  padding: 12px 20px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  margin-bottom: 24px;
+details.attribute .body ul { list-style: none; padding: 0; margin: 0; }
+details.attribute .body ul li {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
   font-size: 13px;
-  color: var(--muted);
 }
-.coverage strong { color: var(--text); }
-.coverage .uncited { color: var(--warn); }
+details.attribute .body ul li:last-child { border-bottom: none; padding-bottom: 4px; }
+details.attribute .body .file  { color: var(--accent); font-size: 13px; font-family: ui-monospace, Menlo, monospace; font-weight: 500; }
+details.attribute .body .loc   { color: var(--ink); background: var(--accent-soft); padding: 1px 6px; border-radius: 3px; font-size: 12px; font-family: ui-monospace, Menlo, monospace; }
+details.attribute .body .obs   { color: var(--muted); font-size: 13px; margin-top: 6px; line-height: 1.55; }
+details.attribute .body .quote {
+  color: var(--ink-2); padding: 10px 14px;
+  border-left: 2px solid var(--accent);
+  background: var(--accent-soft);
+  margin-top: 8px;
+  font-size: 13px;
+  font-style: italic;
+  border-radius: 0 4px 4px 0;
+}
+
+/* --- Trace table --- */
 .trace-section h2 {
-  font-size: 16px;
-  color: var(--text);
-  margin: 40px 0 12px;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--ink);
+  margin: 56px 0 6px;
+  letter-spacing: -0.015em;
+}
+.trace-section .trace-meta {
+  color: var(--muted); font-size: 12px; margin-bottom: 20px;
 }
 .trace-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: ui-monospace, monospace;
   font-size: 12px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
 }
 .trace-table th, .trace-table td {
-  padding: 8px 12px;
+  padding: 11px 14px;
   border-bottom: 1px solid var(--border);
   text-align: left;
+  color: var(--ink);
 }
-.trace-table th { color: var(--muted); font-weight: 500; text-transform: uppercase; font-size: 10px; letter-spacing: 0.10em; }
-.trace-table td.num  { text-align: right; }
-.trace-table td.cost { color: var(--success); text-align: right; }
+.trace-table tbody tr:last-child td { border-bottom: none; }
+.trace-table tbody tr:hover { background: var(--paper-soft); }
+.trace-table th {
+  color: var(--muted); font-weight: 600;
+  text-transform: uppercase; font-size: 10px;
+  letter-spacing: 0.16em;
+  background: var(--paper-soft);
+  font-family: -apple-system, Inter, sans-serif;
+}
+.trace-table td.num  { text-align: right; color: var(--ink-2); }
+.trace-table td.cost { color: var(--accent); text-align: right; font-weight: 500; }
+
+/* --- Footer --- */
 .footer {
-  margin-top: 60px;
-  padding-top: 24px;
+  margin-top: 72px;
+  padding-top: 28px;
   border-top: 1px solid var(--border);
-  color: var(--muted);
-  font-size: 12px;
+  color: var(--muted-2);
+  font-size: 11px;
   text-align: center;
+  letter-spacing: 0.05em;
 }
-.footer code { color: var(--text); background: var(--code-bg); padding: 2px 6px; border-radius: 4px; }
+.footer code {
+  color: var(--ink); background: var(--paper-soft);
+  padding: 3px 8px; border-radius: 3px; font-size: 11px;
+  font-family: ui-monospace, Menlo, monospace;
+}
+.footer a { color: var(--accent); text-decoration: none; }
+
+@media print {
+  body { background: white; color: black; }
+  details.attribute { break-inside: avoid; }
+  details.attribute[open] > summary { background: none; }
+  details.attribute .body { display: block !important; }
+}
 """
 
 
@@ -258,10 +405,11 @@ def _render_attribute(a: Any) -> str:
     parts.append(f'<div class="verdict-icon">{_VERDICT_ICON[verdict]}</div>')
     parts.append('<div class="attr-title">')
     parts.append(f"<div>{_esc(a.attribute_text)}</div>")
-    parts.append(f'<div class="verdict-text">{verdict}</div>')
+    parts.append(f'<div class="verdict-text">{verdict.replace("_", " ")}</div>')
     parts.append("</div>")
     parts.append(
-        f'<div class="attr-meta">conf {a.confidence:.2f} · {len(a.evidence_refs)} citations</div>'
+        f'<div class="attr-meta">Confidence <strong>{a.confidence:.2f}</strong><br>'
+        f"{len(a.evidence_refs)} citation{'s' if len(a.evidence_refs) != 1 else ''}</div>"
     )
     parts.append("</summary>")
     parts.append('<div class="body">')
@@ -308,14 +456,20 @@ def _render_sample(sa: SampleAssessment) -> str:
     parts: list[str] = []
     parts.append('<section class="sample-card">')
     conclusion = sa.control_conclusion.value
+    parts.append('<div class="sample-header">')
+    parts.append('<div>')
+    parts.append('<div class="sample-label">Sample</div>')
+    parts.append(f"<h2>{_esc(sa.sample_id)}</h2>")
+    parts.append('</div>')
     parts.append(
-        f'<div class="badge {_BADGE_CLASS[conclusion]}"><span class="dot"></span>'
-        f"{conclusion}</div>"
+        f'<div class="badge {_BADGE_CLASS[conclusion]}" style="margin-top:0;"><span class="dot"></span>'
+        f"{conclusion.replace('_', ' ')}</div>"
     )
-    parts.append(f"<h2>Sample: {_esc(sa.sample_id)}</h2>")
+    parts.append('</div>')
+
     parts.append('<div class="sample-meta">')
     parts.append(f"<span><strong>{sa.model}</strong></span>")
-    parts.append(f"<span>generated: {_esc(sa.generated_at.isoformat())}</span>")
+    parts.append(f'<span>generated {_esc(sa.generated_at.strftime("%d %b %Y, %H:%M UTC"))}</span>')
     if sa.consistency_disagreement_rate is not None:
         parts.append(
             f"<span>disagreement <strong>{sa.consistency_disagreement_rate:.0%}</strong></span>"
@@ -323,21 +477,28 @@ def _render_sample(sa: SampleAssessment) -> str:
     parts.append("</div>")
 
     if sa.reperformance_notes:
-        parts.append('<div class="section-title">Reperformance summary</div>')
-        parts.append(f'<div class="reperformance">{_esc(sa.reperformance_notes)}</div>')
+        parts.append('<div class="section-title">Reperformance</div>')
+        parts.append('<div class="reperformance">')
+        parts.append('<div class="reperformance-label">Deterministic re-check · ground truth</div>')
+        parts.append(_esc(sa.reperformance_notes))
+        parts.append('</div>')
 
     if sa.evidence_coverage:
         cov = sa.evidence_coverage
-        parts.append('<div class="section-title">Evidence coverage</div>')
         parts.append('<div class="coverage">')
-        parts.append(
-            f"<div><strong>{int(cov.coverage_rate * 100)}%</strong> "
-            f"({len(cov.cited_files)}/{len(cov.all_files)} files cited)</div>"
-        )
+        parts.append('<div>')
+        parts.append('<div class="label">Evidence coverage</div>')
+        parts.append(f'<div class="value">{int(cov.coverage_rate * 100)}%</div>')
+        parts.append('</div>')
+        parts.append('<div>')
+        parts.append('<div class="label">Files cited</div>')
+        parts.append(f'<div class="value">{len(cov.cited_files)} of {len(cov.all_files)}</div>')
+        parts.append('</div>')
         if cov.uncited_files:
-            parts.append(
-                f'<div class="uncited">Uncited: {_esc(", ".join(cov.uncited_files))}</div>'
-            )
+            parts.append('<div class="uncited">')
+            parts.append('<div class="label">Uncited</div>')
+            parts.append(f'<div class="value">{_esc(", ".join(cov.uncited_files))}</div>')
+            parts.append('</div>')
         parts.append("</div>")
 
     parts.append('<div class="section-title">Attribute verdicts</div>')
@@ -418,19 +579,19 @@ def build_report(run_dir: Path) -> Path:
 
     parts = [
         "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">",
-        f"<title>Audit report — {_esc(control)}</title>",
+        f"<title>Bead · {_esc(control)}</title>",
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
         f"<style>{_CSS}</style></head><body>",
         '<div class="container">',
         '<header class="hero">',
-        '<div class="eyebrow">Bead audit report</div>',
-        f"<h1>{_esc(control)}</h1>",
+        '<div class="eyebrow">Bead audit workpaper</div>',
+        f'<h1 class="display">{_esc(control)}</h1>',
         '<div class="meta">',
-        f"model {_esc(model)} · {len(assessments)} sample(s)",
+        f"Model {_esc(model)} &nbsp;·&nbsp; {len(assessments)} sample{'s' if len(assessments) != 1 else ''}",
         "</div>",
-        '<div style="margin-top:12px;">',
+        '<div style="margin-top:16px;">',
         f'<span class="badge {_BADGE_CLASS[run_verdict]}"><span class="dot"></span>'
-        f"{run_verdict}</span>",
+        f"{run_verdict.replace('_', ' ')}</span>",
         "</div>",
         "</header>",
     ]
