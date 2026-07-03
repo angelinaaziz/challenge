@@ -1,9 +1,9 @@
 # Setup
 
 ## Prerequisites
-- Python ≥ 3.11 (tested on 3.13)
-- [`uv`](https://docs.astral.sh/uv/) — `curl -LsSf https://astral.sh/uv/install.sh | sh`
-- An Anthropic API key (required). OpenAI + Google API keys (optional, only for multi-model eval).
+- Python 3.11 or later (tested on 3.13)
+- [`uv`](https://docs.astral.sh/uv/) via `curl -LsSf https://astral.sh/uv/install.sh | sh`
+- An Anthropic API key (required). OpenAI and Google API keys are optional, only needed for multi-model eval.
 
 ## Install
 
@@ -18,13 +18,13 @@ uv pip install -e .
 ```bash
 cp ../.env.example ../.env    # from repo root
 # Fill in ANTHROPIC_API_KEY (required)
-# OPENAI_API_KEY + GOOGLE_API_KEY (optional — only needed for multi-model eval)
+# OPENAI_API_KEY + GOOGLE_API_KEY are optional (needed for multi-model eval)
 ```
 
 ## Run
 
 ```bash
-# Audit a single control — auto-opens the HTML report when done.
+# Audit a single control. Auto-opens the HTML report when done.
 bead-agent audit ../data/independent-code-review
 bead-agent audit ../data/user-access-review
 bead-agent audit ../data/change-management
@@ -36,7 +36,7 @@ bead-agent audit ../data/independent-code-review --model gemini
 # Peek at a control without spending API credit
 bead-agent info ../data/user-access-review
 
-# Score all three models against the hand-labeled golden set
+# Score all three models against the hand-labelled golden set
 bead-agent eval ../data/independent-code-review --models claude,openai,gemini
 
 # Skip the FURTHER_EVIDENCE_REQUIRED verifier pass (useful for eval sweeps)
@@ -50,13 +50,13 @@ bead-agent show output/user-access-review/claude/sample-1/assessment.json
 ```
 
 Outputs land in `output/<control>/<model>/`:
-- `report.html` — Bead-themed HTML report (auto-opens on `audit`)
-- `<sample>/assessment.json` — structured verdicts (Bead's requested format)
-- `<sample>/assessment.md` — human-readable workpaper
-- `<sample>/workpaper.xlsx` — native Excel workpaper
-- Plus `control.json` (parsed control spec) and `trace.jsonl` (every LLM call, hashed)
+- `report.html` is the Bead-themed HTML report (auto-opens on `audit`)
+- `<sample>/assessment.json` holds the structured verdicts (Bead's requested format)
+- `<sample>/assessment.md` is the readable workpaper
+- `<sample>/workpaper.xlsx` is the native Excel workpaper
+- `control.json` has the parsed control spec, and `trace.jsonl` logs every LLM call, hashed
 
-Run the tests + linter:
+Run the tests and linter:
 
 ```bash
 uv pip install pytest ruff
@@ -64,4 +64,4 @@ pytest tests/ -v
 ruff check src/ tests/
 ```
 
-See the top-level [README](../README.md) for the full architecture, model scoreboard, and design write-up.
+See the top-level [README](../README.md) for the architecture, model scoreboard, and design write-up.
