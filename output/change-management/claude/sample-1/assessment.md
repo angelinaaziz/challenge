@@ -1,0 +1,62 @@
+# Change Management — sample-1
+_generated: 2026-07-03T02:00:41.644951+00:00 · model: claude:claude-opus-4-7_
+
+## ✅ Every production change has a corresponding change request that documents scope, risk classification, and rollback plan
+**Verdict**: `SUCCESS`  · confidence `0.95`
+
+The change-request.md document CHG-2026-0847 satisfies every documentation criterion: identifier matches CHG-YYYY-NNNN, scope lists affected systems/repos, risk is Medium, a detailed rollback plan is present, requester (Marcus Bell) and approver (Priya Nadkarni) are named, planned window is documented, category is Normal, and a CAB review (CAB-2026-W25) is recorded. This attribute is limited to documentation completeness; approval validity/independence are judged elsewhere.
+
+**Policy references:**
+- `change-management-policy.md` § Required Documentation: “Every change (regardless of category) must include: A change request identifier (e.g. CHG-YYYY-NNNN); Scope: systems affected, code repositories, config surfaces; Risk classification (Low / Medium / High); Rollback plan; Named requester and named approver; Planned start and end times”
+- `change-management-policy.md` § Change Categories: “Normal | Non-routine change with a defined risk assessment | 2 (Change Coordinator + Change Approver from CAB) | Yes”
+
+**Evidence:**
+- `change-request.md` @ `Title line` — Identifier 'CHG-2026-0847' matches CHG-YYYY-NNNN format.
+- `change-request.md` @ `Header block (Category/Risk/Systems/Repositories/Planned window)` — Category=Normal, Risk=Medium, systems affected (payments-primary RDS, payments-api), repo northpeak/infra-terraform PR #2411, planned window 2026-06-24 20:00–22:00 UTC.
+- `change-request.md` @ `Scope section` — Documents Postgres 15.7→16.3 upgrade and pg library bump; no schema changes.
+- `change-request.md` @ `Rollback plan section` — Three-step rollback with snapshot ID, redeploy pinned version, healthcheck; RTO 25 minutes validated in staging drill.
+- `change-request.md` @ `Requester and Approver sections` — Named requester Marcus Bell and named approver Priya Nadkarni (CAB Change Approver).
+- `change-request.md` @ `Approval record section` — CAB reference CAB-2026-W25 recorded with approval decision and timestamp — CAB review documented for the Normal change.
+
+**Exceptions considered:**
+- Documentation-only exception rejected — change is a Postgres major-version upgrade on production, not README/comments.
+- Emergency retrospective CAB clause not applicable — change is categorised Normal, not Emergency.
+
+## ❌ Production changes are approved by an authorised change approver prior to deployment
+**Verdict**: `FAIL`  · confidence `0.75`
+
+On careful re-read, the change is explicitly categorised as Normal (Medium risk), which per the change management policy requires two approvers: a Change Coordinator AND a Change Approver from CAB. The change-request.md documents only one named approver — Priya Nadkarni (Change Approver, CAB) — and the deployment log likewise references only priya.nadkarni. No Change Coordinator approval is recorded anywhere in the evidence bundle. The first-pass judge hedged on the basis that CAB minutes (cab-minutes-w25.pdf) might contain a second approver, but that document is explicitly excluded from the bundle and cannot be relied upon; the evidence on record shows a single approver for a Normal change, which contradicts the two-approver requirement. This is a positive contradiction (only one approver listed) rather than mere absence, so a FAIL verdict is defensible now. Other criteria (four-eyes, timestamp before window) are met, but the two-approver rule for Normal changes is not. If cab-minutes-w25.pdf were produced showing an additional Change Coordinator approval before 2026-06-24 20:00 UTC, this could flip to SUCCESS; absent that, the on-record evidence fails the control.
+
+**Policy references:**
+- `change-management-policy.md` § Change Categories: “Normal | Non-routine change with a defined risk assessment | 2 (Change Coordinator + Change Approver from CAB) | Yes”
+- `change-management-policy.md` § Approval Rules: “The approver must be a different named human from the requester (four-eyes principle). Approvers must hold the Change Approver role in the identity provider. Approval must occur before the deployment window opens.”
+
+**Evidence:**
+- `change-request.md` @ `Header: Category / Risk` — Category: Normal; Risk: Medium — triggers the 2-approver requirement under policy.
+- `change-request.md` @ `Approver section` — Only one approver named: Priya Nadkarni (Change Approver, CAB). No Change Coordinator listed.
+- `change-request.md` @ `Approval record section` — Approval record cites CAB-2026-W25 and a single approval decision timestamped 2026-06-23 15:42 UTC; notes cab-minutes-w25.pdf is NOT included in the evidence bundle.
+- `deployment-log.txt` @ `Line 2026-06-24 20:00:15 UTC` — Runner records 'approval OK — CHG-2026-0847 approved by priya.nadkarni' — a single approver, no second approval referenced.
+- `change-request.md` @ `Requester section vs Approver section` — Requester Marcus Bell distinct from approver Priya Nadkarni — four-eyes satisfied; timestamp 2026-06-23 15:42 UTC precedes 2026-06-24 20:00 UTC window.
+
+**Exceptions considered:**
+- Retrospective approval exception — not applicable; approval preceded deployment by ~28 hours.
+- Whether cab-minutes-w25.pdf might contain a Change Coordinator approval — disregarded because the document is explicitly excluded from the bundle and cannot be assumed to exist favourably.
+- Whether 'CAB approval' implicitly covers both roles — policy language distinguishes Change Coordinator from CAB Change Approver as two separate approvers, so a single CAB sign-off does not satisfy both.
+
+## ✅ Pre-deployment testing is completed and evidence retained before release
+**Verdict**: `SUCCESS`  · confidence `0.90`
+
+Change is Normal category. Test plan and test results are attached via pre-deployment-test-results.xlsx, which the change request references (42 test cases including 12 functional smoke tests). Sampled functional smoke tests (TC-001..TC-005) all show PASS, executed 2026-06-23 14:12–14:14 UTC — before the deployment window start of 2026-06-24 20:00 UTC. No failed tests are indicated, so the block-on-failure criterion is not triggered.
+
+**Policy references:**
+- `change-management-policy.md` § Testing Requirements: “Standard and Normal changes: pre-deployment testing evidence (test plan + test results) must be attached to the change request.”
+- `change-management-policy.md` § Testing Requirements: “Testing must include, at minimum, functional smoke tests of the affected surfaces.”
+- `change-management-policy.md` § Testing Requirements: “Failed tests block deployment for Standard/Normal changes; must be documented as accepted risk for Emergency changes.”
+
+**Evidence:**
+- `change-request.md` @ `Category field / Testing evidence section` — Category = Normal; references pre-deployment-test-results.xlsx with 42 test cases (12 functional smoke, 24 regression, 6 rollback).
+- `pre-deployment-test-results.xlsx` @ `Test Cases sheet, rows TC-001–TC-005` — Five functional smoke tests covering payments API /healthz, ledger insert/read, transaction id constraint, and currency conversion — all Result = PASS, executed 2026-06-23 14:12–14:14.
+- `deployment-log.txt` @ `window start line` — Deployment window started 2026-06-24 20:00:02 UTC — after test execution timestamps on 2026-06-23, satisfying the pre-deployment timing criterion.
+
+**Exceptions considered:**
+- Documentation-only exception: not applicable — change is a Postgres major version upgrade affecting production.

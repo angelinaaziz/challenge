@@ -1,0 +1,68 @@
+{
+  "control": "User Access Review",
+  "sample_id": "sample-1",
+  "generated_at": "2026-07-03T01:27:54.319868Z",
+  "model": "gemini:gemini-3.1-pro-preview",
+  "attributes": [
+    {
+      "control": "User Access Review",
+      "sample_id": "sample-1",
+      "attribute_id": "periodic-access-reviews",
+      "attribute_text": "Access reviews are performed on a periodic basis (e.g. quarterly)",
+      "verdict": "FURTHER_EVIDENCE_REQUIRED",
+      "confidence": 1.0,
+      "rationale": "I agree with the first-pass verdict. The evidence confirms a 'Periodic (Quarterly) User Access Review' was completed for Q2 2026 on 2026-06-30. However, to evaluate whether this review occurred within the defined periodic interval (quarterly) since the previous review, we must establish the completion date of the prior review. Please provide the Q1 2026 access review documentation (or equivalent evidence) showing its completion date.",
+      "policy_references": [],
+      "evidence_refs": [
+        {
+          "file": "uar-netsuite-q2-2026.xlsx",
+          "locator": "Cover sheet",
+          "observation": "The cover sheet notes the review period is 'Q2 2026' and the review type is 'Periodic (Quarterly) User Access Review', completed on 2026-06-30. There is no indication of when the prior review was completed."
+        }
+      ],
+      "exceptions_considered": []
+    },
+    {
+      "control": "User Access Review",
+      "sample_id": "sample-1",
+      "attribute_id": "reviewed-and-approved-by-owner",
+      "attribute_text": "Access is reviewed and approved by an appropriate system or data owner",
+      "verdict": "SUCCESS",
+      "confidence": 1.0,
+      "rationale": "The access review evidence includes an explicit electronic sign-off by Priya Nadkarni on 2026-06-30. The review cover sheet documents Priya Nadkarni as the System Owner and Director of Finance Systems, satisfying the requirement for the review to be approved by an appropriate system owner.",
+      "policy_references": [],
+      "evidence_refs": [
+        {
+          "file": "uar-netsuite-q2-2026.xlsx",
+          "locator": "Cover sheet",
+          "observation": "The 'Reviewer Sign-off' field states that the review was approved electronically by Priya Nadkarni on 2026-06-30. The 'Reviewer / Approver' field documents Priya Nadkarni as the Director, Finance Systems and System Owner."
+        },
+        {
+          "file": "uar-netsuite-q2-2026.xlsx",
+          "locator": "Access Review sheet, Column G",
+          "observation": "Priya Nadkarni is listed as the individual who reviewed the specific access line items."
+        }
+      ],
+      "exceptions_considered": []
+    },
+    {
+      "control": "User Access Review",
+      "sample_id": "sample-1",
+      "attribute_id": "remediation-of-inappropriate-access",
+      "attribute_text": "Inappropriate or excessive access identified during the review is remediated in a timely manner",
+      "verdict": "FURTHER_EVIDENCE_REQUIRED",
+      "confidence": 1.0,
+      "rationale": "The access review identified one user (Danielle Goodwin) whose access needed to be revoked, and it noted that deprovisioning ticket ITSM-48217 was raised. However, the provided evidence does not include the closed ticket or any system audit logs to demonstrate that the access was successfully removed, nor does it provide the timestamp of the removal to assess timeliness. To resolve this, evidence of the completed ticket ITSM-48217 or system logs showing the actual deprovisioning event and timestamp is required.",
+      "policy_references": [],
+      "evidence_refs": [
+        {
+          "file": "uar-netsuite-q2-2026.xlsx",
+          "locator": "Cover!Observation 1",
+          "observation": "Observation 1 explicitly notes that Danielle Goodwin retained active access despite being terminated, and that ticket ITSM-48217 was raised for remediation. However, no evidence of the ticket's resolution is provided."
+        }
+      ],
+      "exceptions_considered": []
+    }
+  ],
+  "reperformance_notes": "System export: 334 rows | HRIS roster: 720 rows | Reviewer sheet: 334 rows | Matched to HRIS: 332 | Orphans (no HRIS record): 2 | Terminated but active in system: 2 | On leave but active in system: 8 | Reviewer missed (terminated + retained): 1"
+}

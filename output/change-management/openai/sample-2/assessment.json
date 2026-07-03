@@ -1,0 +1,203 @@
+{
+  "control": "Change Management",
+  "sample_id": "sample-2",
+  "generated_at": "2026-07-03T01:56:25.509820Z",
+  "model": "openai:gpt-5.4",
+  "attributes": [
+    {
+      "control": "Change Management",
+      "sample_id": "sample-2",
+      "attribute_id": "every-production-change-has-a-corresponding-change-request-that-documents-scope-risk-classification-and-rollback-plan",
+      "attribute_text": "Every production change has a corresponding change request that documents scope, risk classification, and rollback plan",
+      "verdict": "FAIL",
+      "confidence": 0.98,
+      "rationale": "A corresponding change request exists and includes identifier CHG-2026-0912, documented scope, systems affected, repositories touched, risk Medium, rollback plan, requester/approver names, and a planned window in change-request.md. However, the documented scope does not explicitly include config surfaces as required; the scope mentions configuring IAM roles and API gateway routes, but there is no dedicated config surfaces field in the required documentation. The named approver also fails policy because the approver is the same named human as the requester (Marcus Bell), which contradicts the four-eyes requirement for named requester and named approver documentation under this attribute.",
+      "policy_references": [
+        {
+          "source": "change-management-policy.md",
+          "section": "Required Documentation",
+          "quote": "Every change (regardless of category) must include:\n- A change request identifier (e.g. CHG-YYYY-NNNN)\n- Scope: systems affected, code repositories, config surfaces\n- Risk classification (Low / Medium / High)\n- Rollback plan\n- Named requester and named approver\n- Planned start and end times"
+        },
+        {
+          "source": "change-management-policy.md",
+          "section": "Approval Rules",
+          "quote": "- The approver must be a different named human from the requester (four-eyes principle)."
+        }
+      ],
+      "evidence_refs": [
+        {
+          "file": "change-request.md",
+          "locator": "Title heading",
+          "observation": "The change request is titled 'CHG-2026-0912 — Deploy new Q2 reporting service to production', providing a change request record and identifier."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "Metadata block",
+          "observation": "The metadata lists Category Normal, Risk Medium, affected systems reports-api, reports-worker, and reports-db, repositories northpeak/reports-service and northpeak/infra-terraform, and planned window 2026-06-28 15:00 UTC to 2026-06-28 17:00 UTC."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "## Scope",
+          "observation": "The scope states deployment of a new reporting service, provisioning a new RDS instance, and configuring IAM roles and API gateway routes."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "## Risk assessment",
+          "observation": "The risk assessment is documented as Medium."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "## Rollback plan",
+          "observation": "A rollback plan is documented with steps to delete API gateway routes, scale ECS services to zero, and leave RDS provisioned, with rollback RTO of 5 minutes."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "## Requester",
+          "observation": "The requester is identified as Marcus Bell (Platform Engineer)."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "## Approver",
+          "observation": "The approver is also identified as Marcus Bell (Platform Engineer), the same named human as the requester."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "## Approval record",
+          "observation": "The approval record states 'Approval decision: Self-approved' and notes CAB meeting reference none."
+        }
+      ],
+      "exceptions_considered": [
+        "Documentation-only change exception rejected because the change deploys new production services, provisions a new RDS instance, and creates API gateway routes.",
+        "Break-fix hotfix / Incident Response exception rejected because the change request is categorized as Normal, not Incident Response.",
+        "Development or staging-only exception rejected because the change request and deployment log both describe production deployment."
+      ]
+    },
+    {
+      "control": "Change Management",
+      "sample_id": "sample-2",
+      "attribute_id": "production-changes-are-approved-by-an-authorised-change-approver-prior-to-deployment",
+      "attribute_text": "Production changes are approved by an authorised change approver prior to deployment",
+      "verdict": "FAIL",
+      "confidence": 0.99,
+      "rationale": "The change request records an approval, but the requester and approver are both Marcus Bell, which violates the four-eyes requirement and the criterion that the approver be a different named human. This is a Normal change, yet the record says CAB meeting reference '(none)' and 'Self-approved,' so the required two approvers, including a Change Coordinator and a CAB Change Approver, are not present. Approval was timestamped before the deployment window opened, but that does not cure the failed independence and Normal-change approval criteria.",
+      "policy_references": [
+        {
+          "source": "change-management-policy.md",
+          "section": "Change Categories",
+          "quote": "| Normal | Non-routine change with a defined risk assessment | 2 (Change Coordinator + Change Approver from CAB) | Yes |"
+        },
+        {
+          "source": "change-management-policy.md",
+          "section": "Approval Rules",
+          "quote": "- The approver must be a different named human from the requester (four-eyes principle)."
+        },
+        {
+          "source": "change-management-policy.md",
+          "section": "Approval Rules",
+          "quote": "- Approvers must hold the Change Approver role in the identity provider."
+        },
+        {
+          "source": "change-management-policy.md",
+          "section": "Approval Rules",
+          "quote": "- Approval must occur **before** the deployment window opens."
+        }
+      ],
+      "evidence_refs": [
+        {
+          "file": "change-request.md",
+          "locator": "## Requester",
+          "observation": "The named requester is Marcus Bell (Platform Engineer) with email marcus.bell@northpeakfinancial.com."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "## Approver",
+          "observation": "The named approver is also Marcus Bell (Platform Engineer) with the same email, showing self-approval."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "## Approval record",
+          "observation": "The approval record states CAB meeting reference '(none — deployed under standing team autonomy waiver)', approval decision 'Self-approved', and approval timestamp '2026-06-28 14:47 UTC'."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "Top metadata block",
+          "observation": "The change category is listed as Normal and the planned window is 2026-06-28 15:00 UTC to 2026-06-28 17:00 UTC."
+        },
+        {
+          "file": "deployment-log.txt",
+          "locator": "window start header",
+          "observation": "The deployment log shows window start at 2026-06-28 15:04:17 UTC."
+        },
+        {
+          "file": "deployment-log.txt",
+          "locator": "2026-06-28 15:04:20 UTC line",
+          "observation": "The deployment system records 'approval OK' and explicitly says the change was approved by marcus.bell at 2026-06-28T14:47:00Z '(self-approved)'."
+        }
+      ],
+      "exceptions_considered": [
+        "Considered whether the policy exception for 'Break-fix hotfixes classified as Incident Response' applied, but the change is explicitly categorized as Normal in the change request, not Incident Response or Emergency.",
+        "Considered whether retrospective approval rules for Emergency changes applied because the note mentions a retroactive CAB scheduled for 2026-07-02, but retrospective approvals are only valid for Emergency changes and this sample is documented as a Normal change.",
+        "Considered whether 'standing team autonomy waiver' created an exception, but no such exception appears in the provided policy excerpt, so it was not accepted."
+      ]
+    },
+    {
+      "control": "Change Management",
+      "sample_id": "sample-2",
+      "attribute_id": "pre-deployment-testing-is-completed-and-evidence-retained-before-release",
+      "attribute_text": "Pre-deployment testing is completed and evidence retained before release",
+      "verdict": "FAIL",
+      "confidence": 0.98,
+      "rationale": "This is a Normal change, so pre-deployment testing evidence with both a test plan and test results was required before release. The change request links only `pre-deployment-test-results.xlsx`, and the workbook contains executed test cases/results but no separate test plan artefact is evidenced; additionally, the change request states 3 staging test failures and the workbook shows failed functional/regression tests before deployment. For a Normal change, failed tests block deployment, so the criterion 'there is no failed test result at the time of deployment' failed.",
+      "policy_references": [
+        {
+          "source": "change-management-policy.md",
+          "section": "Testing Requirements",
+          "quote": "Standard and Normal changes: pre-deployment testing evidence (test plan + test results) must be attached to the change request."
+        },
+        {
+          "source": "change-management-policy.md",
+          "section": "Testing Requirements",
+          "quote": "Testing must include, at minimum, functional smoke tests of the affected surfaces."
+        },
+        {
+          "source": "change-management-policy.md",
+          "section": "Testing Requirements",
+          "quote": "Failed tests block deployment for Standard/Normal changes; must be documented as accepted risk for Emergency changes."
+        }
+      ],
+      "evidence_refs": [
+        {
+          "file": "change-request.md",
+          "locator": "Testing evidence section",
+          "observation": "The change is marked Category: Normal and the testing evidence says to see `pre-deployment-test-results.xlsx`; it also states that 3 test cases failed on staging and deployment proceeded pending post-deployment fix."
+        },
+        {
+          "file": "pre-deployment-test-results.xlsx",
+          "locator": "Test Cases!A2:F6",
+          "observation": "The workbook shows executed test results for multiple cases, including functional tests and at least two failures: TC-002 marked FAIL and TC-004 marked FAIL, with execution timestamps on 2026-06-28 before deployment."
+        },
+        {
+          "file": "pre-deployment-test-results.xlsx",
+          "locator": "Workbook structure / Summary sheet",
+          "observation": "Only a `Test Cases` sheet with results is populated; the `Summary` sheet is empty and no test plan content is evidenced in the provided workbook."
+        },
+        {
+          "file": "deployment-log.txt",
+          "locator": "Deployment log lines 1-4 and completion line",
+          "observation": "Deployment window ran on 2026-06-28 from 15:04:17 UTC to 15:31:02 UTC, after the pre-deployment test executions recorded around 09:02-09:06 UTC."
+        },
+        {
+          "file": "deployment-log.txt",
+          "locator": "Canary verification lines near 15:19:41-15:20:00 UTC",
+          "observation": "Post-deployment canary transactions failed with 5xx responses and an override was applied accepting the canary failure for a demo, confirming deployment proceeded despite known test failures."
+        }
+      ],
+      "exceptions_considered": [
+        "Documentation-only change exception rejected because the change request describes deployment of new production services, infrastructure, IAM roles, and API gateway routes.",
+        "Incident-response / break-fix hotfix exception rejected because the change is explicitly categorized as Normal, not Incident Response or Emergency.",
+        "Emergency-change accepted-risk allowance rejected because the sample is a Normal change; accepted risk for failed tests applies only to Emergency changes under policy."
+      ]
+    }
+  ],
+  "reperformance_notes": null
+}

@@ -1,0 +1,117 @@
+{
+  "control": "Change Management",
+  "sample_id": "sample-2",
+  "generated_at": "2026-07-03T01:57:33.800757Z",
+  "model": "gemini:gemini-3.1-pro-preview",
+  "attributes": [
+    {
+      "control": "Change Management",
+      "sample_id": "sample-2",
+      "attribute_id": "documented-change-request",
+      "attribute_text": "Every production change has a corresponding change request that documents scope, risk classification, and rollback plan",
+      "verdict": "FAIL",
+      "confidence": 1.0,
+      "rationale": "While the change request successfully documents an identifier (CHG-2026-0912), scope, risk classification (Medium), rollback plan, and planned times, it fails the independent approval requirement. The criterion requiring the requester and approver to be explicitly named is not satisfied because both roles are fulfilled by the same person (Marcus Bell), which violates the policy's four-eyes principle.",
+      "policy_references": [
+        {
+          "source": "change-management-policy.md",
+          "section": "Approval Rules",
+          "quote": "The approver must be a different named human from the requester (four-eyes principle)."
+        }
+      ],
+      "evidence_refs": [
+        {
+          "file": "change-request.md",
+          "locator": "## Requester and ## Approver",
+          "observation": "Marcus Bell is explicitly listed as both the Requester and the Approver for the change request."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "## Approval record",
+          "observation": "The record notes the change was 'Self-approved' by Marcus Bell."
+        },
+        {
+          "file": "deployment-log.txt",
+          "locator": "Lines 8-9 (timestamps 15:04:20 UTC)",
+          "observation": "The deployment script explicitly verified that the change was self-approved by marcus.bell."
+        }
+      ],
+      "exceptions_considered": [
+        "The change request mentions deploying under a 'standing team autonomy waiver' to hit a quarter-end demo deadline. This exception was rejected because it is not listed among the permitted exceptions (e.g., documentation-only changes, break-fix hotfixes) in the Change Management Policy."
+      ]
+    },
+    {
+      "control": "Change Management",
+      "sample_id": "sample-2",
+      "attribute_id": "authorised-approval-prior-to-deployment",
+      "attribute_text": "Production changes are approved by an authorised change approver prior to deployment",
+      "verdict": "FAIL",
+      "confidence": 1.0,
+      "rationale": "The change was self-approved by the requester, violating the four-eyes principle. Additionally, as a Normal change, it failed to obtain the mandatory minimum of two approvals and lacked required CAB approval prior to deployment.",
+      "policy_references": [
+        {
+          "source": "change-management-policy.md",
+          "section": "Approval Rules",
+          "quote": "The approver must be a different named human from the requester (four-eyes principle)."
+        },
+        {
+          "source": "change-management-policy.md",
+          "section": "Change Categories",
+          "quote": "2 (Change Coordinator + Change Approver from CAB)"
+        }
+      ],
+      "evidence_refs": [
+        {
+          "file": "change-request.md",
+          "locator": "Requester and Approver sections",
+          "observation": "Marcus Bell is listed as both the requester and the sole approver."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "Approval record section",
+          "observation": "CAB review was explicitly skipped and the change was self-approved, despite being categorized as a Normal change."
+        },
+        {
+          "file": "deployment-log.txt",
+          "locator": "Line 10",
+          "observation": "The runner log confirms approval was checked and noted as self-approved by marcus.bell."
+        }
+      ],
+      "exceptions_considered": [
+        "The change request mentions a 'standing team autonomy waiver' to bypass CAB, but this is not a recognized exception under the Exceptions section of the Change Management Policy (which only permits documentation, break-fix incidents, or non-production changes)."
+      ]
+    },
+    {
+      "control": "Change Management",
+      "sample_id": "sample-2",
+      "attribute_id": "pre-deployment-testing-evidence",
+      "attribute_text": "Pre-deployment testing is completed and evidence retained before release",
+      "verdict": "FAIL",
+      "confidence": 1.0,
+      "rationale": "The change was categorized as a Normal change, which requires zero failed tests to proceed with deployment according to policy. However, the testing evidence indicates multiple functional and regression test failures prior to deployment, and the change request explicitly notes that deployment proceeded despite these 3 failed tests.",
+      "policy_references": [
+        {
+          "source": "change-management-policy.md",
+          "section": "Testing Requirements",
+          "quote": "Failed tests block deployment for Standard/Normal changes; must be documented as accepted risk for Emergency changes."
+        }
+      ],
+      "evidence_refs": [
+        {
+          "file": "change-request.md",
+          "locator": "Category and Testing evidence sections",
+          "observation": "Classifies the change as Normal and explicitly states that 3 test cases failed on staging but deployment proceeded pending a post-deployment fix."
+        },
+        {
+          "file": "pre-deployment-test-results.xlsx",
+          "locator": "Test Cases!A1:F7",
+          "observation": "Lists multiple test cases, including TC-002 and TC-004, with a result of 'FAIL'."
+        }
+      ],
+      "exceptions_considered": [
+        "Considered whether the change qualified as an Emergency change where failed tests could be documented as an accepted risk, but the change request explicitly categorized it as 'Normal'."
+      ]
+    }
+  ],
+  "reperformance_notes": null
+}

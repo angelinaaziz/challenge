@@ -1,0 +1,37 @@
+{
+  "name": "User Access Review",
+  "description": "User access to systems and data is periodically reviewed to ensure access remains appropriate and aligned with each individual's role. User access reviews reduce the risk of unauthorised or excessive access by confirming that only authorised individuals retain access and that access is revoked when no longer required.",
+  "attributes": [
+    {
+      "id": "access-reviews-are-performed-on-a-periodic-basis-eg-quarterly",
+      "text": "Access reviews are performed on a periodic basis (e.g. quarterly)",
+      "testable_criteria": [
+        "Is there evidence that user access reviews are performed on a recurring schedule?",
+        "Does the review cadence shown in evidence occur at least quarterly, if quarterly is the defined periodic basis for the system or data set under review?",
+        "Does the evidence show that a review was completed for the period under examination?"
+      ],
+      "relevant_policies": []
+    },
+    {
+      "id": "access-is-reviewed-and-approved-by-an-appropriate-system-or-data-owner",
+      "text": "Access is reviewed and approved by an appropriate system or data owner",
+      "testable_criteria": [
+        "Is there evidence that the access review included an approval decision?",
+        "Is the approval evidenced as performed by the system owner or data owner for the system or data under review?",
+        "Can the approver's identity and role be verified from evidence?",
+        "Does the evidence support that the approver is appropriate for the reviewed system or data set?"
+      ],
+      "relevant_policies": []
+    },
+    {
+      "id": "inappropriate-or-excessive-access-identified-during-the-review-is-remediated-in-a-timely-manner",
+      "text": "Inappropriate or excessive access identified during the review is remediated in a timely manner",
+      "testable_criteria": [
+        "If inappropriate or excessive access was identified during the review, is there evidence that remediation actions were initiated for each identified exception?",
+        "If inappropriate or excessive access was identified during the review, is there evidence that the inappropriate or excessive access was removed or otherwise corrected?",
+        "If inappropriate or excessive access was identified during the review, does the evidence show the remediation was completed within the organization's defined timeframe for timely remediation?"
+      ],
+      "relevant_policies": []
+    }
+  ]
+}

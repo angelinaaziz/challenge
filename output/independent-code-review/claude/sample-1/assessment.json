@@ -1,0 +1,135 @@
+{
+  "control": "Independent Code Review",
+  "sample_id": "sample-1",
+  "generated_at": "2026-07-03T01:49:23.847869Z",
+  "model": "claude:claude-opus-4-7",
+  "attributes": [
+    {
+      "control": "Independent Code Review",
+      "sample_id": "sample-1",
+      "attribute_id": "code-review-before-merge-to-main",
+      "attribute_text": "Code Reviews are performed prior to committing a change to the main branch",
+      "verdict": "SUCCESS",
+      "confidence": 0.85,
+      "rationale": "A pull request (#62754) exists for the change, authored by jakebailey. An independent human reviewer, RyanCavanaugh, approved the changes 17 hours ago, and the PR was merged into microsoft:main 16 hours ago (merge commit ea48ded) — approval precedes merge. The PR page displays a \"Merged\" badge and a success banner, and the merge was performed via GitHub's auto-merge (squash) flow, which enforces that no direct commit bypassed the PR. Copilot's review is disregarded for independence purposes, but RyanCavanaugh provides the required independent human 4-eyes approval.",
+      "policy_references": [],
+      "evidence_refs": [
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "PR header / status badge",
+          "observation": "PR #62754 shows 'Merged' badge; header states 'jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller 16 hours ago'."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "Conversation timeline - review event",
+          "observation": "'RyanCavanaugh approved these changes 17 hours ago' with green check; RyanCavanaugh is a different human from author jakebailey."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "Conversation timeline - merge event",
+          "observation": "'jakebailey merged commit ea48ded into microsoft:main 16 hours ago' — merge occurred after the 17-hours-ago approval."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "Reviewers sidebar panel",
+          "observation": "Sidebar shows RyanCavanaugh with green check (approval) and Copilot with comment icon; confirms independent human approver present."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "Auto-merge timeline entry",
+          "observation": "'jakebailey enabled auto-merge (squash) 17 hours ago' — indicates merge to main was gated by PR approval workflow, not a direct push."
+        }
+      ],
+      "exceptions_considered": [
+        "Copilot AI review considered but rejected as satisfying independence — automated/AI review does not qualify as an independent human 4-eyes review. However, RyanCavanaugh (human) independently approved, so the criterion is met on his review alone."
+      ]
+    },
+    {
+      "control": "Independent Code Review",
+      "sample_id": "sample-1",
+      "attribute_id": "independent-reviewer-approval",
+      "attribute_text": "Code Review approvals are performed by independent code reviewers",
+      "verdict": "SUCCESS",
+      "confidence": 0.9,
+      "rationale": "PR #62754 was authored and merged by jakebailey, and RyanCavanaugh (a different human identity) approved the changes prior to merge, satisfying the 4-eyes principle. Copilot's review is not counted as independent (automated bot, and was invoked \"on behalf of jakebailey\"), but RyanCavanaugh's approval is a separate human approval visible in both the timeline and the Reviewers sidebar. As a Member reviewing in the microsoft/TypeScript repo, RyanCavanaugh has authority to approve, and the approval is not self-approval or bot-granted.",
+      "policy_references": [],
+      "evidence_refs": [
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "PR header",
+          "observation": "jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller — author and committer both jakebailey."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "Conversation timeline",
+          "observation": "'RyanCavanaugh approved these changes 17 hours ago' with green check, prior to merge 16 hours ago."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "Reviewers sidebar",
+          "observation": "RyanCavanaugh listed as reviewer with green check (approved); Copilot listed with comment icon only."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "Timeline - Copilot activity",
+          "observation": "'Copilot started reviewing on behalf of jakebailey' — automated review invoked by author, not counted as independent."
+        }
+      ],
+      "exceptions_considered": [
+        "Copilot AI review considered but rejected as an independent approver — it is an automated bot acting on behalf of the author. RyanCavanaugh's separate human approval is what satisfies the criterion."
+      ]
+    },
+    {
+      "control": "Independent Code Review",
+      "sample_id": "sample-1",
+      "attribute_id": "testing-per-policy",
+      "attribute_text": "Testing is performed in accordance with the testing policy",
+      "verdict": "SUCCESS",
+      "confidence": 0.72,
+      "rationale": "PR #62754 is a test-only change: all 4 changed files are under tests/ (relationComplexityError test + baselines), shrinking the test's Digits type from 10 to 8 literals to prevent timeouts. This is a behavior-preserving refactor of a test with no application logic changes, and the CI run #34653 completed successfully (Success, 15 matrix test jobs green, coverage/lint/typecheck/smoke/baselines all green, 36 of 37 checks passed). The coverage report shows repo-wide summary metrics well above policy thresholds: Statements 94.62% (≥80% line proxy), Branches 89.48% (≥70%), Functions 94.79% (≥80%). Coverage was produced as a CI artifact (39.2 MB) tied to commit 9e76dd2 and thus available in the PR checks for review. No critical/high bugs are indicated open and the PR merged cleanly.",
+      "policy_references": [
+        {
+          "source": "testing-policy.md",
+          "section": "Minimum Test Coverage Requirements",
+          "quote": "Unit Tests: Minimum 80% code coverage for all new code; Branch coverage (minimum 70%); Function coverage (minimum 80%)"
+        },
+        {
+          "source": "testing-policy.md",
+          "section": "Pre-Release Test Requirements",
+          "quote": "Tests must run in CI/CD pipeline before merge; Test results must be visible in pull request status checks"
+        },
+        {
+          "source": "testing-policy.md",
+          "section": "Exceptions and Waivers",
+          "quote": "Refactoring with No Behavioral Changes: Code refactoring that maintains exact functional behavior and is verified through existing test coverage"
+        }
+      ],
+      "evidence_refs": [
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "PR header + Files changed count + Copilot Overview",
+          "observation": "PR modifies 4 files, all under tests/ (relationComplexityError.ts and its baselines); +10/-10; described as reducing Digits type from 10 to 8 literals to shrink combinations from 10,000 to 4,096 — a test-size reduction, not application logic."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "Merge status bar",
+          "observation": "'36 of 37 checks passed'; PR merged as commit ea48ded — status checks were visible on the PR."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-29-21 Shrink relationComplexityError test size · microsoft_TypeScript@9e76dd2.png",
+          "locator": "CI run #34653 Jobs list and summary",
+          "observation": "CI status Success, 15 matrix test jobs green across Node 14–24/OS combinations, plus coverage (12m 37s), lint, knip, format, browser-integration, typecheck, smoke, package-size, self-check, baselines — all green. Coverage artifact (39.2 MB) produced."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-27-50 Coverage Report.png",
+          "locator": "Summary row",
+          "observation": "Repo-wide coverage: Statements 94.62%, Branches 89.48%, Functions 94.79% — all above policy minimums (80/70/80)."
+        }
+      ],
+      "exceptions_considered": [
+        "Refactoring with No Behavioral Changes: accepted as applicable — the PR touches only test files and baselines to reduce combinatorial test size; behavior of the compiler is unchanged and existing test coverage validates the change. This also renders the 100% critical-path, legacy-code, integration/E2E-specific, performance, and security-scan sub-criteria non-triggering for this sample."
+      ]
+    }
+  ],
+  "reperformance_notes": null
+}

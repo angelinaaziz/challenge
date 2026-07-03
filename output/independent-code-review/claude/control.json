@@ -1,0 +1,54 @@
+{
+  "name": "Independent Code Review",
+  "description": "Changes are reviewed by an independent code reviewer prior to code being merged and released to production. Independent code review restricts the ability for anyone individual from taking a change production without involving an independent party (4-eyes principle).",
+  "attributes": [
+    {
+      "id": "code-review-before-merge-to-main",
+      "text": "Code Reviews are performed prior to committing a change to the main branch",
+      "testable_criteria": [
+        "A code review record (e.g. pull request) exists for the change.",
+        "The code review was completed and approved before the change was merged into the main branch.",
+        "The merge commit timestamp to main is after the code review approval timestamp.",
+        "No direct commits to main were made bypassing the code review process."
+      ],
+      "relevant_policies": []
+    },
+    {
+      "id": "independent-reviewer-approval",
+      "text": "Code Review approvals are performed by independent code reviewers",
+      "testable_criteria": [
+        "At least one approval on the code review is recorded from a reviewer other than the change author.",
+        "The approving reviewer is not the same identity (username/email) as the author or committer of the change.",
+        "The approving reviewer has authority/permission to approve code reviews in the repository.",
+        "The approval was not self-approved or granted by an automated bot acting on behalf of the author."
+      ],
+      "relevant_policies": []
+    },
+    {
+      "id": "testing-per-policy",
+      "text": "Testing is performed in accordance with the testing policy",
+      "testable_criteria": [
+        "Unit test code coverage for new code is ≥ 80%.",
+        "Integration test coverage for critical integration points is ≥ 60%.",
+        "IF the change touches security-sensitive, payment, or authentication flows THEN line coverage for those paths = 100%.",
+        "IF the change modifies legacy code THEN existing coverage levels are maintained or improved.",
+        "Branch coverage is ≥ 70%.",
+        "Function coverage is ≥ 80%.",
+        "A coverage report was generated and reviewed as part of the code review.",
+        "All unit tests passed with zero failures prior to release.",
+        "All integration tests passed prior to release.",
+        "End-to-end tests for critical user journeys passed prior to release.",
+        "IF applicable, performance benchmarks were met prior to release.",
+        "Security scan results were reviewed and approved prior to release.",
+        "Tests were executed in the CI/CD pipeline before merge.",
+        "Test results are visible in the pull request status checks.",
+        "No known critical or high-severity bugs are open at time of release.",
+        "Manual smoke tests were completed for critical features prior to release.",
+        "IF the change qualifies for a documented exception (legacy integration, third-party dependency, PoC/experimental, documentation-only, build/deployment scripts, dependency version bump, or behavior-preserving refactor) THEN the exception is explicitly documented and applicable."
+      ],
+      "relevant_policies": [
+        "testing-policy.md"
+      ]
+    }
+  ]
+}

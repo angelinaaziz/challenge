@@ -1,0 +1,63 @@
+{
+  "name": "Independent Code Review",
+  "description": "Changes are reviewed by an independent code reviewer prior to code being merged and released to production. Independent code review restricts the ability for anyone individual from taking a change production without involving an independent party (4-eyes principle).",
+  "attributes": [
+    {
+      "id": "code-reviews-are-performed-prior-to-committing-a-change-to-the-main-branch",
+      "text": "Code Reviews are performed prior to committing a change to the main branch",
+      "testable_criteria": [
+        "For each sampled change merged to the main branch, evidence shows a code review occurred before the merge to the main branch.",
+        "For each sampled change merged to the main branch, the code review record is associated with the specific change being merged."
+      ],
+      "relevant_policies": []
+    },
+    {
+      "id": "code-review-approvals-are-performed-by-independent-code-reviewers",
+      "text": "Code Review approvals are performed by independent code reviewers",
+      "testable_criteria": [
+        "For each sampled change, the person who approved the code review is not the same person who authored the change.",
+        "For each sampled change, at least one approval from an independent reviewer exists before the change is merged to the main branch."
+      ],
+      "relevant_policies": []
+    },
+    {
+      "id": "testing-is-performed-in-accordance-with-the-testing-policy",
+      "text": "Testing is performed in accordance with the testing policy",
+      "testable_criteria": [
+        "Tests run in the CI/CD pipeline before merge.",
+        "Test results are visible in pull request status checks.",
+        "All unit tests pass with zero failures before release.",
+        "All integration tests pass before release.",
+        "Critical user journeys pass end-to-end tests before release.",
+        "IF performance testing is applicable, performance benchmarks are met before release.",
+        "Security scan results are reviewed and approved before release.",
+        "Tests pass in a clean environment with no cached dependencies.",
+        "Flaky tests are fixed or removed before release.",
+        "All automated tests pass before release.",
+        "Test coverage meets the minimum thresholds before release.",
+        "No known critical or high-severity bugs exist before release.",
+        "IF performance testing is applicable, performance tests pass before release.",
+        "Security tests pass before release.",
+        "Manual smoke tests are completed for critical features before release.",
+        "For all new code, unit test line coverage is at least 80%.",
+        "For critical integration points, integration test coverage is at least 60%.",
+        "IF the change touches security-sensitive, payment, or authentication flows, coverage is 100% for those critical paths.",
+        "For legacy code, existing coverage is maintained or improved.",
+        "Branch coverage is at least 70%.",
+        "Function coverage is at least 80%.",
+        "Coverage reports are generated as part of the code review process.",
+        "Coverage reports are reviewed as part of the code review process.",
+        "Tests are deterministic and repeatable.",
+        "Tests are independent and do not rely on execution order.",
+        "Tests clean up after themselves and leave no side effects.",
+        "Test names clearly describe what is being tested.",
+        "Tests include both positive and negative test cases.",
+        "Tests that fail are fixed before code merge.",
+        "IF an exception is claimed, the change fits one of the allowed exception categories in the testing policy."
+      ],
+      "relevant_policies": [
+        "testing-policy.md"
+      ]
+    }
+  ]
+}

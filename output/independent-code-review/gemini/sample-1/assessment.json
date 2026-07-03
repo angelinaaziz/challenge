@@ -1,0 +1,96 @@
+{
+  "control": "Independent Code Review",
+  "sample_id": "sample-1",
+  "generated_at": "2026-07-03T01:30:21.837195Z",
+  "model": "gemini:gemini-3.1-pro-preview",
+  "attributes": [
+    {
+      "control": "Independent Code Review",
+      "sample_id": "sample-1",
+      "attribute_id": "code-reviews-prior-to-commit",
+      "attribute_text": "Code Reviews are performed prior to committing a change to the main branch",
+      "verdict": "SUCCESS",
+      "confidence": 1.0,
+      "rationale": "Evidence confirms that the pull request received an approval from an independent reviewer prior to being merged into the main branch. Specifically, 'RyanCavanaugh' approved the PR 17 hours prior to capture, whereas the author 'jakebailey' merged the commit 16 hours prior to capture.",
+      "policy_references": [],
+      "evidence_refs": [
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "Pull request timeline",
+          "observation": "The timeline shows 'RyanCavanaugh approved these changes 17 hours ago'."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "Pull request timeline",
+          "observation": "The timeline shows 'jakebailey merged commit ea48ded into microsoft:main 16 hours ago', establishing that the review occurred before the merge."
+        }
+      ],
+      "exceptions_considered": []
+    },
+    {
+      "control": "Independent Code Review",
+      "sample_id": "sample-1",
+      "attribute_id": "independent-code-review-approvals",
+      "attribute_text": "Code Review approvals are performed by independent code reviewers",
+      "verdict": "SUCCESS",
+      "confidence": 1.0,
+      "rationale": "The evidence confirms that the pull request was authored by one user and explicitly approved by a different named user prior to merge. This satisfies the testable criteria for an independent code review.",
+      "policy_references": [],
+      "evidence_refs": [
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png",
+          "locator": "Pull Request header and timeline",
+          "observation": "The PR author is identified as 'jakebailey'. The timeline explicitly records that a different user, 'RyanCavanaugh', approved the changes."
+        }
+      ],
+      "exceptions_considered": []
+    },
+    {
+      "control": "Independent Code Review",
+      "sample_id": "sample-1",
+      "attribute_id": "testing-in-accordance-with-policy",
+      "attribute_text": "Testing is performed in accordance with the testing policy",
+      "verdict": "FURTHER_EVIDENCE_REQUIRED",
+      "confidence": 0.95,
+      "rationale": "I agree with the first-pass assessment. While coverage metrics meet the policy requirements (94.62% statement, 89.48% branch, and 94.79% function coverage), the PR timeline states '36 of 37 checks passed'. This leaves the status of one check ambiguous (it may have been skipped, pending, or failed). Furthermore, the provided CI workflow screenshot shows successful unit and integration tests (e.g., 'test', 'browser-integration') but does not show an explicit security testing job, which is required by the Pre-Release Test Requirements policy. To resolve this, we need a screenshot or extract showing the fully expanded list of the 37 PR status checks to verify that the missing check was not a required automated test, and to confirm that security tests were executed and passed prior to release.",
+      "policy_references": [
+        {
+          "source": "testing-policy.md",
+          "section": "Minimum Test Coverage Requirements",
+          "quote": "- **Unit Tests**: Minimum 80% code coverage for all new code\n- **Integration Tests**: Minimum 60% coverage for critical integration points"
+        },
+        {
+          "source": "testing-policy.md",
+          "section": "Minimum Test Coverage Requirements",
+          "quote": "Coverage is measured using:\n- Line coverage (primary metric)\n- Branch coverage (minimum 70%)\n- Function coverage (minimum 80%)"
+        },
+        {
+          "source": "testing-policy.md",
+          "section": "Pre-Release Test Requirements",
+          "quote": "1. **Unit Tests**: All unit tests must pass with zero failures\n2. **Integration Tests**: All integration tests must pass\n... 5. **Security Tests**: Security scan results must be reviewed and approved"
+        }
+      ],
+      "evidence_refs": [
+        {
+          "file": "Screenshot 2025-11-14 at 14-27-50 Coverage Report.png",
+          "locator": "Summary row in the coverage table",
+          "observation": "The summary row displays 94.62% for Statements, 89.48% for Branches, and 94.79% for Functions, all of which satisfy the minimum coverage thresholds."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey v Pull Request #62754 v microsoft_TypeScript.png",
+          "locator": "PR timeline beneath the merge event",
+          "observation": "The PR timeline states '36 of 37 checks passed', leaving the status of one check unaccounted for."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-29-21 Shrink relationComplexityError test size v microsoft_TypeScript@9e76dd2.png",
+          "locator": "CI workflow visualizer graph",
+          "observation": "The workflow graph lists successful jobs including 'test', 'coverage', and 'browser-integration', but does not explicitly name any security testing or security scan job."
+        }
+      ],
+      "exceptions_considered": [
+        "I considered whether this could be exempt from security tests as it is shrinking a test size, but no explicit policy exemption (e.g., Documentation-Only) is tagged, and policy mandates security test results be reviewed for releases."
+      ]
+    }
+  ],
+  "reperformance_notes": null
+}

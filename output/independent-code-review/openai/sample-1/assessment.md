@@ -1,0 +1,75 @@
+# Independent Code Review — sample-1
+_generated: 2026-07-03T01:25:24.708029+00:00 · model: openai:gpt-5.4_
+
+## ✅ Code Reviews are performed prior to committing a change to the main branch
+**Verdict**: `SUCCESS`  · confidence `0.95`
+
+The pull request evidence is tied to the specific merged change: PR #62754 titled "Shrink relationComplexityError test size" shows it was merged into microsoft:main from branch relationComplexityErrorSmaller, with 1 commit and 4 files changed. The same PR timeline shows RyanCavanaugh approved the changes 17 hours ago, while the merge occurred 16 hours ago, demonstrating review happened before merge. I treated Copilot as non-independent AI review, but the human approval from RyanCavanaugh separately satisfies the review criterion.
+
+**Evidence:**
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Pull request header` — The page is for microsoft/TypeScript PR #62754 titled "Shrink relationComplexityError test size," marked Merged, and states jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Tabs and diff summary below PR title` — The PR shows Commits 1 and Files changed 4, linking the review record to the specific change set being merged.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Timeline entries in conversation` — The timeline shows RyanCavanaugh approved these changes 17 hours ago.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Merge timeline entry` — The timeline shows jakebailey merged commit ea48ded into microsoft:main 16 hours ago.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Reviewers section in right sidebar` — The Reviewers section lists RyanCavanaugh with a green check mark and also lists Copilot as a reviewer.
+
+**Exceptions considered:**
+- AI review exception considered: Copilot appears as an AI reviewer and was not treated as an independent human reviewer. This did not affect the conclusion because RyanCavanaugh, a different named human from author jakebailey, approved before merge.
+- No documentation-only or similar testing-policy exception was needed because the evidence directly shows a human review before merge.
+
+## ✅ Code Review approvals are performed by independent code reviewers
+**Verdict**: `SUCCESS`  · confidence `0.95`
+
+The PR evidence shows the author/merger was jakebailey, while RyanCavanaugh approved the changes, so the approver is a different named human from the author. The timeline shows RyanCavanaugh approved 17 hours ago and jakebailey merged 16 hours ago, demonstrating at least one independent approval existed before merge to main. I did not rely on the Copilot review for independence because it is an AI reviewer, but the human approval from RyanCavanaugh is sufficient.
+
+**Evidence:**
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `PR header / merge status header` — The pull request is marked Merged, and the header states jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Conversation timeline entry for review request and approval` — The timeline shows jakebailey requested review from RyanCavanaugh and Copilot 17 hours ago, and RyanCavanaugh approved these changes 17 hours ago.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Conversation timeline entry for merge` — The timeline shows jakebailey merged commit ea48ded into microsoft:main 16 hours ago.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Right sidebar - Reviewers section` — The Reviewers section lists RyanCavanaugh with a green check mark and also lists Copilot as a reviewer.
+
+**Exceptions considered:**
+- AI/bot reviewer exception considered: Copilot appears as an AI reviewer and was not treated as an independent human reviewer. This was rejected as the basis for compliance, but a separate human approval from RyanCavanaugh satisfies the attribute.
+- No documentation-only or similar change exception was applied; the attribute requires independent review evidence, and such evidence is present.
+
+## ❌ Testing is performed in accordance with the testing policy
+**Verdict**: `FAIL`  · confidence `0.94`
+
+The evidence contradicts the requirement that all automated tests pass before release: the merged PR shows "36 of 37 checks passed," so at least one check did not pass at merge time. While a CI run tied to PR #62754 shows a successful workflow with visible jobs including coverage, browser-integration, and smoke, the PR status at merge still indicates not all checks passed. Coverage thresholds shown in the coverage report exceed the policy minimums at the summary level (Branches 89.48%, Functions 94.79%), but that does not cure the failed criterion that all tests/checks must pass before merge.
+
+**Policy references:**
+- `testing-policy.md` § Pre-Release Checklist: “Before any release, the following must be verified:
+
+- [ ] All automated tests pass”
+- `testing-policy.md` § Pre-Release Test Requirements > Mandatory Test Execution: “All code must pass the following test suites before release:
+
+1. **Unit Tests**: All unit tests must pass with zero failures
+2. **Integration Tests**: All integration tests must pass
+3. **End-to-End Tests**: Critical user journeys must pass
+4. **Performance Tests**: Performance benchmarks must be met (if applicable)
+5. **Security Tests**: Security scan results must be reviewed and approved”
+- `testing-policy.md` § Pre-Release Test Requirements > Test Execution Environment: “- Tests must run in CI/CD pipeline before merge
+- All tests must pass in a clean environment (no cached dependencies)
+- Test results must be visible in pull request status checks
+- Flaky tests must be fixed or removed before release”
+- `testing-policy.md` § Test Quality Standards > Test Maintenance: “- Tests that fail must be fixed before code merge”
+- `testing-policy.md` § Minimum Test Coverage Requirements > Coverage Metrics: “Coverage is measured using:
+- Line coverage (primary metric)
+- Branch coverage (minimum 70%)
+- Function coverage (minimum 80%)
+
+Coverage reports must be generated and reviewed as part of the code review process.”
+
+**Evidence:**
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Pull request merge timeline/header area` — The PR is marked Merged, and the merge entry states "36 of 37 checks passed," showing the change was merged even though not all checks passed.
+- `Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png` @ `Tabs/status area near top of PR` — The PR shows a "Checks 31" tab, indicating test/check results were surfaced on the pull request.
+- `Screenshot 2025-11-14 at 14-29-21 Shrink relationComplexityError test size · microsoft_TypeScript@9e76dd2.png` @ `Workflow run summary header` — The GitHub Actions run for PR #62754 shows status "Success," triggered via pull request, with workflow "ci.yml" on pull_request.
+- `Screenshot 2025-11-14 at 14-29-21 Shrink relationComplexityError test size · microsoft_TypeScript@9e76dd2.png` @ `Workflow graph / visible jobs` — Visible CI jobs include coverage, browser-integration, smoke, lint, typecheck, baselines, and others, showing tests ran in CI before merge.
+- `Screenshot 2025-11-14 at 14-27-50 Coverage Report.png` @ `Summary row of coverage table` — The coverage report summary shows Statements 94.62%, Branches 89.48%, and Functions 94.79%, which exceed the policy minimums for branch and function coverage.
+
+**Exceptions considered:**
+- Documentation-Only Changes: rejected because the PR changes executable test source file tests/cases/compiler/relationComplexityError.ts in addition to baseline files, so it is not documentation-only.
+- Dependency Updates: rejected because the change is not limited to version bumps or third-party library updates.
+- Refactoring with No Behavioral Changes: potentially relevant because the PR shrinks a test to avoid timeouts, but even if considered a refactor-like change, the policy still requires failed tests/checks to be fixed before merge; the evidence shows 36 of 37 checks passed at merge.
+- Build and Deployment Scripts: rejected because the changed files listed are test case/baseline files, not CI/CD or deployment scripts.
+- Legacy Code Integration / Third-Party Dependencies / Proof of Concept: no evidence the change fits these exception categories.

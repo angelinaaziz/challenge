@@ -1,0 +1,153 @@
+{
+  "control": "Independent Code Review",
+  "sample_id": "sample-2",
+  "generated_at": "2026-07-03T01:26:03.539200Z",
+  "model": "openai:gpt-5.4",
+  "attributes": [
+    {
+      "control": "Independent Code Review",
+      "sample_id": "sample-2",
+      "attribute_id": "code-reviews-are-performed-prior-to-committing-a-change-to-the-main-branch",
+      "attribute_text": "Code Reviews are performed prior to committing a change to the main branch",
+      "verdict": "SUCCESS",
+      "confidence": 0.96,
+      "rationale": "The pull request evidence for PR #31272 shows a review record tied to the specific change: the page title is \"feat: use Node.js timers by default #31272\" and the header states bartlomieju merged 7 commits into denoland:main from bartlomieju:node_timers. The same PR timeline shows \"dsherret approved these changes 20 hours ago\" and later \"bartlomieju merged commit 7ada8d6 into denoland:main 19 hours ago,\" demonstrating the review occurred before merge. Reviewer independence is supported because dsherret is a different named human from bartlomieju; Copilot was present but not relied upon as the independent reviewer.",
+      "policy_references": [],
+      "evidence_refs": [
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "PR title/header area",
+          "observation": "The page is for pull request \"feat: use Node.js timers by default #31272\" and shows a \"Merged\" badge."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "PR header merge summary",
+          "observation": "The header states \"bartlomieju merged 7 commits into denoland:main from bartlomieju:node_timers,\" linking the PR to the change merged to main."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "Right sidebar reviewers panel",
+          "observation": "The reviewers panel lists \"Copilot\" and \"dsherret,\" with a check mark next to dsherret."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "Timeline review event",
+          "observation": "A review event states \"dsherret approved these changes 20 hours ago\" and includes a comment ending with \"LGTM\"."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "Timeline merge event",
+          "observation": "A merge timeline entry states \"bartlomieju merged commit 7ada8d6 into denoland:main 19 hours ago.\""
+        }
+      ],
+      "exceptions_considered": [
+        "Copilot AI review was considered but rejected as the basis for independence because it is not an independent named human reviewer. The human approval from dsherret satisfied the review criterion."
+      ]
+    },
+    {
+      "control": "Independent Code Review",
+      "sample_id": "sample-2",
+      "attribute_id": "code-review-approvals-are-performed-by-independent-code-reviewers",
+      "attribute_text": "Code Review approvals are performed by independent code reviewers",
+      "verdict": "SUCCESS",
+      "confidence": 0.95,
+      "rationale": "The PR page shows bartlomieju as the person who merged 7 commits from bartlomieju:node_timers into main, establishing bartlomieju as the change author for this sample. The same page shows dsherret approved the changes 20 hours ago, and dsherret is a different named human from bartlomieju, satisfying reviewer independence; Copilot was not relied on as an independent reviewer. The approval also appears before the merge event because dsherret approved 20 hours ago and bartlomieju merged 19 hours ago.",
+      "policy_references": [],
+      "evidence_refs": [
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "PR header beneath title",
+          "observation": "The header states bartlomieju merged 7 commits into denoland:main from bartlomieju:node_timers, indicating bartlomieju authored the sampled change branch and performed the merge."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "Right sidebar reviewer panel",
+          "observation": "The reviewer panel lists dsherret with a check mark, while Copilot is also listed separately."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "PR timeline review event",
+          "observation": "A review event states dsherret approved these changes 20 hours ago."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "PR timeline merge event",
+          "observation": "A merge event states bartlomieju merged commit 7ada8d6 into denoland:main 19 hours ago."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "PR title/header area",
+          "observation": "The PR is marked Merged and titled feat: use Node.js timers by default #31272."
+        }
+      ],
+      "exceptions_considered": [
+        "Copilot appears in the reviewer list and timeline, but it is not an independent human reviewer for audit purposes; independence was satisfied based on dsherret's approval instead.",
+        "No documentation-only, dependency-only, or other testing exception is evidenced on the PR page, so no exception was applied."
+      ]
+    },
+    {
+      "control": "Independent Code Review",
+      "sample_id": "sample-2",
+      "attribute_id": "testing-is-performed-in-accordance-with-the-testing-policy",
+      "attribute_text": "Testing is performed in accordance with the testing policy",
+      "verdict": "FAIL",
+      "confidence": 0.95,
+      "rationale": "The evidence positively contradicts the criterion that all automated tests pass before release: the merged PR shows only \"33 of 36 checks passed\" in the merge box, so not all checks passed before merge/release. Although a GitHub Actions run for ci.yml on pull_request shows a successful run with multiple test jobs, the PR evidence does not demonstrate full compliance with the policy requirement that all required tests/security checks pass prior to release. No evidence of an approved exception is shown, so the testing-policy exception criterion is not satisfied as a waiver.",
+      "policy_references": [
+        {
+          "source": "testing-policy.md",
+          "section": "Pre-Release Checklist",
+          "quote": "Before any release, the following must be verified:\n\n- [ ] All automated tests pass"
+        },
+        {
+          "source": "testing-policy.md",
+          "section": "Pre-Release Test Requirements / Mandatory Test Execution",
+          "quote": "All code must pass the following test suites before release:\n\n1. **Unit Tests**: All unit tests must pass with zero failures\n2. **Integration Tests**: All integration tests must pass\n3. **End-to-End Tests**: Critical user journeys must pass\n4. **Performance Tests**: Performance benchmarks must be met (if applicable)\n5. **Security Tests**: Security scan results must be reviewed and approved"
+        },
+        {
+          "source": "testing-policy.md",
+          "section": "Test Execution Environment",
+          "quote": "- Tests must run in CI/CD pipeline before merge\n- All tests must pass in a clean environment (no cached dependencies)\n- Test results must be visible in pull request status checks\n- Flaky tests must be fixed or removed before release"
+        },
+        {
+          "source": "testing-policy.md",
+          "section": "Test Maintenance",
+          "quote": "- Tests that fail must be fixed before code merge"
+        }
+      ],
+      "evidence_refs": [
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "PR merge box near bottom of timeline",
+          "observation": "The merge box states \"33 of 36 checks passed\" while the PR is shown as successfully merged."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "PR header beside title",
+          "observation": "The PR status badge reads \"Merged,\" confirming the change was merged despite only 33 of 36 checks passing."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png",
+          "locator": "Actions run summary header",
+          "observation": "The workflow run for \"ci.yml\" shows status \"Success\" and trigger \"on: pull_request,\" indicating tests ran in CI/CD before merge."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png",
+          "locator": "Jobs list and workflow graph",
+          "observation": "The run includes multiple test jobs and a benchmark job, including test debug/release jobs across macOS, Windows, and Linux, plus \"bench release linux-x86_64\"."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "Top PR tabs under title",
+          "observation": "The PR page shows a \"Checks 18\" tab, evidencing that test/check results are visible on the pull request."
+        }
+      ],
+      "exceptions_considered": [
+        "Testing-policy exceptions were considered and rejected because the evidence shows a feature change to timer behavior in application code (not documentation-only, dependency update, build/deployment-script-only, or clearly pure refactor), and no approved waiver or exception record is visible.",
+        "Proof-of-concept/experimental exception was considered and rejected because the PR was merged to main and the evidence does not show it was explicitly marked temporary or not intended for production use.",
+        "Legacy code integration / third-party dependency exceptions were considered, but the screenshots do not show any documented exception approval or statement that testing requirements were waived for those reasons."
+      ]
+    }
+  ],
+  "reperformance_notes": null
+}

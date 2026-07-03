@@ -1,0 +1,45 @@
+{
+  "name": "Independent Code Review",
+  "description": "Changes are reviewed by an independent code reviewer prior to code being merged and released to production. Independent code review restricts the ability for anyone individual from taking a change production without involving an independent party (4-eyes principle).",
+  "attributes": [
+    {
+      "id": "code-reviews-prior-to-commit",
+      "text": "Code Reviews are performed prior to committing a change to the main branch",
+      "testable_criteria": [
+        "Is there evidence of a code review for the change?",
+        "Does the timestamp of the code review completion predate the timestamp of the code commit or merge to the main branch?"
+      ],
+      "relevant_policies": []
+    },
+    {
+      "id": "independent-code-review-approvals",
+      "text": "Code Review approvals are performed by independent code reviewers",
+      "testable_criteria": [
+        "Is there an explicit approval recorded on the code review?",
+        "Is the person who approved the code review someone other than the author of the code change?"
+      ],
+      "relevant_policies": []
+    },
+    {
+      "id": "testing-in-accordance-with-policy",
+      "text": "Testing is performed in accordance with the testing policy",
+      "testable_criteria": [
+        "Are test coverage reports generated and visible within the code review?",
+        "Does the coverage report show unit test line coverage >= 80% for all new code?",
+        "Does the coverage report show branch coverage >= 70%?",
+        "Does the coverage report show function coverage >= 80%?",
+        "IF the change touches critical integration points, is integration test coverage >= 60%?",
+        "IF the change touches security-sensitive, payment, or authentication flows, does the coverage report show 100% coverage?",
+        "IF the change modifies legacy code, is the previous coverage level maintained or improved?",
+        "Are test results visible in the pull request status checks?",
+        "Do the PR status checks show all automated unit tests passed with zero failures in a clean CI/CD environment prior to merge?",
+        "Do the PR status checks show all integration tests passed in a clean CI/CD environment prior to merge?",
+        "Do the PR status checks show security tests passed prior to release?",
+        "IF minimum coverage requirements are not met, does the change fall under an explicit policy exemption (e.g., Documentation-Only, Legacy Code Integration, Dependency Updates)?"
+      ],
+      "relevant_policies": [
+        "testing-policy.md"
+      ]
+    }
+  ]
+}

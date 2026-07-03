@@ -1,0 +1,34 @@
+{
+  "name": "User Access Review",
+  "description": "User access to systems and data is periodically reviewed to ensure access remains appropriate and aligned with each individual's role. User access reviews reduce the risk of unauthorised or excessive access by confirming that only authorised individuals retain access and that access is revoked when no longer required.",
+  "attributes": [
+    {
+      "id": "periodic-access-reviews",
+      "text": "Access reviews are performed on a periodic basis (e.g. quarterly)",
+      "testable_criteria": [
+        "Evidence exists showing an access review was conducted for the target system.",
+        "The access review occurred within the defined periodic interval (e.g., quarterly) since the previous review."
+      ],
+      "relevant_policies": []
+    },
+    {
+      "id": "reviewed-and-approved-by-owner",
+      "text": "Access is reviewed and approved by an appropriate system or data owner",
+      "testable_criteria": [
+        "The access review evidence includes explicit approval of the evaluated user access list.",
+        "The individual approving the access review is formally documented as the system owner or data owner for the target system."
+      ],
+      "relevant_policies": []
+    },
+    {
+      "id": "remediation-of-inappropriate-access",
+      "text": "Inappropriate or excessive access identified during the review is remediated in a timely manner",
+      "testable_criteria": [
+        "IF inappropriate or excessive access was identified THEN a list of flagged users is documented in the review evidence.",
+        "For each flagged user, evidence exists showing their access was successfully removed or modified.",
+        "The timestamp of access removal or modification falls within the organization's defined SLA for timely remediation following the review date."
+      ],
+      "relevant_policies": []
+    }
+  ]
+}
