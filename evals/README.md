@@ -20,13 +20,13 @@ Row shape:
 
 ## Category breakdown
 
-Current golden set is **15 labelled rows** across the three controls:
+Current golden set is **21 labelled rows** across the three controls:
 
 | Control | Category | Row count |
 | --- | --- | --- |
-| independent-code-review | review | 2 |
-| independent-code-review | independence | 2 |
-| independent-code-review | testing | 2 |
+| independent-code-review | review | 4 |
+| independent-code-review | independence | 4 |
+| independent-code-review | testing | 4 |
 | user-access-review | cadence | 1 |
 | user-access-review | ownership | 1 |
 | user-access-review | remediation | 1 |
@@ -35,6 +35,8 @@ Current golden set is **15 labelled rows** across the three controls:
 | change-management | testing-evidence | 2 |
 
 Small on purpose. Every row is a defensible auditor call I can walk through in a debrief. Padding the set with vague labels would make the scoreboard less honest, not more.
+
+Six of the ICR rows are labels for real unseen public PRs (Kubernetes `#139018` and Next.js `#95391`). They're the strongest generalisation signal in the set: the pipeline has no prior context on them, they use different UI shapes and CI conventions, and the labels reflect what a strict SOX auditor would say about each attribute.
 
 ## Running the scoreboard
 

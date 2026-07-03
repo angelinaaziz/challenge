@@ -8,15 +8,15 @@ Give it a control folder. It reads the rules, looks at the evidence, and tells y
 
 ## The result
 
-I hand-labelled 15 correct answers across three controls (Bead's two plus one I invented to stress-test the pipeline), ran three frontier models against them, and scored the output.
+I hand-labelled 21 correct answers across three controls (Bead's two plus one I invented to stress-test the pipeline, plus two real unseen public PRs from Kubernetes and Next.js), ran three frontier models against them, and scored the output.
 
 | Model | Independent Code Review | User Access Review | Change Management | **Overall** |
 | --- | :-: | :-: | :-: | :-: |
-| **Claude Opus 4.8** | **6/6 (100%)** | **3/3 (100%)** | **6/6 (100%)** | **15/15 · 100%** ✅ |
-| GPT-5.4 *(stale prompt)* | 4/6 (67%) | 3/3 (100%) | 3/6 (50%) | 10/15 · 67% |
-| Gemini 3.1 Pro Preview *(stale prompt)* | 5/6 (83%) | 1/3 (33%) | 4/6 (67%) | 10/15 · 67% |
+| **Claude Opus 4.8** | **12/12 (100%)** | **3/3 (100%)** | **6/6 (100%)** | **21/21 · 100%** ✅ |
+| GPT-5.4 *(stale prompt, 15-row set)* | 4/6 (67%) | 3/3 (100%) | 3/6 (50%) | 10/15 · 67% |
+| Gemini 3.1 Pro Preview *(stale prompt, 15-row set)* | 5/6 (83%) | 1/3 (33%) | 4/6 (67%) | 10/15 · 67% |
 
-**Claude nails all 15.** After a targeted prompt tune (see below), single-run Claude matches every hand-labelled verdict across all three controls with zero mismatches.
+**Claude nails all 21, including the two unseen public PRs.** After a targeted prompt tune (see below), single-run Claude matches every hand-labelled verdict across all three controls with zero mismatches.
 
 **Two prompt tunes closed the gap.** Both live in `src/audit_agent/prompts/attribute_judge.md`:
 
@@ -260,7 +260,7 @@ src/audit_agent/
 └── prompts/           # versioned .md prompts
 
 tests/                 # 18 unit tests around the reconciler, narrative, IPE validator
-evals/golden.jsonl     # hand-labelled ground truth (15 rows across 3 controls)
+evals/golden.jsonl     # hand-labelled ground truth (21 rows across 3 controls)
 data/                  # three controls (two Bead-provided plus one synthetic)
 output/                # committed model outputs (inspect without spending credits)
 .github/workflows/     # CI (ruff plus pytest on every push)
@@ -318,7 +318,7 @@ Bead said cost isn't a factor in the evaluation so I haven't optimised heavily f
 
 1. **PDF evidence.** Router classifies but doesn't extract. `pdfplumber` plus vision fallback for scans is about 1 hour.
 2. **Verifier is single-pass.** In a real workflow it should be able to ask for missing evidence back from the human.
-3. **Golden set is 15 rows.** Would want around 50 across 6 controls for real statistical weight.
+3. **Golden set is 21 rows.** Would want around 50 across 6 controls for real statistical weight.
 4. **Reconciler is UAR-shaped.** Generalising to any two-workbook cross-check (SoD, vendor risk, key-controls matrix) is about 1 hour.
 5. **Per-attribute judges run serially.** They're independent. `asyncio.gather` would cut wall-clock by around 3x.
 
