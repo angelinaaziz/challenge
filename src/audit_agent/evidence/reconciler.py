@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 
 from audit_agent.evidence.xlsx_parser import XlsxSheet, XlsxWorkbook
 
@@ -137,6 +137,25 @@ class UserFinding:
 
 
 @dataclass
+class IPECheck:
+    """Information Produced by the Entity — did the source data reconcile
+    against its own declared numbers?
+
+    An auditor doesn't trust reviewer decisions on top of source data whose
+    integrity hasn't been verified. IPE checks are the deterministic first
+    line of defence: if the Cover sheet says "332 accounts in scope" and
+    the System Access Export has 334 rows total with 2 service accounts,
+    do those numbers agree? If not, either the reviewer worked from a
+    different export or the workpaper is stale.
+
+    Bead literally markets "IPE completeness testing" as a product feature.
+    """
+    check: str
+    status: Literal["pass", "fail", "not_declared"]
+    detail: str
+
+
+@dataclass
 class UARReconciliation:
     system_export_rows: int
     hris_rows: int
@@ -150,8 +169,15 @@ class UARReconciliation:
     reviewer_names: set[str]
     unique_review_dates: list[str]
     cover_sheet: dict[str, str]
+    ipe_checks: list[IPECheck] = field(default_factory=list)
 
     def to_summary_dict(self) -> dict[str, Any]:
+        def ipe_list() -> list[dict[str, str]]:
+            return [
+                {"check": c.check, "status": c.status, "detail": c.detail}
+                for c in self.ipe_checks
+            ]
+
         def uf_list(items: list[UserFinding]) -> list[dict[str, str]]:
             return [
                 {
@@ -185,6 +211,8 @@ class UARReconciliation:
             "reviewer_names": sorted(self.reviewer_names),
             "unique_review_dates": self.unique_review_dates,
             "cover_sheet": self.cover_sheet,
+            "ipe_checks": ipe_list(),
+            "ipe_failures_count": sum(1 for c in self.ipe_checks if c.status == "fail"),
         }
 
 
@@ -240,6 +268,154 @@ def _status_matches(status: str, tokens: set[str]) -> bool:
     if current:
         parts.add(current)
     return bool(parts & tokens)
+
+
+def _int(x: Any) -> Optional[int]:
+    """Best-effort int coerce for Cover-sheet declared counts."""
+    if isinstance(x, int):
+        return x
+    if isinstance(x, str) and x.strip().isdigit():
+        return int(x.strip())
+    return None
+
+
+def _run_ipe_checks(
+    access_book: XlsxWorkbook,
+    export_sheet: XlsxSheet,
+    review_sheet: XlsxSheet,
+    orphan_count: int,
+    system_export_rows: int,
+) -> list[IPECheck]:
+    """Deterministic IPE (Information Produced by the Entity) checks.
+
+    The auditor trusts reviewer decisions only if the underlying source data
+    reconciles against its own declared numbers. If the Cover sheet says X
+    accounts and the export has Y, that's an IPE integrity finding — and it
+    doesn't require an LLM to notice.
+    """
+    checks: list[IPECheck] = []
+    # Cover-sheet KV pairs are keyed by declared label (case-preserved).
+    cover: dict[str, Any] = {}
+    for sh in access_book.sheets.values():
+        for label, (value, _coord) in sh.kv.items():
+            cover[label] = value
+
+    # -- Total accounts in export vs actual system export rows -------------
+    declared_total = _int(cover.get("Accounts In Scope")) or _int(
+        cover.get("Total accounts in export")
+    )
+    declared_service = _int(cover.get("Service accounts (out of scope)")) or 0
+    if declared_total is not None:
+        expected = declared_total + declared_service
+        if expected == system_export_rows:
+            checks.append(
+                IPECheck(
+                    check="Total export row count matches Cover sheet declaration",
+                    status="pass",
+                    detail=(
+                        f"Cover declares {declared_total} in-scope + {declared_service} "
+                        f"service accounts = {expected}. Actual system access export "
+                        f"has {system_export_rows} rows."
+                    ),
+                )
+            )
+        else:
+            checks.append(
+                IPECheck(
+                    check="Total export row count matches Cover sheet declaration",
+                    status="fail",
+                    detail=(
+                        f"Cover declares {declared_total} in-scope + {declared_service} "
+                        f"service accounts = {expected} expected, but actual export has "
+                        f"{system_export_rows} rows. Reviewer may have worked from a "
+                        f"different snapshot — IPE integrity finding."
+                    ),
+                )
+            )
+    else:
+        checks.append(
+            IPECheck(
+                check="Total export row count matches Cover sheet declaration",
+                status="not_declared",
+                detail="Cover sheet does not declare an in-scope row count to reconcile against.",
+            )
+        )
+
+    # -- Service-account carve-out reconciles to orphans (no HRIS record) ---
+    if declared_service:
+        if declared_service == orphan_count:
+            checks.append(
+                IPECheck(
+                    check="Service-account carve-out matches reperformance orphans",
+                    status="pass",
+                    detail=(
+                        f"Cover declares {declared_service} service accounts out of "
+                        f"scope; reperformance found exactly {orphan_count} orphan(s) "
+                        f"(users in access export with no HRIS record)."
+                    ),
+                )
+            )
+        else:
+            checks.append(
+                IPECheck(
+                    check="Service-account carve-out matches reperformance orphans",
+                    status="fail",
+                    detail=(
+                        f"Cover declares {declared_service} service accounts, "
+                        f"but reperformance found {orphan_count} orphan(s). "
+                        f"Either a service account is missing from the carve-out, "
+                        f"or a human employee is missing from HRIS."
+                    ),
+                )
+            )
+
+    # -- Reviewer decision counts vs Cover declared retained/revoked --------
+    declared_retained = _int(cover.get("Accounts Retained"))
+    declared_revoked = _int(cover.get("Accounts Flagged for Revocation"))
+    if declared_retained is not None or declared_revoked is not None:
+        # Count from actual reviewer sheet decisions.
+        rev_col = _find_col(review_sheet.headers, ["reviewer decision", "decision"])
+        actual_retained = actual_revoked = 0
+        for row in review_sheet.rows:
+            dec = _lower(row.values.get(rev_col)) if rev_col else ""
+            if "retain" in dec:
+                actual_retained += 1
+            elif "revoke" in dec or "remove" in dec:
+                actual_revoked += 1
+        ok = True
+        mismatches = []
+        if declared_retained is not None and declared_retained != actual_retained:
+            ok = False
+            mismatches.append(
+                f"Cover Retained={declared_retained} vs actual {actual_retained}"
+            )
+        if declared_revoked is not None and declared_revoked != actual_revoked:
+            ok = False
+            mismatches.append(
+                f"Cover Revoked={declared_revoked} vs actual {actual_revoked}"
+            )
+        if ok:
+            checks.append(
+                IPECheck(
+                    check="Reviewer decision counts match Cover sheet totals",
+                    status="pass",
+                    detail=(
+                        f"Actual counts on Access Review sheet ({actual_retained} retain / "
+                        f"{actual_revoked} revoke) reconcile to Cover totals."
+                    ),
+                )
+            )
+        else:
+            checks.append(
+                IPECheck(
+                    check="Reviewer decision counts match Cover sheet totals",
+                    status="fail",
+                    detail=" · ".join(mismatches)
+                    + ". Suggests the reviewer sheet was edited after the Cover was written.",
+                )
+            )
+
+    return checks
 
 
 def reconcile_user_access_review(
@@ -429,6 +605,14 @@ def reconcile_user_access_review(
         for label, (value, _coord) in sh.kv.items():
             cover_sheet[label] = str(value)
 
+    ipe_checks = _run_ipe_checks(
+        access_book=access_book,
+        export_sheet=export_sheet,
+        review_sheet=review_sheet,
+        orphan_count=len(orphans),
+        system_export_rows=len(export_sheet.rows),
+    )
+
     return UARReconciliation(
         system_export_rows=len(export_sheet.rows),
         hris_rows=len(hris_sheet.rows),
@@ -442,4 +626,5 @@ def reconcile_user_access_review(
         reviewer_names=reviewer_names,
         unique_review_dates=sorted(review_dates),
         cover_sheet=cover_sheet,
+        ipe_checks=ipe_checks,
     )

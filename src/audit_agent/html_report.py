@@ -720,6 +720,11 @@ def _render_sample(sa: SampleAssessment) -> str:
         parts.append('<div class="reperformance-label">Deterministic re-check · ground truth</div>')
         parts.append(_esc(sa.reperformance_notes))
         parts.append('</div>')
+    # IPE checks — surface even if there's no LLM-produced narrative.
+    # We store IPE in the same trace JSONL / assessment JSON.
+    ipe_html = _render_ipe_checks(sa)
+    if ipe_html:
+        parts.append(ipe_html)
 
     if sa.evidence_coverage:
         cov = sa.evidence_coverage
@@ -790,6 +795,37 @@ def _render_trace(trace_path: Path) -> str:
         parts.append("</tr>")
     parts.append("</tbody></table>")
     parts.append("</section>")
+    return "".join(parts)
+
+
+def _render_ipe_checks(sa: SampleAssessment) -> str:
+    """IPE (Information Produced by the Entity) check results — deterministic
+    reconciliation of the source data against its own declared numbers.
+
+    Rendered as a callout so an auditor sees IPE integrity findings before
+    they read reviewer decisions on top of the source data."""
+    if not sa.ipe_checks:
+        return ""
+    fail_count = sum(1 for c in sa.ipe_checks if c.status == "fail")
+    label = (
+        "IPE integrity checks · all passed"
+        if fail_count == 0
+        else f"IPE integrity checks · {fail_count} finding(s)"
+    )
+    parts = ['<div class="section-title">IPE (Information Produced by the Entity)</div>']
+    parts.append('<div class="reperformance">')
+    parts.append(f'<div class="reperformance-label">{label}</div>')
+    for c in sa.ipe_checks:
+        badge = {"pass": "✓", "fail": "✕", "not_declared": "—"}[c.status]
+        colour = {"pass": "var(--pass)", "fail": "var(--fail)", "not_declared": "var(--muted)"}[c.status]
+        parts.append(
+            f'<div style="margin: 8px 0; display: flex; gap: 12px;">'
+            f'<span style="color: {colour}; font-weight: 600; width: 16px;">{badge}</span>'
+            f'<span><strong style="color: var(--ink);">{_esc(c.check)}</strong><br>'
+            f'<span style="color: var(--muted); font-size: 12px;">{_esc(c.detail)}</span></span>'
+            f"</div>"
+        )
+    parts.append("</div>")
     return "".join(parts)
 
 

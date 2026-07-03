@@ -185,12 +185,21 @@ def _process_sample(
         conclusion, attributes, coverage, reconciliation
     )
 
+    ipe_results = []
+    if reconciliation:
+        from audit_agent.schemas import IPEResult
+        ipe_results = [
+            IPEResult(check=c["check"], status=c["status"], detail=c["detail"])
+            for c in reconciliation.get("ipe_checks", [])
+        ]
+
     return SampleAssessment(
         control=control.name,
         sample_id=bundle.sample_id,
         generated_at=datetime.now(timezone.utc),
         model=f"{cfg.provider.name}:{cfg.provider.model}",
         attributes=attributes,
+        ipe_checks=ipe_results,
         control_conclusion=conclusion,
         executive_summary=execsum,
         key_findings=findings,
@@ -275,6 +284,18 @@ def _build_audit_narrative(
         findings.append(AuditFinding(severity="pass", text=a.attribute_text))
 
     if reconciliation:
+        # IPE (Information Produced by the Entity) integrity — surface any
+        # failed checks prominently. An IPE failure taints every reviewer
+        # decision downstream, so this is a headline finding.
+        ipe = reconciliation.get("ipe_checks", [])
+        for c in ipe:
+            if c["status"] == "fail":
+                findings.append(
+                    AuditFinding(
+                        severity="fail",
+                        text=f"IPE finding — {c['check']}: {c['detail']}",
+                    )
+                )
         missed = reconciliation.get("reviewer_missed_findings", [])
         for m in missed[:3]:  # cap for signal density
             findings.append(
@@ -444,6 +465,9 @@ def _summary_from_reconciliation(recon: dict) -> str:
         f"On leave but active in system: {recon['on_leave_but_active_in_system_count']}",
         f"Reviewer missed (terminated + retained): {recon['reviewer_missed_findings_count']}",
     ]
+    ipe_failures = recon.get("ipe_failures_count", 0) or 0
+    if ipe_failures:
+        lines.append(f"IPE integrity failures: {ipe_failures}")
     return " | ".join(lines)
 
 

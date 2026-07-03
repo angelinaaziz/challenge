@@ -1,5 +1,5 @@
 # Change Management — sample-1
-_generated: 2026-07-03T03:13:27.899520+00:00 · model: claude:claude-opus-4-7_
+_generated: 2026-07-03T03:36:18.315306+00:00 · model: claude:claude-opus-4-7_
 
 ## ⚠️ Control conclusion: `CONTROL_INCONCLUSIVE`
 
@@ -14,45 +14,47 @@ _generated: 2026-07-03T03:13:27.899520+00:00 · model: claude:claude-opus-4-7_
 ## ✅ Every production change has a corresponding change request that documents scope, risk classification, and rollback plan
 **Verdict**: `SUCCESS`  · confidence `0.97`
 
-The change request CHG-2026-0847 satisfies every testable criterion: identifier follows CHG-YYYY-NNNN format; scope enumerates affected systems (payments-primary RDS, payments-api) and repository (infra-terraform PR #2411); risk is classified Medium; a three-step rollback plan with RTO is documented; named requester (Marcus Bell) and approver (Priya Nadkarni) are given; planned start/end window is 2026-06-24 20:00–22:00 UTC; and the change is categorised as Normal. This attribute concerns documentation completeness only — approval validity/independence is judged separately.
+The change request CHG-2026-0847 exists with the correct CHG-YYYY-NNNN identifier format and documents all required elements: scope (payments-primary RDS, payments-api, repo northpeak/infra-terraform PR #2411, config surfaces), risk classification (Medium), rollback plan (3-step PITR + redeploy + verify), named requester (Marcus Bell), named approver (Priya Nadkarni), planned start/end times (2026-06-24 20:00→22:00 UTC), and change category (Normal). The change is a Postgres major upgrade on production — not a documentation-only, hotfix, or dev/staging change, so no exception applies.
 
 **Policy references:**
 - `change-management-policy.md` § Required Documentation: “Every change (regardless of category) must include: A change request identifier (e.g. CHG-YYYY-NNNN); Scope: systems affected, code repositories, config surfaces; Risk classification (Low / Medium / High); Rollback plan; Named requester and named approver; Planned start and end times”
-- `change-management-policy.md` § Change Categories: “Standard | Normal | Emergency”
+- `change-management-policy.md` § Exceptions: “The following are out of scope: Documentation-only changes (README, comments); Break-fix hotfixes classified as Incident Response; Changes to development or staging environments”
 
 **Evidence:**
-- `change-request.md` @ `Title line` — Identifier 'CHG-2026-0847' present, matching CHG-YYYY-NNNN format.
-- `change-request.md` @ `Header block (Category/Risk/Systems/Repositories/Planned window)` — Category: Normal; Risk: Medium; Systems affected: payments-primary (RDS), payments-api; Repositories touched: northpeak/infra-terraform PR #2411; Planned window: 2026-06-24 20:00 UTC → 22:00 UTC.
-- `change-request.md` @ `Scope section` — Enumerates Postgres 15.7→16.3 upgrade, pg library bump 8.11→8.13, no schema changes.
-- `change-request.md` @ `Rollback plan section` — Three-step rollback: PITR snapshot restore, redeploy pinned pg@8.11, verify via /healthz and canary. RTO 25 min, validated in staging drill 2026-06-19.
-- `change-request.md` @ `Requester section` — Named requester: Marcus Bell (Platform Engineer).
-- `change-request.md` @ `Approver section` — Named approver: Priya Nadkarni (Change Approver, CAB).
+- `change-request.md` @ `Title line` — Change request identifier 'CHG-2026-0847' present in CHG-YYYY-NNNN format, titled 'Upgrade Postgres 15 → 16 on payments-primary cluster'.
+- `change-request.md` @ `Header metadata block (Category/Risk/Systems/Repos/Window)` — Category: Normal; Risk: Medium; systems affected payments-primary (RDS) and payments-api; repository northpeak/infra-terraform PR #2411; planned window 2026-06-24 20:00 UTC → 22:00 UTC.
+- `change-request.md` @ `Scope section` — Documents Postgres 15.7→16.3 upgrade and pg library bump from 8.11 to 8.13, no schema changes.
+- `change-request.md` @ `Rollback plan section` — Three-step rollback: PITR snapshot restore (snap-payments-2026-06-24-1955), redeploy payments-api pinned to pg@8.11, verify via /healthz and canary; RTO 25 min, validated in staging drill 2026-06-19.
+- `change-request.md` @ `Requester and Approver sections` — Named requester Marcus Bell (Platform Engineer); named approver Priya Nadkarni (Change Approver, CAB).
+- `deployment-log.txt` @ `Deployment log header` — Confirms target is production payments-primary + payments-api — not dev/staging, not documentation-only, not an incident-response hotfix.
 
 **Exceptions considered:**
-- Documentation-only exception rejected — this is a Postgres major version upgrade on a production cluster, not documentation.
+- Documentation-only exception rejected: change is a Postgres major version upgrade with code and infra changes.
+- Dev/staging exception rejected: deployment log shows target is payments-primary production cluster.
+- Incident-response hotfix exception rejected: change is a planned Normal category change with CAB approval, not a break-fix.
 
 ## ⚠️ Production changes are approved by an authorised change approver prior to deployment
 **Verdict**: `FURTHER_EVIDENCE_REQUIRED`  · confidence `0.70`
 
-The change request records approval by Priya Nadkarni (a different named human from requester Marcus Bell) at 2026-06-23 15:42 UTC, before the 2026-06-24 20:00 UTC deployment window, and cites CAB-2026-W25. However, this is a Normal change requiring 2 approvers (Change Coordinator + Change Approver from CAB); only one approver (the CAB Change Approver) is named — no Change Coordinator approval is evidenced. Additionally, the signed CAB minutes (`cab-minutes-w25.pdf`) and IdP role membership confirming Priya holds the Change Approver role are not included in this bundle. Providing the CAB minutes showing a second approver / Change Coordinator sign-off, and an IdP export confirming Priya's Change Approver role, would resolve to SUCCESS.
+The change request records approval by Priya Nadkarni (Change Approver, CAB), a different named human from requester Marcus Bell, timestamped 2026-06-23 15:42 UTC — before the 2026-06-24 20:00 UTC window. However, this is a Normal change requiring TWO approvers (Change Coordinator + Change Approver from CAB); only one approver (Priya) is named on the change request. Additionally, the CAB minutes (`cab-minutes-w25.pdf`) that would document CAB review and any second approver are explicitly not included in the evidence bundle, and there is no IdP role assignment evidence confirming Priya holds the Change Approver role. Providing the CAB minutes (showing CAB review and Change Coordinator approval) plus an IdP role screenshot for Priya would resolve this to SUCCESS.
 
 **Policy references:**
 - `change-management-policy.md` § Change Categories: “Normal | Non-routine change with a defined risk assessment | 2 (Change Coordinator + Change Approver from CAB) | Yes”
 - `change-management-policy.md` § Approval Rules: “The approver must be a different named human from the requester (four-eyes principle). Approvers must hold the Change Approver role in the identity provider. Approval must occur before the deployment window opens.”
 
 **Evidence:**
-- `change-request.md` @ `Category / Requester / Approver / Approval record sections` — Category = Normal; Requester = Marcus Bell; Approver = Priya Nadkarni (Change Approver, CAB); Approval timestamp 2026-06-23 15:42 UTC; CAB reference CAB-2026-W25; signed CAB minutes noted as not included in bundle.
-- `change-request.md` @ `Planned window` — Deployment window 2026-06-24 20:00 UTC → 22:00 UTC — approval timestamp precedes window opening by ~28 hours.
-- `deployment-log.txt` @ `line at 2026-06-24 20:00:15 UTC` — Runner verified 'approval OK — CHG-2026-0847 approved by priya.nadkarni at 2026-06-23T15:42:00Z (CAB-2026-W25)'; only a single approver identity referenced.
+- `change-request.md` @ `Category / Requester / Approver / Approval record sections` — Category = Normal; Requester = Marcus Bell; Approver = Priya Nadkarni (Change Approver, CAB); approval timestamp 2026-06-23 15:42 UTC; only one approver listed; CAB minutes referenced as CAB-2026-W25 but attached file cab-minutes-w25.pdf is explicitly not included in the evidence bundle.
+- `change-request.md` @ `Planned window line` — Deployment window planned 2026-06-24 20:00 UTC to 22:00 UTC — approval at 2026-06-23 15:42 UTC precedes window opening.
+- `deployment-log.txt` @ `line 'approval OK — CHG-2026-0847 approved by priya.nadkarni at 2026-06-23T15:42:00Z (CAB-2026-W25)'` — Runner verified approval by priya.nadkarni tied to CAB-2026-W25 prior to deployment start at 2026-06-24 20:00:02 UTC. Only one approver named; no second Change Coordinator approval logged.
 
 **Exceptions considered:**
-- Documentation-only / dev-staging exception — rejected: this change modifies production payments-primary RDS and payments-api.
-- Emergency retrospective approval — not applicable: change is categorised Normal and approval is pre-deployment.
+- Emergency retrospective-approval clause — not applicable; change is classified Normal and approval is prospective.
+- Documentation-only exception — not applicable; change is a Postgres major version upgrade affecting production.
 
 ## ✅ Pre-deployment testing is completed and evidence retained before release
 **Verdict**: `SUCCESS`  · confidence `0.90`
 
-Change is Normal category. A test plan and test results are attached via pre-deployment-test-results.xlsx, referenced in the change request. Test execution timestamps (2026-06-23 14:12–14:14) predate the deployment window start (2026-06-24 20:00 UTC). Functional smoke tests of the affected payments API surface (healthz, ledger insert/read, monotonic constraint, currency conversion) are present and all PASS, so the failed-test-blocks-deployment criterion is not triggered. Emergency criteria are N/A.
+The change is categorised Normal, and the change request references an attached test results workbook. pre-deployment-test-results.xlsx contains 12 test cases including functional smoke tests (e.g., /healthz, ledger insert/read) all with PASS results, executed 2026-06-23 (before the 2026-06-24 20:00 UTC deployment window). No failed tests, so the deployment-block criterion is not triggered. Testing evidence is retained and linked from the change request.
 
 **Policy references:**
 - `change-management-policy.md` § Testing Requirements: “Standard and Normal changes: pre-deployment testing evidence (test plan + test results) must be attached to the change request.”
@@ -60,12 +62,11 @@ Change is Normal category. A test plan and test results are attached via pre-dep
 - `change-management-policy.md` § Testing Requirements: “Failed tests block deployment for Standard/Normal changes; must be documented as accepted risk for Emergency changes.”
 
 **Evidence:**
-- `change-request.md` @ `Header — Category` — Change is classified as Normal, Risk Medium — invokes Standard/Normal testing criteria.
-- `change-request.md` @ `Testing evidence section` — References pre-deployment-test-results.xlsx with 42 test cases including 12 functional smoke, 24 regression, 6 rollback validation — all pass on staging.
-- `pre-deployment-test-results.xlsx` @ `Test Cases!A1:F13` — 12 test rows with Test ID, Category=Functional, Description, Result=PASS, Executed By, Executed At. Sample rows TC-001..TC-005 cover payments API /healthz, ledger insert/read, transaction id monotonic constraint, and currency-conversion — functional smoke of affected surfaces.
-- `pre-deployment-test-results.xlsx` @ `Test Cases!F2:F6 (Executed At)` — Test execution timestamps 2026-06-23 14:12–14:14 UTC, which predate the deployment window start of 2026-06-24 20:00 UTC.
-- `deployment-log.txt` @ `window start line` — Deployment window began 2026-06-24 20:00:02 UTC — confirms tests (2026-06-23) predate deployment.
+- `change-request.md` @ `Header — Category` — Change categorised as Normal, Risk Medium.
+- `change-request.md` @ `Testing evidence section` — References pre-deployment-test-results.xlsx with 42 test cases passing on staging, including 12 functional smoke, 24 regression, 6 rollback validation.
+- `pre-deployment-test-results.xlsx` @ `Test Cases!A1:F13` — 12 test cases listed; sampled rows TC-001..TC-005 all Functional smoke (payments API /healthz, ledger insert/read, monotonic constraint, currency-conversion) with Result=PASS, executed 2026-06-23 14:12–14:14, i.e., before deployment window start of 2026-06-24 20:00 UTC.
+- `deployment-log.txt` @ `window start line` — Deployment window began 2026-06-24 20:00:02 UTC, after test execution on 2026-06-23; deployment ultimately status SUCCESS with no failed tests triggering block.
 
 **Exceptions considered:**
-- Emergency post-deployment testing clause: not applicable — change is Normal, not Emergency.
-- Documentation-only exception: not applicable — change involves Postgres major version upgrade and library bump.
+- Documentation-only exception — not applicable; this is a Postgres major-version upgrade with code dependency changes.
+- Emergency post-deployment testing branch — not applicable; change is Normal, not Emergency.

@@ -223,12 +223,27 @@ class AuditFinding(BaseModel):
     text: str
 
 
+class IPEResult(BaseModel):
+    """Per-check outcome of an IPE (Information Produced by the Entity) validation."""
+    check: str
+    status: Literal["pass", "fail", "not_declared"]
+    detail: str
+
+
 class SampleAssessment(BaseModel):
     control: str
     sample_id: str
     generated_at: datetime
     model: str
     attributes: list[AttributeAssessment]
+    ipe_checks: list[IPEResult] = Field(
+        default_factory=list,
+        description=(
+            "Deterministic IPE (Information Produced by the Entity) checks — reconciles "
+            "declared numbers on the Cover sheet against actual export/reviewer data. "
+            "None = not applicable to this control."
+        ),
+    )
     control_conclusion: "ControlConclusion" = Field(
         description="Sample-level rollup: PASS if all attributes SUCCESS, FAIL if any attribute FAIL, INCONCLUSIVE otherwise."
     )

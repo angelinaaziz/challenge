@@ -1,120 +1,131 @@
 {
   "control": "User Access Review",
   "sample_id": "sample-1",
-  "generated_at": "2026-07-03T03:08:00.053243Z",
+  "generated_at": "2026-07-03T03:35:51.819219Z",
   "model": "claude:claude-opus-4-7",
   "attributes": [
     {
       "control": "User Access Review",
       "sample_id": "sample-1",
-      "attribute_id": "periodic-review-cadence",
+      "attribute_id": "periodic-access-reviews",
       "attribute_text": "Access reviews are performed on a periodic basis (e.g. quarterly)",
       "verdict": "SUCCESS",
-      "confidence": 0.9,
-      "rationale": "The evidence file uar-netsuite-q2-2026.xlsx documents a Q2 2026 Periodic (Quarterly) User Access Review for NetSuite (Production), completed on 2026-06-30 (within Q2 2026). All 334 rows on the Access Review sheet share a single review date of 2026-06-30, and the Cover sheet explicitly identifies the cadence (\"Periodic (Quarterly) User Access Review\") and completion date. This attribute concerns cadence and completion timing only; substantive issues (e.g., missed terminated user) are scoped to other attributes. Only limitation is that a single quarter's evidence is provided, so full-period cadence adherence across all quarters cannot be independently confirmed from this sample alone.",
+      "confidence": 0.85,
+      "rationale": "The evidence shows a Q2 2026 quarterly access review for NetSuite (Production) was performed and completed on 2026-06-30, with a documented review date on every reviewed row and a Cover sheet declaring the review type as \"Periodic (Quarterly) User Access Review\". This directly evidences that a review occurred in the audit period, at the defined quarterly cadence, with the review date documented. The interval between consecutive reviews cannot be fully assessed from a single quarter's file, but the cadence declaration and dated Q2 2026 completion satisfy the criteria for this sample.",
       "policy_references": [],
       "evidence_refs": [
         {
           "file": "uar-netsuite-q2-2026.xlsx",
-          "locator": "Cover!Review Period / Review Type / Review Completed",
-          "observation": "Cover metadata states Review Period = 'Q2 2026', Review Type = 'Periodic (Quarterly) User Access Review', Review Completed = '2026-06-30', with Reviewer Sign-off 'Approved electronically by Priya Nadkarni on 2026-06-30.'"
+          "locator": "Cover!Review Type / Review Period / Review Completed",
+          "observation": "Cover sheet declares Review Period 'Q2 2026', Review Type 'Periodic (Quarterly) User Access Review', and Review Completed '2026-06-30'."
         },
         {
           "file": "uar-netsuite-q2-2026.xlsx",
-          "locator": "Access Review!H2:H335 (Review Date column)",
-          "observation": "All 334 reviewer rows carry Review Date = 2026-06-30, evidencing a completed review within Q2 2026."
+          "locator": "Access Review!H2:H6 (Review Date column)",
+          "observation": "All sampled Access Review rows show Review Date 2026-06-30; deterministic reperformance found a single unique review date (2026-06-30) across all 334 rows."
         },
         {
           "file": "uar-netsuite-q2-2026.xlsx",
-          "locator": "Deterministic reperformance: unique_review_dates",
-          "observation": "Reperformance confirms exactly one unique review date (2026-06-30) across the population, consistent with a single quarterly cycle."
+          "locator": "Cover!Reviewer Sign-off",
+          "observation": "'Approved electronically by Priya Nadkarni on 2026-06-30' — confirms review completion date is documented and signed off."
         }
       ],
       "exceptions_considered": [
-        "Only one quarter (Q2 2026) of evidence was provided in this sample; verdict is on the observed cycle. If the audit period spans multiple quarters, additional quarters' UAR packs would be needed to fully confirm no skipped cycles."
+        "Interval-between-consecutive-reviews criterion: only Q2 2026 is in evidence; no prior quarter's UAR file was provided, so interval cannot be directly measured. Accepted as satisfied for this sample based on the documented quarterly cadence declaration, but would require prior-period UAR to fully verify."
       ]
     },
     {
       "control": "User Access Review",
       "sample_id": "sample-1",
-      "attribute_id": "reviewer-is-appropriate-owner",
+      "attribute_id": "reviewed-approved-by-owner",
       "attribute_text": "Access is reviewed and approved by an appropriate system or data owner",
       "verdict": "SUCCESS",
       "confidence": 0.9,
-      "rationale": "The Cover sheet identifies Priya Nadkarni, Director, Finance Systems as the System Owner and Reviewer/Approver for NetSuite (Production), and the Access Review sheet consistently lists her as \"Reviewed By\" for all sampled rows on 2026-06-30. An electronic sign-off attestation is documented (\"Approved electronically by Priya Nadkarni on 2026-06-30\"). Priya is not present in the reviewed user population (she does not appear as a user in the NetSuite export), so she did not review her own access. The population reviewed (334 rows) reconciles to the system export (334 rows). Note: this attribute concerns reviewer appropriateness/independence/sign-off — the separate reconciliation finding (Kevin Lewis missed) belongs to a different attribute and is not held against this one.",
+      "rationale": "The reviewer is identified by name and role on the Cover sheet as \"Priya Nadkarni, Director, Finance Systems (System Owner)\" and is the sole \"Reviewed By\" name across all 332 in-scope Access Review rows. Reviewer sign-off is documented (\"Approved electronically by Priya Nadkarni on 2026-06-30\"). IPE checks reconcile the 334-row export to 332 in-scope + 2 service accounts, and reviewer decisions (331 retain / 1 revoke) tie to Cover totals, evidencing that the approval covers the complete in-scope population.",
       "policy_references": [],
       "evidence_refs": [
         {
           "file": "uar-netsuite-q2-2026.xlsx",
           "locator": "Cover!Reviewer / Approver",
-          "observation": "Reviewer / Approver identified as 'Priya Nadkarni, Director, Finance Systems (System Owner)' for NetSuite (Production)."
+          "observation": "Reviewer/Approver identified as 'Priya Nadkarni, Director, Finance Systems (System Owner)'."
         },
         {
           "file": "uar-netsuite-q2-2026.xlsx",
           "locator": "Cover!Reviewer Sign-off",
-          "observation": "'Approved electronically by Priya Nadkarni on 2026-06-30.' — documented sign-off."
+          "observation": "Sign-off recorded: 'Approved electronically by Priya Nadkarni on 2026-06-30.'"
         },
         {
           "file": "uar-netsuite-q2-2026.xlsx",
-          "locator": "Access Review!G2:G6 (Reviewed By column, sampled rows)",
-          "observation": "All sampled rows show 'Priya Nadkarni' as Reviewed By with Review Date 2026-06-30."
+          "locator": "Access Review!G2:G335 (Reviewed By column)",
+          "observation": "All 334 rows show 'Priya Nadkarni' as Reviewed By with Review Date 2026-06-30 (single reviewer, single date)."
         },
         {
           "file": "uar-netsuite-q2-2026.xlsx",
-          "locator": "System Access Export (full user list)",
-          "observation": "Priya Nadkarni does not appear as a user in the NetSuite access export — she did not review her own access."
-        },
-        {
-          "file": "uar-netsuite-q2-2026.xlsx",
-          "locator": "Deterministic reperformance: reviewer_names, unique_review_dates",
-          "observation": "Single reviewer 'Priya Nadkarni' and single review date '2026-06-30' across all 334 rows; reviewer_sheet_rows (334) equals system_export_rows (334)."
+          "locator": "IPE checks / Cover totals",
+          "observation": "Reperformance confirms 332 in-scope accounts fully covered (331 retain + 1 revoke reconciles to Cover); 2 service accounts appropriately scoped out."
         }
       ],
       "exceptions_considered": [
-        "Considered whether the reviewer might also be a user of the system (self-review) — she is not present in the system access export.",
-        "Considered whether reconciliation gaps (Kevin Lewis missed, service account orphans) undermine this attribute — they pertain to review completeness/effectiveness, a separate attribute, and do not affect reviewer appropriateness/independence/sign-off."
+        "Service-account carve-out (2 orphan accounts marked 'n/a - out of scope') was considered; this does not undermine population completeness because the carve-out is explicit and reconciles to IPE checks."
       ]
     },
     {
       "control": "User Access Review",
       "sample_id": "sample-1",
-      "attribute_id": "timely-remediation-of-exceptions",
+      "attribute_id": "timely-remediation",
       "attribute_text": "Inappropriate or excessive access identified during the review is remediated in a timely manner",
       "verdict": "FURTHER_EVIDENCE_REQUIRED",
       "confidence": 0.8,
-      "rationale": "The reviewer flagged one account (Danielle Goodwin) for revocation and the summary records remediation via ITSM ticket ITSM-48217 assigned to IT with a 5-business-day SLA. However, no evidence has been provided showing (a) the ticket itself, (b) that the access was actually revoked, or (c) post-remediation confirmation that the account is now inactive in NetSuite. Additionally, the reperformance identified a second terminated-but-active account (Kevin Lewis) that the reviewer incorrectly retained — this is a reviewer-completeness issue, not strictly a remediation-timeliness issue, but it means only 1 of 2 real findings entered the remediation workflow. To reach SUCCESS, provide the ITSM-48217 ticket record with closure date and a post-remediation NetSuite screenshot showing Danielle Goodwin's account is inactive/deleted.",
+      "rationale": "The reviewer documented one exception (Danielle Goodwin) and evidenced a remediation action — ITSM-48217 was raised and assigned to IT with a 5-business-day SLA. However, the workbook only shows the ticket was raised; there is no evidence that the access was actually revoked in NetSuite (e.g., closed ticket, deprovisioning confirmation, or updated system export showing status=Inactive). Additionally, the reperformer independently identified a second exception (Kevin Lewis — terminated in HRIS but reviewer decided \"retain\"), which the reviewer missed entirely and therefore no remediation was undertaken; however that gap belongs to the \"completeness of exception identification\" attribute rather than \"timeliness of remediation of identified exceptions.\" To flip this to SUCCESS, evidence is needed that ITSM-48217 was closed and Danielle Goodwin's NetSuite account is now Inactive, along with the closure date to assess timeliness against the 5-business-day SLA.",
       "policy_references": [],
       "evidence_refs": [
         {
           "file": "uar-netsuite-q2-2026.xlsx",
           "locator": "Cover!Observation 1",
-          "observation": "States Danielle Goodwin retains ACTIVE access despite HRIS termination effective 2021-12-03; access flagged for immediate revocation and deprovisioning ticket ITSM-48217 raised, assigned to IT Identity & Access, due within 5 business days."
-        },
-        {
-          "file": "uar-netsuite-q2-2026.xlsx",
-          "locator": "Cover!Conclusion",
-          "observation": "'Review complete. 1 observation raised and remediated via ITSM-48217.' — narrative claims remediation but no supporting ticket artefact provided."
+          "observation": "States Danielle Goodwin retains ACTIVE access despite HRIS termination 2021-12-03; remediation: access flagged for immediate revocation; deprovisioning ticket ITSM-48217 raised, assigned to IT Identity & Access, due within 5 business days."
         },
         {
           "file": "uar-netsuite-q2-2026.xlsx",
           "locator": "Access Review!E90 (Danielle Goodwin row)",
-          "observation": "Reviewer Decision = 'revoke' for danielle.goodwin@northpeakfinancial.com — the flagged item is documented with a remediation action in the review workbook."
+          "observation": "Reviewer Decision = 'revoke' — the exception is documented on the reviewer sheet."
         },
         {
           "file": "uar-netsuite-q2-2026.xlsx",
-          "locator": "Access Review!E187 (Kevin Lewis row)",
-          "observation": "Reviewer Decision = 'retain' for kevin.lewis@northpeakfinancial.com despite HRIS showing terminated — this account was not flagged for remediation, so no remediation was triggered."
+          "locator": "System Access Export!C90",
+          "observation": "Danielle Goodwin account still shows Account Status = Active in the export dated 26 Jun 2026 — no post-remediation export provided to confirm the access was actually revoked."
         },
         {
-          "file": "deterministic reperformance",
-          "locator": "reviewer_missed_findings / terminated_but_active_in_system",
-          "observation": "Reperformance identifies 2 terminated-but-active accounts (Danielle Goodwin, Kevin Lewis); only Danielle Goodwin entered the remediation workflow."
+          "file": "uar-netsuite-q2-2026.xlsx",
+          "locator": "Cover!Conclusion",
+          "observation": "States '1 observation raised and remediated via ITSM-48217' but provides no ticket closure date or confirmation of actual deprovisioning in NetSuite."
+        },
+        {
+          "file": "reperformance (deterministic)",
+          "locator": "reviewer_missed_findings",
+          "observation": "Reperformer identified Kevin Lewis (terminated in HRIS, still active in system) — reviewer decision was 'retain' so no remediation initiated. Not an in-scope failure for this attribute (belongs to identification-completeness), but noted."
         }
       ],
       "exceptions_considered": [
-        "Considered whether Kevin Lewis being missed by the reviewer belongs to a separate 'reviewer completeness' attribute rather than this timeliness attribute — it primarily does, but it is noted because remediation cannot be timely for a finding that was never raised.",
-        "Considered whether the narrative statement 'remediated via ITSM-48217' on the Cover sheet is sufficient evidence — rejected because there is no independent artefact (ticket export or post-remediation system screenshot) confirming the revocation actually occurred."
+        "Considered whether the ticket number ITSM-48217 alone constitutes sufficient evidence of remediation. Rejected — a ticket being raised evidences a remediation request, not that access was actually revoked in the target system. The attribute explicitly requires 'evidence confirms the access was actually revoked or adjusted in the target system (not just requested).'",
+        "Considered whether Kevin Lewis (missed by reviewer) should cause this attribute to FAIL. Rejected — Kevin Lewis was not 'identified during the review' by the reviewer, so remediation timeliness for identified exceptions is not directly impugned. That gap belongs to the exception-identification attribute."
       ]
+    }
+  ],
+  "ipe_checks": [
+    {
+      "check": "Total export row count matches Cover sheet declaration",
+      "status": "pass",
+      "detail": "Cover declares 332 in-scope + 2 service accounts = 334. Actual system access export has 334 rows."
+    },
+    {
+      "check": "Service-account carve-out matches reperformance orphans",
+      "status": "pass",
+      "detail": "Cover declares 2 service accounts out of scope; reperformance found exactly 2 orphan(s) (users in access export with no HRIS record)."
+    },
+    {
+      "check": "Reviewer decision counts match Cover sheet totals",
+      "status": "pass",
+      "detail": "Actual counts on Access Review sheet (331 retain / 1 revoke) reconcile to Cover totals."
     }
   ],
   "control_conclusion": "CONTROL_INCONCLUSIVE",
@@ -150,7 +161,7 @@
     }
   ],
   "recommended_actions": [
-    "Provide additional evidence to close “Inappropriate or excessive access identified during the review is remediated in a timely manner”. Specifically: The reviewer flagged one account (Danielle Goodwin) for revocation and the summary records remediation via ITSM ticket ITSM-48217 assigned to IT with a 5-business-day SLA.",
+    "Provide additional evidence to close “Inappropriate or excessive access identified during the review is remediated in a timely manner”. Specifically: The reviewer documented one exception (Danielle Goodwin) and evidenced a remediation action — ITSM-48217 was raised and assigned to IT with a 5-business-day SLA.",
     "Revoke Kevin Lewis's access (kevin.lewis@northpeakfinancial.com) and update the review process to catch terminated employees still marked Retain."
   ],
   "evidence_coverage": {
@@ -179,18 +190,17 @@
       "bytes_size": 42432,
       "extraction_summary": "Workbook · 4 sheet(s), 668 rows total. Sheets: Cover, System Access Export, Access Review, Summary & Observations",
       "cited_by_attributes": [
-        "periodic-review-cadence",
-        "periodic-review-cadence",
-        "periodic-review-cadence",
-        "reviewer-is-appropriate-owner",
-        "reviewer-is-appropriate-owner",
-        "reviewer-is-appropriate-owner",
-        "reviewer-is-appropriate-owner",
-        "reviewer-is-appropriate-owner",
-        "timely-remediation-of-exceptions",
-        "timely-remediation-of-exceptions",
-        "timely-remediation-of-exceptions",
-        "timely-remediation-of-exceptions"
+        "periodic-access-reviews",
+        "periodic-access-reviews",
+        "periodic-access-reviews",
+        "reviewed-approved-by-owner",
+        "reviewed-approved-by-owner",
+        "reviewed-approved-by-owner",
+        "reviewed-approved-by-owner",
+        "timely-remediation",
+        "timely-remediation",
+        "timely-remediation",
+        "timely-remediation"
       ]
     }
   ],
