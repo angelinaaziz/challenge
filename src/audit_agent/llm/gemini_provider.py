@@ -12,6 +12,7 @@ from google.genai import types
 from pydantic import BaseModel
 
 from audit_agent.llm.base import ImagePart, Message, TextPart
+from audit_agent.llm.retry import with_retry
 
 TModel = TypeVar("TModel", bound=BaseModel)
 
@@ -31,6 +32,18 @@ class GeminiProvider:
         schema: type[TModel],
         purpose: str,
         max_tokens: int = 4096,
+    ) -> tuple[TModel, dict[str, Any]]:
+        return with_retry(
+            self._complete_once, system, messages, schema, purpose, max_tokens
+        )
+
+    def _complete_once(
+        self,
+        system: str,
+        messages: list[Message],
+        schema: type[TModel],
+        purpose: str,
+        max_tokens: int,
     ) -> tuple[TModel, dict[str, Any]]:
         contents = [_to_gemini_content(m) for m in messages]
         # Gemini Developer API rejects `additionalProperties`; strip it from the schema.
