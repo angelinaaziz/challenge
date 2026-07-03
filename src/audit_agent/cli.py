@@ -147,9 +147,12 @@ def audit(
         "N=3 costs ~3x tokens on the judge step (cheaper with cache warm) but lifts accuracy.",
     ),
     open_report: bool = typer.Option(
-        False,
-        "--open",
-        help="Auto-open the HTML report in the default browser after the run finishes.",
+        True,
+        "--open/--no-open",
+        help=(
+            "Auto-open the HTML report in the default browser after the run "
+            "finishes (default: on). Use --no-open in CI or when running headless."
+        ),
     ),
 ):
     """Audit a control folder and emit per-sample assessments.
@@ -464,10 +467,17 @@ def show(
         dir_okay=False,
         help="Path to an assessment.json file.",
     ),
+    open_report: bool = typer.Option(
+        True,
+        "--open/--no-open",
+        help="Also open the HTML report for this run in the default browser (default: on).",
+    ),
 ):
     """Pretty-print a past assessment.json in the terminal.
 
-    Use this to inspect audit output without opening the JSON file directly.
+    Prints the sample assessment. If a report.html exists in the run
+    directory (the assessment.json's grandparent), the report link is also
+    printed as a clickable file:// URI. Pass `--open` to auto-launch it.
     """
     from audit_agent.schemas import SampleAssessment
 
@@ -603,6 +613,40 @@ def show(
             )
         )
 
+    # Surface the HTML report (and Excel workpaper if present) alongside the
+    # in-terminal detail. The run dir is the grandparent of assessment.json:
+    # output/<control>/<model>/<sample>/assessment.json → run_dir = <model>/
+    run_dir = assessment_path.parent.parent
+    report_html = run_dir / "report.html"
+    workpaper_xlsx = assessment_path.parent / "workpaper.xlsx"
+    if report_html.exists() or workpaper_xlsx.exists():
+        CONSOLE.print()
+        if report_html.exists():
+            uri = report_html.resolve().as_uri()
+            CONSOLE.print(
+                Padding(
+                    Text.assemble(
+                        ("HTML report: ", "dim"),
+                        (uri, f"{_ACCENT} underline link " + uri),
+                    ),
+                    (0, 2),
+                )
+            )
+        if workpaper_xlsx.exists():
+            uri_x = workpaper_xlsx.resolve().as_uri()
+            CONSOLE.print(
+                Padding(
+                    Text.assemble(
+                        ("Excel workpaper: ", "dim"),
+                        (uri_x, f"{_ACCENT} underline link " + uri_x),
+                    ),
+                    (0, 2),
+                )
+            )
+        if open_report and report_html.exists():
+            import webbrowser
+            webbrowser.open(report_html.resolve().as_uri())
+
 
 # --- trace ------------------------------------------------------------------
 
@@ -662,7 +706,9 @@ def report(
         help="Output directory containing sample assessment.json files and trace.jsonl.",
     ),
     open_browser: bool = typer.Option(
-        False, "--open", help="Open the report in the default browser after generating."
+        True,
+        "--open/--no-open",
+        help="Open the report in the default browser after generating (default: on).",
     ),
 ):
     """Generate a self-contained HTML report + Excel workpaper of a past run.

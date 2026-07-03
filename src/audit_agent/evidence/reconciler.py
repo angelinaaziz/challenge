@@ -192,6 +192,56 @@ def _lower(x: Any) -> str:
     return str(x).strip().lower() if x is not None else ""
 
 
+# Small controlled vocab for employment-status normalisation. Real-world HRIS
+# systems vary on how they spell "terminated" (Workday says "Terminated",
+# NetSuite HR says "Ended", some SAP setups say "Separated" or "Retired").
+# Rather than exact-matching "terminated" we tokenise the status value and
+# check for any of these signals — much more robust to unseen data.
+_TERMINATED_TOKENS = {
+    "terminated", "termed", "terminate",
+    "separated", "separation", "ended",
+    "retired", "resigned", "left",
+    "inactive-terminated",
+    "involuntary", "voluntary",  # standalone in some HRIS
+}
+_ON_LEAVE_TOKENS = {
+    "on leave", "leave", "loa",
+    "sabbatical", "furlough", "furloughed",
+    "medical leave", "parental leave", "maternity", "paternity",
+}
+
+
+def _status_matches(status: str, tokens: set[str]) -> bool:
+    """Return True if the normalised status contains any of the vocab tokens.
+
+    Splits on whitespace, hyphens, slashes and en-dashes so `Terminated - Retired`,
+    `Terminated/Involuntary`, and `on-leave` all match. Also checks the full
+    normalised string for multi-word tokens like "on leave".
+    """
+    if not status:
+        return False
+    s = status.strip().lower()
+    if s in tokens:
+        return True
+    # Multi-word token check (e.g. "on leave").
+    for t in tokens:
+        if " " in t and t in s:
+            return True
+    # Single-word token check via delimited split.
+    parts = set()
+    current = ""
+    for ch in s:
+        if ch.isalpha():
+            current += ch
+        else:
+            if current:
+                parts.add(current)
+                current = ""
+    if current:
+        parts.add(current)
+    return bool(parts & tokens)
+
+
 def reconcile_user_access_review(
     access_book: XlsxWorkbook,
     hris_book: XlsxWorkbook,
@@ -308,7 +358,9 @@ def reconcile_user_access_review(
         matched += 1
         hris_status = hris["status"]
 
-        if hris_status == "terminated" and sys_status == "active":
+        # Tokenised match so alt vocab (Terminated - Retired, Separated,
+        # Ended, etc.) is still surfaced. Same for on-leave.
+        if _status_matches(hris_status, _TERMINATED_TOKENS) and sys_status == "active":
             f = UserFinding(
                 email=email,
                 name=str(name),
@@ -330,7 +382,7 @@ def reconcile_user_access_review(
             terminated_active.append(f)
             if rev_decision == "retain":
                 reviewer_missed.append(f)
-        elif hris_status == "on leave" and sys_status == "active":
+        elif _status_matches(hris_status, _ON_LEAVE_TOKENS) and sys_status == "active":
             on_leave_active.append(
                 UserFinding(
                     email=email,

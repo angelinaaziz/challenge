@@ -90,18 +90,45 @@ def test_all_orphans_case_no_matches(uar_all_orphans):
     assert recon["terminated_but_active_in_system_count"] == 0
 
 
-def test_alt_status_vocab_still_detected(uar_alt_status_vocab):
-    """Known weak point: HRIS says 'Terminated - Retired' not 'Terminated'.
+def test_alt_status_vocabs_are_tokenised():
+    """Direct-level test of the vocab tokeniser on the value strings we've
+    seen in real HRIS exports."""
+    from audit_agent.evidence.reconciler import (
+        _ON_LEAVE_TOKENS,
+        _TERMINATED_TOKENS,
+        _status_matches,
+    )
+    # Positive termination signals
+    for s in [
+        "Terminated",
+        "TERMINATED",
+        "terminated",
+        "Terminated - Retired",
+        "Terminated/Involuntary",
+        "Separated",
+        "Ended",
+        "Retired",
+        "Resigned",
+    ]:
+        assert _status_matches(s, _TERMINATED_TOKENS), s
+    # Negative — real "Active" and "On Leave" should NOT be termed.
+    for s in ["Active", "on leave", "On Leave", "Sabbatical"]:
+        assert not _status_matches(s, _TERMINATED_TOKENS), s
 
-    The reconciler currently does `_lower(status) == 'terminated'` — this test
-    documents the current behaviour. When we tokenise the status vocab in a
-    follow-up, this test should be updated to expect the finding to fire.
+    # Positive on-leave signals
+    for s in ["On Leave", "Leave", "Sabbatical", "Furloughed", "Maternity Leave"]:
+        assert _status_matches(s, _ON_LEAVE_TOKENS), s
+
+
+def test_alt_status_vocab_still_detected(uar_alt_status_vocab):
+    """HRIS says 'Terminated - Retired' not 'Terminated'.
+
+    Robustness against unseen status vocab: the reconciler tokenises the
+    normalised HRIS status against a controlled vocabulary of termination
+    signals, so multi-word variants ("Terminated - Retired", "Separated",
+    "Ended") still surface as findings.
     """
     uar, hris = uar_alt_status_vocab
     recon = reconcile_user_access_review(uar, hris).to_summary_dict()
-    # Current behaviour: not detected (documented gap).
-    # When we normalise status vocab, this assertion should flip to == 1.
-    # Keeping it explicit so a future change makes the test intent obvious.
-    assert recon["terminated_but_active_in_system_count"] == 0, (
-        "Known gap: alt status vocab isn't tokenised. See NOTES.md."
-    )
+    assert recon["terminated_but_active_in_system_count"] == 1
+    assert recon["terminated_but_active_in_system"][0]["email"] == "ravi@corp.com"
