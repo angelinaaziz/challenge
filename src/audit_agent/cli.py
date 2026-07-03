@@ -208,11 +208,15 @@ def _render_audit_summary(
 
     _render_cost_footer(out)
 
-    # Auto-generate + surface the HTML report as a clickable link.
+    # Auto-generate HTML report + Excel working paper. Both are surfaced as
+    # clickable links in modern terminals.
     from audit_agent.html_report import build_report
+    from audit_agent.xlsx_workpaper import build_workpapers_for_run
 
     report_path = build_report(out)
     report_uri = report_path.resolve().as_uri()
+    workpapers = build_workpapers_for_run(out)
+
     CONSOLE.print()
     link_text = Text.assemble(
         ("Report ", f"bold {_ACCENT}"),
@@ -220,6 +224,16 @@ def _render_audit_summary(
         (report_uri, f"{_ACCENT} underline link " + report_uri),
     )
     CONSOLE.print(Padding(link_text, (0, 2)))
+    if workpapers:
+        xlsx_line = Text.assemble(
+            ("Working papers ", f"bold {_ACCENT}"),
+            ("(.xlsx): ", "dim"),
+            (
+                ", ".join(str(p.relative_to(out)) for p in workpapers),
+                _PAPER,
+            ),
+        )
+        CONSOLE.print(Padding(xlsx_line, (0, 2)))
     if open_report:
         import webbrowser
         webbrowser.open(report_uri)
@@ -651,20 +665,26 @@ def report(
         False, "--open", help="Open the report in the default browser after generating."
     ),
 ):
-    """Generate a self-contained HTML report of a past run.
+    """Generate a self-contained HTML report + Excel workpaper of a past run.
 
-    Writes report.html into the same directory. No external dependencies —
-    styles are inlined so the file works offline and can be emailed as a
-    single attachment.
+    Writes report.html + <sample>/workpaper.xlsx into the same directory. No
+    external dependencies — styles are inlined so the HTML works offline and
+    can be emailed as a single attachment. The .xlsx follows Bead's marketed
+    "native Excel working papers" format with Cover / Attribute Verdicts /
+    Evidence Citations / Reperformance / Evidence Inventory / Decision Log
+    sheets.
     """
     from audit_agent.html_report import build_report
+    from audit_agent.xlsx_workpaper import build_workpapers_for_run
 
     out_path = build_report(run_dir)
+    workpapers = build_workpapers_for_run(run_dir)
     CONSOLE.print(f"[green]Wrote[/] [bold]{out_path}[/]")
+    for w in workpapers:
+        CONSOLE.print(f"[green]Wrote[/] [bold]{w}[/]")
     if open_browser:
         import webbrowser
-
-        webbrowser.open(out_path.as_uri())
+        webbrowser.open(out_path.resolve().as_uri())
 
 
 # --- eval -------------------------------------------------------------------

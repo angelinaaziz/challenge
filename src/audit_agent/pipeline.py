@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -14,7 +13,6 @@ from rich.progress import track
 from audit_agent.control import load_control
 from audit_agent.evidence import (
     EvidenceBundle,
-    classify_sample,
     extract_screenshot_facts,
     extract_xlsx_facts,
     reconcile_user_access_review,

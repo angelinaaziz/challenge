@@ -279,7 +279,7 @@ def reconcile_user_access_review(
         rev_entry = review_by_email.get(email)
         rev_decision = rev_entry["decision"] if rev_entry else "no_reviewer_entry"
         exp_email_coord = row.coords.get(exp_cols.email, "?") if exp_cols.email else "?"
-        exp_status_coord = row.coords.get(exp_cols.status, "?") if exp_cols.status else "?"
+        _ = row.coords.get(exp_cols.status, "?") if exp_cols.status else "?"
         rev_coord = rev_entry["coord_decision"] if rev_entry else "?"
 
         hris = hris_by_email.get(email)

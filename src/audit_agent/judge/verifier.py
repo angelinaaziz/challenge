@@ -47,10 +47,10 @@ def verify_attribute(
     user_text = (
         f"# Attribute under review\n\n**{attribute.text}**\n\n"
         f"Testable criteria:\n" + "\n".join(f"- {c}" for c in attribute.testable_criteria) + "\n\n"
-        f"# First-pass verdict (which was FURTHER_EVIDENCE_REQUIRED)\n\n"
+        "# First-pass verdict (which was FURTHER_EVIDENCE_REQUIRED)\n\n"
         + json.dumps(first_pass.model_dump(), indent=2, default=str)
         + "\n\n"
-        f"# Evidence (same as before — re-read carefully)\n\n"
+        "# Evidence (same as before — re-read carefully)\n\n"
         + _facts_block(screenshots, xlsx, text_evidence, reconciliation)
     )
     assessment, meta = provider.complete_structured(

@@ -89,6 +89,28 @@ If Bead's real customers write controls in a consistent house template, a rules-
 5. **Citation verifier.** After the judge produces verdicts, verify cited cells actually contain the claimed values — deterministic self-check.
 6. **Verifier that can request evidence.** Right now the verifier is a single re-read. In a real workflow it should say "I need the CAB minutes attached" and gate on that.
 
+## Three questions a Bead engineer will grill me on, and my honest answers
+
+I ran a staff-level self-review against Bead's stated criteria + the reference harness + the other public forks. Three questions came out of it that will land in the debrief. I want to name them here before Bead has to raise them.
+
+### 1. "Give me a UAR where the HRIS says `Terminated - Retired` instead of `Terminated` and the reviewer sheet is called `Q3 Reviewer Decisions` — does your reconciler still work?"
+
+**Sheet-name change**: yes. `_sheet_role()` classifies by header content, not filename. `tests/test_reconciler.py::test_detects_uar_shape_from_headers_not_sheet_names` locks this in.
+
+**Alt status vocabulary**: honest answer — no, not yet. `_lower(hris_status) == "terminated"` is an exact string match. `test_alt_status_vocab_still_detected` documents this exact gap so a future change flips the assertion once we normalise. The 30-minute fix is either (a) tokenise the status against a small vocab set (`{"terminated", "termed", "separated", "left"}` etc.) or (b) run a one-shot LLM normaliser on distinct status values. I'd choose (a) — deterministic, cacheable, cheaper.
+
+### 2. "Why is control parsing an LLM call? What happens when the model drifts and adds or removes an attribute across runs?"
+
+Owned this in the design decision I was least sure about earlier in this file. Short version:
+
+- The eval matches golden labels by **normalised attribute text**, not attribute ID, precisely because IDs drift across providers.
+- If Bead's real customer controls follow a house template (e.g. every control has a `## Control Attributes` markdown section with bulleted items), a deterministic parser is cheaper and more auditable. I'd invest in the template first.
+- The LLM parse buys me generality-over-brittleness on unseen control shapes, which was the right tradeoff for a take-home where I don't know what Bead's next test data looks like.
+
+### 3. "You have 15 golden rows and no unit tests" (only true until this commit).
+
+Now fixed. `tests/test_reconciler.py` ships 7 unit tests around the deterministic reconciler with 5 synthetic fixture pairs (baseline / renamed reviewer sheet / all-orphans / on-leave / alt status vocab). CI runs `ruff check` + `pytest tests/ -v` on every push. Golden set is still my behavioural test for the LLM path — I chose to keep it small so every entry is defensible and reviewable, not padded.
+
 ## What I'd want to talk through in the debrief
 
 - How Bead's real customers write controls today. My loader assumes clean markdown with `## Control Attributes` and a bulleted list — realistic or optimistic?

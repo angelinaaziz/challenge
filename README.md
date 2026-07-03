@@ -33,6 +33,7 @@ Three outputs per run — from raw JSON for machines to a Bead-themed HTML workp
 | `assessment.json` | Machines. Structured verdicts with citations — Bead's requested output. |
 | `assessment.md` | Reading in the terminal or the repo — headline verdict, reperformance summary, evidence coverage, per-attribute detail with citations. |
 | **`report.html`** | **The workpaper.** Self-contained single-file HTML, Bead-themed light mode, opens offline. Auto-generated at the end of every audit run and shown as a clickable link in the terminal. |
+| **`workpaper.xlsx`** | **Native Excel working paper** (per Bead's marketed format). Cover sheet with verdict + exec summary + sign-off area, Attribute Verdicts, Evidence Citations, Reperformance, Evidence Inventory, and Decision Log sheets. Auto-generated per sample. |
 
 **Every `report.html` includes:**
 
@@ -292,9 +293,11 @@ Bead said cost isn't a factor in the evaluation so I haven't optimised heavily f
 ## Repo hygiene
 
 - **Prompts** live in `src/audit_agent/prompts/`
-- **Session notes** in `NOTES.md` — decisions, tradeoffs, what I'd invest in next. Bead explicitly asks for this.
+- **Unit tests** in `tests/test_reconciler.py` — 7 tests with 5 synthetic fixture pairs stressing the reconciler's header/status detection. `pytest tests/ -v`.
+- **CI** at `.github/workflows/ci.yml` — runs `ruff check` + `pytest` on every push.
+- **Session notes** in `NOTES.md` — decisions, tradeoffs, what I'd invest in next, and the three questions a Bead engineer will grill me on with honest answers. Bead explicitly asks for this.
 - **Setup** in `src/README.md`
-- **Fork** of `bead-ai/challenge`; upstream `data/` preserved; my code in `src/`, `evals/`, plus one synthetic control at `data/change-management/`
+- **Fork** of `bead-ai/challenge`; upstream `data/` preserved; my code in `src/`, `tests/`, `evals/`, plus one synthetic control at `data/change-management/`
 - Planned and iterated with Claude Code — kept scope honest, ran multi-model evals in the background, challenged the design when I was about to over-build
 
 ---
