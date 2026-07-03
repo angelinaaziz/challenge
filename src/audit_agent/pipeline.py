@@ -25,11 +25,14 @@ from audit_agent.llm import LLMProvider
 from audit_agent.schemas import (
     AttributeAssessment,
     Control,
+    ControlConclusion,
+    EvidenceCoverage,
     SampleAssessment,
     ScreenshotFacts,
     TextEvidence,
     Verdict,
     XlsxFacts,
+    rollup_verdicts,
 )
 from audit_agent.trace import Tracer
 
@@ -43,6 +46,7 @@ class RunConfig:
     out_dir: Path
     provider: LLMProvider
     verify: bool = True
+    consistency: int = 1  # >1 = self-consistency voting on the judge
 
 
 def _load_evidence(
@@ -122,6 +126,7 @@ def _process_sample(
     )
 
     attributes: list[AttributeAssessment] = []
+    disagreements: list[float] = []
     for attr in track(control.attributes, description=f"  judging {bundle.sample_id}"):
         assessment, meta = judge_attribute(
             control=control,
@@ -132,7 +137,10 @@ def _process_sample(
             text_evidence=text_evidence,
             reconciliation=reconciliation,
             provider=cfg.provider,
+            consistency=cfg.consistency,
         )
+        if "disagreement_rate" in meta:
+            disagreements.append(meta["disagreement_rate"])
         tracer.log(
             provider=cfg.provider.name,
             model=cfg.provider.model,
@@ -167,17 +175,52 @@ def _process_sample(
             )
         attributes.append(assessment)
 
+    conclusion = rollup_verdicts([a.verdict for a in attributes])
+    coverage = _compute_evidence_coverage(bundle, attributes)
+    disagreement = (sum(disagreements) / len(disagreements)) if disagreements else None
+
     return SampleAssessment(
         control=control.name,
         sample_id=bundle.sample_id,
         generated_at=datetime.now(timezone.utc),
         model=f"{cfg.provider.name}:{cfg.provider.model}",
         attributes=attributes,
+        control_conclusion=conclusion,
+        evidence_coverage=coverage,
+        consistency_disagreement_rate=disagreement,
         reperformance_notes=(
             None
             if reconciliation is None
             else _summary_from_reconciliation(reconciliation)
         ),
+    )
+
+
+def _compute_evidence_coverage(
+    bundle: EvidenceBundle, attributes: list[AttributeAssessment]
+) -> EvidenceCoverage:
+    """Files given to the pipeline vs files cited by at least one verdict."""
+    all_files = sorted({Path(f.path).name for f in bundle.files})
+    cited: set[str] = set()
+    for a in attributes:
+        for ref in a.evidence_refs:
+            cited.add(ref.file)
+    # A judge sometimes cites a file with a slightly different name (e.g. omits
+    # trailing spaces). Best-effort tolerant match: case-insensitive, trimmed.
+    all_norm = {f.strip().lower(): f for f in all_files}
+    cited_normalized: set[str] = set()
+    for c in cited:
+        key = c.strip().lower()
+        if key in all_norm:
+            cited_normalized.add(all_norm[key])
+        else:
+            # Cited file we can't map to a provided file — worth flagging in future.
+            pass
+    uncited = [f for f in all_files if f not in cited_normalized]
+    return EvidenceCoverage(
+        all_files=all_files,
+        cited_files=sorted(cited_normalized),
+        uncited_files=uncited,
     )
 
 
@@ -225,12 +268,33 @@ def _write_sample_output(sa: SampleAssessment, out_dir: Path) -> None:
 
 
 def _render_markdown(sa: SampleAssessment) -> str:
+    emoji = {
+        "CONTROL_PASS": "✅",
+        "CONTROL_FAIL": "❌",
+        "CONTROL_INCONCLUSIVE": "⚠️",
+    }[sa.control_conclusion.value]
     lines = [
         f"# {sa.control} — {sa.sample_id}",
         f"_generated: {sa.generated_at.isoformat()} · model: {sa.model}_",
+        "",
+        f"## {emoji} Control conclusion: `{sa.control_conclusion.value}`",
     ]
     if sa.reperformance_notes:
-        lines += ["", "## Reperformance", sa.reperformance_notes]
+        lines += ["", "### Reperformance summary", sa.reperformance_notes]
+    if sa.evidence_coverage:
+        cov = sa.evidence_coverage
+        lines += [
+            "",
+            f"### Evidence coverage — {int(cov.coverage_rate * 100)}%",
+            f"- All files provided: {len(cov.all_files)}",
+            f"- Cited in at least one verdict: {len(cov.cited_files)}",
+        ]
+        if cov.uncited_files:
+            lines.append(f"- **Uncited:** {', '.join(f'`{f}`' for f in cov.uncited_files)}")
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+    lines.append("## Attribute-level verdicts")
     lines.append("")
     for a in sa.attributes:
         emoji = {"SUCCESS": "✅", "FAIL": "❌", "FURTHER_EVIDENCE_REQUIRED": "⚠️"}[

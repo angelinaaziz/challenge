@@ -16,6 +16,27 @@ class Verdict(str, Enum):
     FURTHER_EVIDENCE_REQUIRED = "FURTHER_EVIDENCE_REQUIRED"
 
 
+class ControlConclusion(str, Enum):
+    """Sample-level rollup derived from all attribute verdicts."""
+    CONTROL_PASS = "CONTROL_PASS"                    # every attribute SUCCESS
+    CONTROL_FAIL = "CONTROL_FAIL"                    # any attribute FAIL
+    CONTROL_INCONCLUSIVE = "CONTROL_INCONCLUSIVE"    # mix of SUCCESS + FURTHER, no FAIL
+
+
+def rollup_verdicts(verdicts: list[Verdict]) -> ControlConclusion:
+    """Sample-level conclusion policy — deterministic, no LLM required.
+
+    Any FAIL wins (worst-case for the auditee). Otherwise, if any attribute
+    couldn't be judged, the sample is INCONCLUSIVE. Only when every attribute
+    is SUCCESS does the control PASS for this sample.
+    """
+    if any(v == Verdict.FAIL for v in verdicts):
+        return ControlConclusion.CONTROL_FAIL
+    if any(v == Verdict.FURTHER_EVIDENCE_REQUIRED for v in verdicts):
+        return ControlConclusion.CONTROL_INCONCLUSIVE
+    return ControlConclusion.CONTROL_PASS
+
+
 # --- Control definition (parsed from control.md + policy files) --------------
 
 class ControlAttribute(BaseModel):
@@ -155,12 +176,41 @@ class AttributeAssessment(BaseModel):
     )
 
 
+class EvidenceCoverage(BaseModel):
+    """Which evidence files got cited by at least one verdict.
+
+    Uncited evidence is a signal: either the file was irrelevant to the control
+    (fine, but worth noting), or the pipeline missed something (bad, worth
+    investigating). This is one of the checks a reviewing auditor would run on
+    a workpaper — "did you actually look at everything I gave you?".
+    """
+    all_files: list[str]
+    cited_files: list[str]
+    uncited_files: list[str]
+
+    @property
+    def coverage_rate(self) -> float:
+        return len(self.cited_files) / len(self.all_files) if self.all_files else 1.0
+
+
 class SampleAssessment(BaseModel):
     control: str
     sample_id: str
     generated_at: datetime
     model: str
     attributes: list[AttributeAssessment]
+    control_conclusion: "ControlConclusion" = Field(
+        description="Sample-level rollup: PASS if all attributes SUCCESS, FAIL if any attribute FAIL, INCONCLUSIVE otherwise."
+    )
+    evidence_coverage: Optional[EvidenceCoverage] = None
+    consistency_disagreement_rate: Optional[float] = Field(
+        default=None,
+        description=(
+            "If self-consistency voting was used (>1 judge run per attribute), this is the "
+            "fraction of attributes where the runs disagreed on the winning verdict — "
+            "high values flag genuinely ambiguous evidence."
+        ),
+    )
     reperformance_notes: Optional[str] = Field(
         default=None,
         description=(
@@ -179,6 +229,9 @@ class LLMCall(BaseModel):
     purpose: str
     input_tokens: Optional[int] = None
     output_tokens: Optional[int] = None
+    cache_read_tokens: Optional[int] = None
+    cache_write_tokens: Optional[int] = None
+    cost_usd: Optional[float] = None
     latency_ms: Optional[int] = None
     system_hash: str = Field(description="sha256 of the system prompt.")
     user_hash: str = Field(description="sha256 of the user prompt (excluding images).")

@@ -6,10 +6,9 @@
       "id": "code-review-before-merge-to-main",
       "text": "Code Reviews are performed prior to committing a change to the main branch",
       "testable_criteria": [
-        "A code review record (e.g. pull request) exists for the change.",
-        "The code review was completed and approved before the change was merged into the main branch.",
-        "The merge commit timestamp to main is after the code review approval timestamp.",
-        "No direct commits to main were made bypassing the code review process."
+        "A code review record exists for the change (e.g., pull/merge request with review comments or approval).",
+        "The code review was completed BEFORE the change was merged into the main branch (review timestamp precedes merge timestamp).",
+        "The change was not merged to main without an associated code review record."
       ],
       "relevant_policies": []
     },
@@ -17,34 +16,35 @@
       "id": "independent-reviewer-approval",
       "text": "Code Review approvals are performed by independent code reviewers",
       "testable_criteria": [
-        "At least one approval on the code review is recorded from a reviewer other than the change author.",
-        "The approving reviewer is not the same identity (username/email) as the author or committer of the change.",
-        "The approving reviewer has authority/permission to approve code reviews in the repository.",
-        "The approval was not self-approved or granted by an automated bot acting on behalf of the author."
+        "The change has at least one recorded approval on the pull/merge request.",
+        "The approver is a different individual from the author/committer of the change (4-eyes principle).",
+        "The approver did not author any of the commits included in the change under review.",
+        "The approval was granted prior to merge to the main branch."
       ],
       "relevant_policies": []
     },
     {
-      "id": "testing-per-policy",
+      "id": "testing-per-testing-policy",
       "text": "Testing is performed in accordance with the testing policy",
       "testable_criteria": [
-        "Unit test code coverage for new code is ≥ 80%.",
-        "Integration test coverage for critical integration points is ≥ 60%.",
-        "IF the change touches security-sensitive, payment, or authentication flows THEN line coverage for those paths = 100%.",
+        "Unit tests achieve minimum 80% code coverage for new code.",
+        "Integration tests achieve minimum 60% coverage for critical integration points.",
+        "IF the change touches security-sensitive, payment, or authentication flows THEN 100% coverage is achieved for those critical paths.",
         "IF the change modifies legacy code THEN existing coverage levels are maintained or improved.",
-        "Branch coverage is ≥ 70%.",
-        "Function coverage is ≥ 80%.",
+        "Branch coverage is at least 70%.",
+        "Function coverage is at least 80%.",
         "A coverage report was generated and reviewed as part of the code review.",
         "All unit tests passed with zero failures prior to release.",
         "All integration tests passed prior to release.",
         "End-to-end tests for critical user journeys passed prior to release.",
-        "IF applicable, performance benchmarks were met prior to release.",
+        "IF performance tests are applicable THEN performance benchmarks were met.",
         "Security scan results were reviewed and approved prior to release.",
         "Tests were executed in the CI/CD pipeline before merge.",
         "Test results are visible in the pull request status checks.",
-        "No known critical or high-severity bugs are open at time of release.",
-        "Manual smoke tests were completed for critical features prior to release.",
-        "IF the change qualifies for a documented exception (legacy integration, third-party dependency, PoC/experimental, documentation-only, build/deployment scripts, dependency version bump, or behavior-preserving refactor) THEN the exception is explicitly documented and applicable."
+        "Tests ran in a clean environment with no cached dependencies.",
+        "No flaky tests remained unresolved at the time of release (fixed or removed).",
+        "Pre-release checklist items are verified: all automated tests pass, coverage meets thresholds, no known critical/high-severity bugs, performance tests pass (if applicable), security tests pass, and manual smoke tests for critical features are completed.",
+        "IF an exception/waiver is claimed THEN the change falls within one of the documented exception categories (legacy integration, third-party dependencies, PoC/experimental, documentation-only, build/deploy scripts, dependency version bumps, or refactoring with no behavioral changes) and the exception is documented."
       ],
       "relevant_policies": [
         "testing-policy.md"
