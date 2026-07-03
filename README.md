@@ -22,6 +22,18 @@ Claude gets Bead's two controls perfectly. All three models tie or struggle on m
 
 ---
 
+## What you get out
+
+Three outputs per run — from raw JSON for machines to a Bead-themed HTML workpaper you can send to a reviewer.
+
+| Format | Best for |
+| --- | --- |
+| `assessment.json` | Machines. Structured verdicts with citations — Bead's requested output. |
+| `assessment.md` | Reading in the terminal or the repo — headline verdict, reperformance summary, evidence coverage, per-attribute detail with citations. |
+| **`report.html`** | **Sharing.** Self-contained single-file HTML report, Bead-themed light mode, opens offline, emailable. Generate with `bead-agent report <run-dir>`. |
+
+Committed sample outputs live under `output/<control>/<model>/report.html` — open any of them in a browser to see what the pipeline produces.
+
 ## Try it
 
 ```bash
@@ -34,6 +46,9 @@ cp .env.example .env       # then fill in ANTHROPIC_API_KEY
 
 # 3. audit
 bead-agent audit data/independent-code-review
+
+# 4. get the workpaper
+bead-agent report output/independent-code-review/claude --open
 ```
 
 That's it. Everything else is optional flags.
