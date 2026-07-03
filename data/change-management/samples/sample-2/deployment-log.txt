@@ -1,0 +1,20 @@
+### Deployment log — CHG-2026-0912 ###
+system: reports-api, reports-worker, reports-db
+executor: marcus.bell@northpeakfinancial.com (Platform Engineer)
+window start: 2026-06-28 15:04:17 UTC
+window end:   2026-06-28 15:31:02 UTC
+
+2026-06-28 15:04:17 UTC  [runner-b2] start CHG-2026-0912 deployment
+2026-06-28 15:04:20 UTC  [runner-b2] verifying approval status
+2026-06-28 15:04:20 UTC  [runner-b2] approval OK — CHG-2026-0912 approved by marcus.bell at 2026-06-28T14:47:00Z (self-approved)
+2026-06-28 15:05:03 UTC  [runner-b2] provisioning reports-db RDS instance (db.m6g.large)
+2026-06-28 15:12:41 UTC  [runner-b2] reports-db provisioning complete
+2026-06-28 15:13:00 UTC  [runner-b2] deploying reports-api (ECS task revision 4)
+2026-06-28 15:14:50 UTC  [runner-b2] reports-api healthy
+2026-06-28 15:15:12 UTC  [runner-b2] deploying reports-worker (ECS task revision 2)
+2026-06-28 15:16:38 UTC  [runner-b2] reports-worker healthy
+2026-06-28 15:17:02 UTC  [runner-b2] creating API gateway routes /reports/q2/*
+2026-06-28 15:19:41 UTC  [runner-b2] canary transaction TXN-CANARY-912-01 FAILED (5xx) — expected 200
+2026-06-28 15:19:44 UTC  [runner-b2] canary transaction TXN-CANARY-912-02 FAILED (5xx) — expected 200
+2026-06-28 15:20:00 UTC  [runner-b2] override applied — accepting canary failure for demo
+2026-06-28 15:31:02 UTC  [runner-b2] CHG-2026-0912 complete — status: DEPLOYED (with known post-deploy defects to be fixed 2026-06-29)

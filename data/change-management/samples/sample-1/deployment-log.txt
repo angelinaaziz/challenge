@@ -1,0 +1,21 @@
+### Deployment log — CHG-2026-0847 ###
+system: payments-primary + payments-api
+executor: marcus.bell@northpeakfinancial.com (Platform Engineer)
+window start: 2026-06-24 20:00:02 UTC
+window end:   2026-06-24 21:47:31 UTC
+
+2026-06-24 20:00:02 UTC  [runner-a1] start CHG-2026-0847 deployment
+2026-06-24 20:00:14 UTC  [runner-a1] verifying approval status
+2026-06-24 20:00:15 UTC  [runner-a1] approval OK — CHG-2026-0847 approved by priya.nadkarni at 2026-06-23T15:42:00Z (CAB-2026-W25)
+2026-06-24 20:01:03 UTC  [runner-a1] taking pre-upgrade snapshot snap-payments-2026-06-24-1955
+2026-06-24 20:03:47 UTC  [runner-a1] snapshot complete (2m44s)
+2026-06-24 20:05:00 UTC  [runner-a1] pausing pgbouncer traffic on payments-primary
+2026-06-24 20:05:12 UTC  [runner-a1] beginning RDS major version upgrade 15.7 -> 16.3
+2026-06-24 21:14:56 UTC  [runner-a1] RDS upgrade complete (1h9m44s) — engine version 16.3 confirmed
+2026-06-24 21:15:12 UTC  [runner-a1] deploying payments-api with pg@8.13
+2026-06-24 21:17:03 UTC  [runner-a1] payments-api healthy — /healthz returning 200
+2026-06-24 21:17:20 UTC  [runner-a1] resuming pgbouncer traffic
+2026-06-24 21:18:05 UTC  [runner-a1] canary transaction TXN-CANARY-847-01 passed (48ms)
+2026-06-24 21:18:05 UTC  [runner-a1] canary transaction TXN-CANARY-847-02 passed (52ms)
+2026-06-24 21:47:31 UTC  [runner-a1] 30-min post-deploy monitoring window elapsed — no anomalies
+2026-06-24 21:47:31 UTC  [runner-a1] CHG-2026-0847 complete — status: SUCCESS
