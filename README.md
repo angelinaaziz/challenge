@@ -35,26 +35,118 @@ cp .env.example .env
 # ANTHROPIC_API_KEY required.
 # OPENAI_API_KEY + GOOGLE_API_KEY only if you want the multi-model scoreboard.
 
-# 3. Audit any control
-bead-agent audit data/independent-code-review --model claude
-bead-agent audit data/user-access-review --model claude
-bead-agent audit data/change-management --model claude
-
-# 4. Multi-model scoreboard against the golden set
-bead-agent eval data/independent-code-review --models claude,openai,gemini
-
-# 5. Self-consistency voting (3× calls per attribute, majority wins)
-bead-agent audit data/user-access-review --model claude --consistency 3
+# 3. Audit
+bead-agent audit data/independent-code-review
 ```
 
-Outputs land in `output/<control>/<model>/<sample>/`:
+That's the whole demo. Full CLI reference below.
+
+## CLI reference
+
+Five commands. Every command has `--help`.
+
+### `bead-agent audit <control-dir>`
+
+Run the full pipeline. Produces per-sample assessment.json + assessment.md.
+
+```bash
+bead-agent audit data/independent-code-review               # defaults: --model claude, verifier on
+bead-agent audit data/user-access-review --model gemini
+bead-agent audit data/change-management --consistency 3     # 3-way self-consistency vote per attribute
+bead-agent audit data/user-access-review --no-verify        # skip the FURTHER_EVIDENCE_REQUIRED verifier
+bead-agent audit data/user-access-review --out /tmp/uar     # custom output dir
+```
+
+| Flag | Default | Purpose |
+| --- | --- | --- |
+| `--model / -m` | `claude` | `claude` \| `openai` \| `gemini` |
+| `--out / -o` | `output/<control>/<model>/` | Output directory |
+| `--no-verify` | off | Skip the FURTHER_EVIDENCE_REQUIRED verifier re-read |
+| `--consistency / -k` | `1` | Self-consistency voting: run the judge N times per attribute, majority wins |
+
+**Example finish-line output:**
+
+```
+                     Audit summary — claude:claude-opus-4-7
+┏━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━┓
+┃ Sample   ┃ Attribute                                        ┃ Verdict ┃ Conf ┃
+┡━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━┩
+│ sample-1 │ Access reviews are performed on a periodic basis │ SUCCESS │ 0.90 │
+│ sample-1 │ Access is reviewed and approved by an appropr…   │ SUCCESS │ 0.90 │
+│ sample-1 │ Inappropriate or excessive access identified…    │ FAIL    │ 0.85 │
+└──────────┴──────────────────────────────────────────────────┴─────────┴──────┘
+╭─────────────────────────── Control conclusion ────────────────────────────╮
+│   ❌ sample-1: CONTROL_FAIL                                               │
+│      coverage: 100% (2/2 evidence files cited)                            │
+╰───────────────────────────────────────────────────────────────────────────╯
+Cost: $2.03 · 11 calls · 70,374 in / 15,186 out tokens · cache-hit 19% (13,190 tokens)
+
+Results written to output/user-access-review/claude
+Inspect: bead-agent show output/user-access-review/claude/<sample>/assessment.json
+```
+
+### `bead-agent info <control-dir>`
+
+Parse the control + list samples **without running the LLM audit**. Use it to sanity-check that samples are discovered correctly and to estimate LLM-call cost before running.
+
+```bash
+bead-agent info data/change-management
+```
+
+Shows: parsed control, all attributes with testable criteria, list of discovered samples with evidence files, plus a call-count estimate for a full audit.
+
+### `bead-agent show <path-to-assessment.json>`
+
+Pretty-print a past assessment in the terminal — panels per attribute with verdict, rationale, evidence citations, policy references, exceptions considered.
+
+```bash
+bead-agent show output/user-access-review/claude/sample-1/assessment.json
+```
+
+### `bead-agent trace <run-dir>`
+
+Table of every LLM call from a past run: purpose, input/cache/output tokens, cost, latency.
+
+```bash
+bead-agent trace output/user-access-review/claude
+```
+
+### `bead-agent eval <control-dir>`
+
+Multi-model scoreboard. Runs the pipeline under each provider and scores against the hand-labelled golden set.
+
+```bash
+bead-agent eval data/independent-code-review --models claude,openai,gemini
+```
+
+| Flag | Default | Purpose |
+| --- | --- | --- |
+| `--models` | `claude,openai,gemini` | Comma-separated provider list |
+| `--golden` | `evals/golden.jsonl` | Path to golden ground-truth |
+
+## Environment variables
+
+Copy `.env.example` to `.env` and fill in:
+
+| Variable | Required for | Notes |
+| --- | --- | --- |
+| `ANTHROPIC_API_KEY` | `--model claude` | Required for the default model |
+| `OPENAI_API_KEY` | `--model openai` | Only needed for multi-model eval |
+| `GOOGLE_API_KEY` | `--model gemini` | Only needed for multi-model eval |
+| `CLAUDE_MODEL` | override default | Defaults to `claude-opus-4-7` |
+| `OPENAI_MODEL` | override default | Defaults to `gpt-5.4` |
+| `GEMINI_MODEL` | override default | Defaults to `gemini-3.1-pro-preview` (Gemini 3 pro isn't GA yet) |
+
+## Output layout
+
+Everything lives under `output/<control>/<model>/`:
 
 | File | What's in it |
 | --- | --- |
-| `assessment.json` | The structured verdicts (Bead's requested format) |
-| `assessment.md` | Human-readable workpaper — reperformance summary, evidence coverage, per-attribute verdicts with citations |
-| `trace.jsonl` | Every LLM call: tokens, cache hits, cost, prompt hashes |
-| `control.json` | The parsed control spec (attributes + testable criteria) |
+| `control.json` | The parsed control spec (name, description, attributes, testable_criteria) |
+| `trace.jsonl` | Every LLM call: purpose, tokens, cache hits, cost, latency, prompt hashes |
+| `<sample>/assessment.json` | The structured verdicts (Bead's requested format) |
+| `<sample>/assessment.md` | Human-readable workpaper — headline verdict, reperformance summary, evidence coverage, per-attribute verdicts with citations |
 
 ---
 
