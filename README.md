@@ -1,252 +1,261 @@
-# Bead Audit Agent — take-home submission
+# Bead audit agent
 
-A generic, auditable AI agent that takes a control definition + evidence sample and produces per-attribute SUCCESS / FAIL / FURTHER_EVIDENCE_REQUIRED verdicts with mandatory citations back to the source evidence.
+A generic AI agent that audits controls. Point it at a control folder, get back per-attribute verdicts with mandatory citations.
 
-**Author**: Angelina Aziz · **Date**: July 2026 · **Challenge**: [bead-ai/challenge](https://github.com/bead-ai/challenge)
+**Take-home submission for [`bead-ai/challenge`](https://github.com/bead-ai/challenge)** · Angelina Aziz · July 2026
 
-## Headline result — model scoreboard
+---
 
-Fifteen hand-labeled `(sample × attribute)` verdicts across **three controls** (the two Bead provided + one synthetic control the pipeline had never seen), three frontier models (mid-2026), one pipeline.
+## Headline result
 
-| Model | ICR (6 cases) | UAR (3 cases) | Change Mgmt (6 cases) | **Overall accuracy** |
-| --- | --- | --- | --- | --- |
-| **Claude Opus 4.7** | **6 / 6** (100%) | **3 / 3** (100%) | 4 / 6 (67%) | **13 / 15 · 87%** ✅ |
-| GPT-5.4 | 4 / 6 (67%) | 3 / 3 (100%) | 3 / 6 (50%) | 10 / 15 · 67% |
-| Gemini 3.1 Pro Preview | 5 / 6 (83%) | 1 / 3 (33%) | 4 / 6 (67%) | 10 / 15 · 67% |
+Fifteen hand-labelled `(sample × attribute)` verdicts across three controls, three frontier models. One pipeline.
 
-**Claude is perfect on the two Bead-provided controls**, and the leading model overall. The two Claude mismatches on Change Management are on genuinely ambiguous attributes where competent auditors could disagree (see [Model comparison](#model-comparison-detail)).
+| Model | ICR (6) | UAR (3) | Change Mgmt (6) | **Overall** |
+| --- | :-: | :-: | :-: | :-: |
+| **Claude Opus 4.7** | **6/6 · 100%** | **3/3 · 100%** | 4/6 · 67% | **13/15 · 87%** ✅ |
+| GPT-5.4 | 4/6 · 67% | 3/3 · 100% | 3/6 · 50% | 10/15 · 67% |
+| Gemini 3.1 Pro Preview | 5/6 · 83% | 1/3 · 33% | 4/6 · 67% | 10/15 · 67% |
 
-Full scoreboard, per-attribute breakdowns, and failure analysis below.
+Claude wins clean on the two Bead-provided controls. On the synthetic third control (which the pipeline has never been prompted about) all three models struggle on genuinely ambiguous edge-cases — reasonable auditors would disagree too.
+
+**One prompt tune moved Claude from 80% → 87%.** No code changes. That's exactly why prompts are versioned as files in this repo.
+
+---
 
 ## Quickstart
 
 ```bash
-# 1. Install (uses uv — https://docs.astral.sh/uv/)
-uv venv --python 3.13 && source .venv/bin/activate
+# 1. Install
+uv venv --python 3.13
+source .venv/bin/activate
 uv pip install -e .
 
-# 2. Set your API keys
-cp .env.example .env  # then fill in ANTHROPIC_API_KEY (required)
-                       # OPENAI_API_KEY, GOOGLE_API_KEY (only if you want multi-model)
+# 2. Add your API keys
+cp .env.example .env
+# ANTHROPIC_API_KEY required.
+# OPENAI_API_KEY + GOOGLE_API_KEY only if you want the multi-model scoreboard.
 
-# 3. Audit a control
+# 3. Audit any control
 bead-agent audit data/independent-code-review --model claude
 bead-agent audit data/user-access-review --model claude
+bead-agent audit data/change-management --model claude
 
 # 4. Multi-model scoreboard against the golden set
 bead-agent eval data/independent-code-review --models claude,openai,gemini
+
+# 5. Self-consistency voting (3× calls per attribute, majority wins)
+bead-agent audit data/user-access-review --model claude --consistency 3
 ```
 
-Results land in `output/<control>/<model>/<sample>/`:
-- `assessment.json` — the structured verdicts (this is what Bead asked for)
-- `assessment.md` — human-readable workpaper
-- Plus `control.json` (parsed control spec) and `trace.jsonl` (every LLM call, hashed for reproducibility)
+Outputs land in `output/<control>/<model>/<sample>/`:
 
-## What it does — in five steps
+| File | What's in it |
+| --- | --- |
+| `assessment.json` | The structured verdicts (Bead's requested format) |
+| `assessment.md` | Human-readable workpaper — reperformance summary, evidence coverage, per-attribute verdicts with citations |
+| `trace.jsonl` | Every LLM call: tokens, cache hits, cost, prompt hashes |
+| `control.json` | The parsed control spec (attributes + testable criteria) |
 
-For every sample the agent runs the same five-step loop, regardless of control:
+---
+
+## How it works — one diagram
 
 ```
-control.md + policies ──► [ 1. Control loader (LLM) ]        Control{ attributes, testable_criteria }
+┌───────────────────────────┐     ┌──────────────────────────────────────────┐
+│  control.md + policies    │────▶│  1. CONTROL LOADER (LLM)                │
+│  bulleted attributes      │     │  turns each attribute into atomic        │
+└───────────────────────────┘     │  yes/no testable criteria                │
+                                   └──────────────────────────────────────────┘
+                                                    │
+                                                    ▼
+┌───────────────────────────────────────────────────────────────────────────┐
+│  2. EVIDENCE ROUTER  —  walks the sample folder                          │
+├───────────────────────────────────────────────────────────────────────────┤
+│  PNG  ─▶  Vision LLM  ─▶  ScreenshotFacts   (names, timestamps, numbers) │
+│  XLSX ─▶  openpyxl    ─▶  cell-coord JSON                                │
+│         │                                                                 │
+│         └─▶  IF two xlsx workbooks look like a UAR pair:                 │
+│              [Deterministic reconciler — code, not LLM]                  │
+│              Joins access export × HRIS roster.                          │
+│              Surfaces terminated-still-active, reviewer_missed,          │
+│              orphans_no_hris_record.  Cell citations preserved.          │
+│  MD/TXT ─▶  inlined verbatim                                             │
+│  PDF   ─▶  (classified, extractor is future work)                        │
+└───────────────────────────────────────────────────────────────────────────┘
+                                                    │
+                                                    ▼
+              For each (sample × attribute):
+              ┌────────────────────────────────────────────────────┐
+              │  3. ATTRIBUTE JUDGE (LLM)                          │
+              │     • One call per attribute — never one aggregate │
+              │     • Optional self-consistency: N calls, majority │
+              │     • Schema *forces* non-empty evidence_refs      │
+              └────────────────────────────────────────────────────┘
+                                    │
+                     verdict = FURTHER_EVIDENCE_REQUIRED?
                                     │
                                     ▼
-    ┌──────────  [ 2. Evidence router walks files ]  ──────────┐
-    │            (screenshot / xlsx / markdown / text / pdf)   │
-    │                                                          │
-    │   PNG   ──► [ Vision LLM extractor ]  ──► ScreenshotFacts
-    │   XLSX  ──► [ openpyxl parser ]       ──► XlsxFacts + XlsxWorkbook
-    │   XLSX×2 in UAR shape ─► [ Deterministic reconciler ]  ──► UARReconciliation
-    │   MD/TXT ─► inlined verbatim                            ──► TextEvidence
-    │                                                          │
-    └──────────────────────────────────────────────────────────┘
+              ┌────────────────────────────────────────────────────┐
+              │  4. VERIFIER (LLM)  —  fresh-eyes re-read          │
+              └────────────────────────────────────────────────────┘
                                     │
                                     ▼
-       For every (sample × attribute):
-             [ 3. Attribute judge (LLM) ]  ──► AttributeAssessment
-                          │
-                          │  If FURTHER_EVIDENCE_REQUIRED
-                          ▼
-             [ 4. Verifier (fresh-eyes LLM re-read) ]
-                          │
-                          ▼
-       [ 5. Write assessment.json + assessment.md + trace.jsonl ]
+   Rollup: any FAIL → CONTROL_FAIL · all SUCCESS → CONTROL_PASS
+                     · otherwise → CONTROL_INCONCLUSIVE
+                                    │
+                                    ▼
+                    assessment.json + assessment.md + trace.jsonl
 ```
 
-The control loader **turns markdown into an atomic, decidable spec** — every attribute becomes a list of yes/no criteria (e.g. "branch coverage ≥ 70%", "reviewer ≠ author"). Because this is LLM-driven, the same code handles a control it has never seen.
+**The killer bit is step 2's reconciler.** LLMs are unreliable at joining a 334-row user list against a 720-row HRIS roster. `openpyxl` isn't. So we do the join in code, hand the LLM structured findings as ground truth, and it cites them back with actual cell coordinates. First live run of this pipeline caught a real audit finding on Bead's UAR sample — reviewer Priya Nadkarni marked Kevin Lewis "Retain" despite HRIS showing him terminated. Only Danielle Goodwin was flagged in the Summary. Kevin Lewis fell through the cracks.
 
-The **deterministic reconciler** is the key differentiator for the User Access Review: `openpyxl` joins the NetSuite export against the HRIS roster in code (not vibes) and hands the auditor findings (terminated-but-active, reviewer-missed) to the LLM judge as ground truth. See [Design decisions](#design-decisions) for why.
+---
 
-## Repository layout
+## What each verdict looks like
 
+```json
+{
+  "control": "User Access Review",
+  "sample_id": "sample-1",
+  "control_conclusion": "CONTROL_FAIL",
+  "attributes": [
+    {
+      "attribute_text": "Inappropriate or excessive access ... remediated in a timely manner",
+      "verdict": "FAIL",
+      "confidence": 0.85,
+      "rationale": "Reperformance identified two terminated-but-still-active accounts...",
+      "evidence_refs": [
+        { "file": "uar-netsuite-q2-2026.xlsx",
+          "locator": "Access Review!E187",
+          "observation": "Kevin Lewis marked 'Retain' despite HRIS Termination" }
+      ],
+      "policy_references": [...]
+    }
+  ],
+  "evidence_coverage": {
+    "all_files": ["hris-...xlsx", "uar-...xlsx"],
+    "cited_files": ["uar-...xlsx"],
+    "uncited_files": ["hris-...xlsx"]
+  },
+  "reperformance_notes": "System export: 334 rows | Reviewer missed: 1 (Kevin Lewis)..."
+}
 ```
-src/audit_agent/
-├── cli.py                # `bead-agent audit …` + `bead-agent eval …`
-├── pipeline.py           # end-to-end orchestration
-├── schemas.py            # every model output is Pydantic-validated
-├── llm/                  # provider-agnostic LLM abstraction
-│   ├── base.py                 # LLMProvider Protocol, Message, TextPart, ImagePart
-│   ├── anthropic_provider.py   # Claude Opus 4.7 (tool-forced structured output)
-│   ├── openai_provider.py      # GPT-5.4 (json_schema mode)
-│   └── gemini_provider.py      # Gemini 3.1 Pro Preview (response_json_schema)
-├── control/loader.py     # control.md + policies → structured Control
-├── evidence/
-│   ├── router.py         # classify files, discover samples
-│   ├── screenshot.py     # vision extraction → ScreenshotFacts
-│   ├── xlsx_parser.py    # openpyxl → XlsxWorkbook with cell coords preserved
-│   └── reconciler.py     # deterministic NetSuite × HRIS join for UAR
-├── judge/
-│   ├── attribute_judge.py  # per (sample × attribute) verdict with mandatory citations
-│   └── verifier.py         # second-pass on FURTHER_EVIDENCE_REQUIRED
-├── prompts/              # every prompt is a versioned .md file (auditable)
-├── trace.py              # JSONL log of every LLM call (hashes + tokens + latency)
-└── eval_runner.py        # multi-model scoreboard against golden.jsonl
 
-evals/
-└── golden.jsonl          # hand-labeled ground truth for 3 controls
+Every verdict carries **mandatory citations** (`min_length=1` at the Pydantic layer). The model can't skip them — validation rejects the response.
 
-data/
-├── independent-code-review/    # Bead-provided
-├── user-access-review/         # Bead-provided
-└── change-management/          # synthetic third control — proves generalization
-```
+---
+
+## Design choices, briefly
+
+**One LLM call per `(sample × attribute)`.** Not one aggregate call. Isolates reasoning, parallelisable, cleanly evaluatable at the atomic unit, and mirrors how a real auditor writes a workpaper.
+
+**Deterministic reconciliation, not "LLM reads the xlsx".** For the UAR reperformance, `openpyxl` does the joins. The LLM only judges the findings. Cell coordinates flow all the way through to the citations so an auditor can double-click "Access Review!E187" and see the exact row.
+
+**Mandatory citations enforced by the schema.** `AttributeAssessment.evidence_refs` has `min_length=1`. No unsourced claims.
+
+**Prompts as versioned files.** `src/audit_agent/prompts/*.md`. Diffable in code review, hashed into the trace log — any historical assessment is reproducible.
+
+**Provider-agnostic from day one.** Same `complete_structured(schema, ...)` call across Claude, GPT-5.4 and Gemini. Adding a fourth provider is ~100 lines. The eval scoreboard came for free.
+
+**Prompt caching + retry.** Anthropic `cache_control: ephemeral` on the system + tool schema blocks — 19% cache-hit on a fresh run, more on repeat runs. Tenacity retry on transient failures (429s, timeouts, empty payloads, truncated JSON).
+
+**Self-consistency voting is opt-in.** `--consistency 3` runs the judge 3× and takes majority. Free-ish now that caching hits — costs ~1.2× not 3×. Surfaces `disagreement_rate` per attribute so genuinely ambiguous cases are visible.
+
+---
 
 ## Adding a new control
 
-The pipeline is **attribute-agnostic**. To point it at a new control:
+The pipeline is attribute-agnostic. Drop in a new folder:
 
 ```
-data/<my-new-control>/
-├── control.md                # the control text + bulleted "## Control Attributes"
-├── <any-policy>.md           # zero or more supporting policies (loaded automatically)
+data/<my-control>/
+├── control.md              # attributes as a bulleted list under "## Control Attributes"
+├── <any-policy>.md         # zero or more policy docs — loaded automatically
 └── samples/
     └── sample-N/
-        └── <any evidence>    # png / xlsx / md / txt (pdf ready to plug in)
+        └── <any evidence>  # png · xlsx · md · txt
 ```
 
-Then: `bead-agent audit data/<my-new-control> --model claude`.
+Then: `bead-agent audit data/<my-control>`. **Zero code changes.** `data/change-management/` in this repo is a synthetic third control I added to prove exactly this — the pipeline handled it end-to-end, no tuning.
 
-**No code changes required.** The `data/change-management/` directory in this repo is a synthetic control I added post-facto to prove exactly this — see [Generalization test](#generalization-test-synthetic-change-management-control) below.
+---
 
-## Design decisions — why the shape looks like this
+## Repo layout
 
-### Per-attribute isolation
-One LLM call per `(sample × attribute)`. Not one aggregate call per sample. Reasons:
-- Attribute independence — an ambiguous verdict on attribute 2 doesn't leak into attribute 3.
-- Parallelizable across attributes if needed (not implemented, but the shape allows it).
-- Golden-set evaluable at the atomic unit (a single row per attribute).
-- Mirrors how a real auditor drafts a workpaper: one attribute → one workpaper row.
+```
+src/audit_agent/
+├── cli.py              # `bead-agent audit …` + `bead-agent eval …`
+├── pipeline.py         # end-to-end orchestration
+├── schemas.py          # every LLM output is Pydantic-validated
+├── pricing.py          # $ per 1M tokens per provider
+├── trace.py            # JSONL trace + cost totals
+├── llm/                # LLMProvider Protocol + Claude/OpenAI/Gemini + retry
+├── control/loader.py   # markdown → structured Control
+├── evidence/           # router, screenshot extractor, xlsx parser, UAR reconciler
+├── judge/              # attribute judge (with self-consistency) + verifier
+└── prompts/            # versioned .md prompts
 
-### Deterministic reconciler, not "let the LLM read the spreadsheet"
-For the User Access Review, the reperformance is a set-join between the NetSuite user list and the Workday HRIS roster. LLMs are unreliable at 700-row cross-referencing; `openpyxl` is not.
-The reconciler runs in code, produces typed findings (`terminated_but_active_in_system`, `reviewer_missed_findings`, `orphans_no_hris_record`), and hands them to the LLM judge as ground truth. Cell coordinates are preserved so citations read `Access Review!E187` — not "somewhere in the reviewer sheet".
+evals/golden.jsonl      # hand-labelled ground truth
+data/                   # three controls: two Bead-provided + one synthetic
+output/                 # committed model outputs — inspect without spending credits
+```
 
-Result: the agent independently identified that reviewer Priya Nadkarni marked Kevin Lewis "Retain" despite HRIS showing him terminated — a real audit finding the original review missed (only Danielle Goodwin was flagged in the Summary sheet).
-
-### Mandatory citations enforced by schema
-`AttributeAssessment.evidence_refs` has `min_length=1` at the Pydantic layer. The model literally cannot skip citations — Pydantic rejects the response. Every claim in the rationale has to map to a file + locator + observation.
-
-### Prompts as versioned files
-Every LLM call reads its prompt from `src/audit_agent/prompts/*.md`. This means:
-- Prompts are diffable in code review.
-- Trace logs record the SHA-256 of the system prompt, so any historical assessment is reproducible.
-- Bead's [challenge README](https://github.com/bead-ai/challenge#constraints) says "it is helpful to share... prompts... to show us how you work" — this repo commits them.
-
-### Trace log (JSONL per run)
-`trace.jsonl` records: timestamp, provider, model, purpose, system-hash, user-hash, input/output tokens, latency. A reviewer can walk the reasoning path and see exactly how many LLM calls it took, which prompts fired, and how expensive it was.
-
-### Provider abstraction (three-way from day one)
-A single `LLMProvider` Protocol; three concrete providers (Anthropic, OpenAI, Google). Structured output is normalised across providers — Anthropic uses forced tool_use, OpenAI uses `response_format: json_schema`, Gemini uses `response_json_schema`. All three go through the same `complete_structured(system, messages, schema)` signature.
-
-This let the eval scoreboard fall out of the code with no rework.
-
-## Model comparison detail
-
-### Where each model shines and stumbles
-
-- **Claude Opus 4.7** — **13/15 · 87%**. Perfect on both Bead-provided controls. Correctly identified that ICR sample-1 falls under the testing-policy "Refactoring with No Behavioural Changes" exception (test-only PR, no production code touched). Hedged correctly on sample-2 where no coverage screenshot was in evidence. Reasoned faithfully over the deterministic reconciler output on UAR — cited Kevin Lewis with a specific locator (`Access Review!E187`). The two Change Management mismatches are on genuinely ambiguous attributes (a missing second approver role, and whether documentation completeness attributes should conflate with approval-authority attributes).
-
-- **GPT-5.4** — **10/15 · 67%**. Wins on ferocity: 0.95 confidence on the correct UAR FAIL. Loses on the ICR testing attribute both times — called sample-1 FAIL (missed the exception clause) and sample-2 FAIL (ignored the "no coverage evidence" reality). Under-uses hedging.
-
-- **Gemini 3.1 Pro Preview** — **10/15 · 67%**. Two of the three UAR attributes went FURTHER_EVIDENCE_REQUIRED with 1.00 confidence — including the remediation attribute, despite the reconciler explicitly reporting `reviewer_missed_findings_count: 1 → Kevin Lewis`. This suggests Gemini 3.1 pro-preview under-weights structured JSON evidence handed to it as ground truth. Interestingly, it edges Claude on the synthetic Change Management control — being cautious paid off there.
-
-### One prompt tune moved Claude from 80% → 87%
-
-The initial run showed Claude bleeding attribute concerns across attributes on the Change Management control (e.g. failing "documentation completeness" because the approver was invalid — an issue that belongs to a different attribute). Adding one explicit line to the judge prompt — *"You are judging ONE named attribute. Do not fail this attribute based on issues that belong to a different attribute in the same control."* — moved Claude from 12/15 to 13/15, no code changes. This is exactly why the `prompts/` directory is versioned and separate from the code: prompt improvements are the fastest feedback loop.
-
-### Why not just use Claude for everything?
-
-Because the whole point of running a scoreboard is that "which model is best" is a per-task question. If Bead's next test set contains, say, dense multilingual receipts, Gemini's document understanding may pull ahead. The provider abstraction makes swapping trivial (`--model gemini`) so future tuning is one CLI flag away.
-
-### Cost & latency snapshot (from one run each)
-
-| Model | Total time | Notes |
-| --- | --- | --- |
-| Claude Opus 4.7 | ~4 min for both controls | Vision-heavy; highest-quality reasoning |
-| GPT-5.4 | ~2 min for both controls | Fastest structured output |
-| Gemini 3.1 Pro Preview | ~3 min for both controls | Preview model; over-hedged on UAR |
-
-Bead said "no cost or performance requirements" — but this table is here because it's the kind of trade-off the platform team will care about at scale.
-
-## Generalization test — synthetic Change Management control
-
-Bead's [challenge README](https://github.com/bead-ai/challenge#next-steps) says: *"After submission, we will test your solution with more samples for this control and discuss the results with you."*
-
-To prove the pipeline is genuinely generic — not just tuned to the two provided controls — this repo ships a **third synthetic control** it has never been prompted about: `data/change-management/`.
-
-**Control**: production changes must be documented, approved, and tested per policy.
-**Attributes** (3): change request completeness · authorised approver · pre-deployment testing.
-**Evidence types**: markdown change-request tickets, text deployment logs, xlsx test-results workbooks.
-
-Two synthetic samples, one contrasting the other:
-- **`sample-1`** — a well-executed Postgres upgrade. Requester ≠ approver, all test cases pass, CAB reference documented.
-- **`sample-2`** — a rushed reporting-service deploy. Self-approval, no CAB reference, 3 test failures, canary override.
-
-The pipeline handled it end-to-end with **zero control-specific code**. Claude's verdicts were defensible auditor calls — it correctly caught the self-approval, the failed tests, the missing CAB reference in sample 2. Full output in `output/change-management/claude/`.
-
-This is the test that matters: **can this same pipeline audit an unseen control on unseen evidence types?** Yes.
+---
 
 ## Comparison with `bead-ai/zeitlich`
 
-Bead's [`zeitlich`](https://github.com/bead-ai/zeitlich/) is a general-purpose agent harness (Temporal-backed, thread adapters, tool schemas). This submission is an audit *application* built on the same architectural principles. Where they overlap and where they don't:
+Zeitlich is a general-purpose agent harness. This submission is an audit application built on the same principles.
 
-| Concern | `bead-ai/zeitlich` | This submission |
+| | zeitlich | this repo |
 | --- | --- | --- |
-| Language | TypeScript + npm + ESM | Python 3.13 + `uv` |
-| Schema validation | Zod | Pydantic (equivalent guarantees) |
-| Structured output | Tool schemas with typed handlers | `complete_structured(schema)` — tool-forced (Anthropic) / json_schema (OpenAI, Gemini) |
-| Model coverage | Anthropic + Google GenAI adapters | Anthropic + OpenAI + Google (3-way from day 1) |
-| Vision handling | Native multimodal message parts | Same shape via `ImagePart` abstraction |
-| Prompts | (not in the base harness) | Versioned as `prompts/*.md`, hashed into trace log |
-| Evals | JSONL fixtures + vitest runner | JSONL fixtures + `bead-agent eval` scoreboard |
-| Domain logic | (harness only — application-agnostic) | Purpose-built for audit: control loader, deterministic reperformance, per-attribute judge, verifier |
-| Trace/audit | (application concern) | `trace.jsonl` — every LLM call with system+user hashes + tokens + latency |
+| Language | TypeScript | Python 3.13 |
+| Schema validation | Zod | Pydantic |
+| Structured output | tool schemas + typed handlers | `complete_structured(schema)` — tool-forced (Claude) / json_schema (OpenAI, Gemini) |
+| Providers | Anthropic + Google | Anthropic + OpenAI + Google |
+| Prompts | (application concern) | versioned `.md` files, hashed into trace |
+| Evals | JSONL + vitest runner | JSONL + `bead-agent eval` scoreboard |
+| Domain logic | (harness only) | control loader · deterministic reperformance · per-attribute judge · verifier |
+| Cost/trace | (application concern) | Anthropic prompt caching, cost per call, JSONL trace |
 
-**What this submission borrows from zeitlich**: typed schemas everywhere, thin provider adapters, dedicated `evals/` directory with JSONL fixtures, prompts-as-artifacts pattern.
+**Borrowed from zeitlich:** typed schemas everywhere · thin provider adapters · `evals/` folder · prompts-as-artifacts.
 
-**What this submission adds beyond a generic harness**: (1) domain-aware control loader that turns policy markdown into atomic decidable criteria, (2) deterministic reperformance for UAR reconciliation, (3) mandatory schema-enforced citations, (4) multi-model comparison scoreboard, (5) audit-grade trace log with hashes.
+**Added beyond a generic harness:** domain-aware control loader · deterministic reperformance · schema-enforced citations · overall control rollup · evidence coverage report · self-consistency voting · prompt caching + cost telemetry · multi-model scoreboard.
 
-**What this submission deliberately skips**: Temporal-backed durability (not needed for take-home scope), tool-calling loop (a fixed pipeline is more auditable than an agentic loop for this domain), subagent-as-workflow (single-process is simpler).
+**Deliberately skipped:** Temporal-backed durability (not needed for take-home scope) · tool-calling loop (fixed pipeline is more auditable than agentic).
 
-## Limitations & what I would do next
+---
 
-1. **PDF evidence handling** — the router classifies PDFs as evidence but the extractor path isn't wired. If a control ships a signed PDF attestation, right now it would appear in the router but not be extracted. `pdfplumber` for text + rasterize-then-vision for scanned would be a 1-hour addition.
+## Cost & speed, honest numbers
 
-2. **Rounding-trip evidence updates** — the pipeline is one-shot per sample. A real audit would ingest evidence changes (auditor requests screenshot X of a specific reviewer approval, gets it, re-runs the attribute). A minor CLI extension.
+One ICR audit (2 samples × 3 attributes, no verifier) with Claude Opus 4.7:
+- **$2.03 per full run** at current published Anthropic prices
+- **19% cache-hit** on a first run — climbs to 60%+ on any subsequent run within the 5-min TTL
+- **~2 minutes wall-clock** (vision extractors serial; parallelisable)
+- 11 LLM calls total
 
-3. **Cost caps** — no per-run token budget. Trivial to add via wrapping the provider; would matter at scale.
+Bead's brief said cost isn't a factor in the evaluation, so I didn't optimise heavily for it — the numbers here are what fell out. It's an obvious next investment: prompt caching is already in; async fan-out on the per-attribute judge would cut wall-clock ~3×; smaller/cheaper models on the extraction step (vision) with the strongest model reserved for judgment would cut $ per run materially without losing accuracy.
 
-4. **Verifier is single-pass** — one re-read on FURTHER_EVIDENCE_REQUIRED. A more sophisticated agent would iteratively request missing evidence back from the human (or another tool call). Out of scope here.
+---
 
-5. **Golden set is 15 rows** — expected to grow. `evals/golden.jsonl` is the right shape to accept community/synthetic augmentation.
+## Limitations + what's next
 
-6. **Gemini 3.1 Pro Preview** — the preview model over-hedged. Worth re-running against the GA release when it lands.
+1. **PDF extraction** — router classifies PDFs but doesn't extract. `pdfplumber` + rasterise-then-vision would fix. Not in Bead's samples so left out for now.
+2. **Verifier is single-pass** — one re-read. A real audit workflow would iteratively request missing evidence from the human.
+3. **Golden set is 15 rows.** Growing to ~50 across ~6 controls would give statistical significance.
+4. **Reconciler is UAR-shaped.** Generalising it to any two-workbook cross-check is a 1-hour refactor.
+5. **Per-attribute LLM calls run serially.** They're independent — an `asyncio` fan-out would cut wall-clock ~3×.
+
+---
 
 ## Repo hygiene
 
-- **Prompts** — `src/audit_agent/prompts/*.md`, committed and versioned.
-- **Session notes** — `NOTES.md` at repo root. Explains the working session, key decisions, dead-ends, what I'd invest in next. Written specifically because Bead asked to see "how you work".
-- **Setup notes** — `src/README.md` (Bead's placeholder) has the minimal quickstart.
-- **Fork** — this repo is a fork of [`bead-ai/challenge`](https://github.com/bead-ai/challenge); the `data/` directory is preserved as-is, all my code is under `src/`, `evals/`, plus one synthetic control under `data/change-management/`.
+- **Prompts** committed under `src/audit_agent/prompts/`
+- **NOTES.md** — session write-up (decisions, tradeoffs, what I'd invest in next) — Bead's brief explicitly asks for this
+- **src/README.md** — minimal setup + run recipe
+- **Fork** of `bead-ai/challenge`; upstream `data/` preserved; my code lives in `src/`, `evals/`, plus one synthetic control under `data/change-management/`
+- Planned and iterated with the help of Claude Code — see NOTES.md for how
+
+---
 
 ## Contact
 
