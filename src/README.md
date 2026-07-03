@@ -24,25 +24,44 @@ cp ../.env.example ../.env    # from repo root
 ## Run
 
 ```bash
-# Audit a single control with Claude Opus 4.7
-bead-agent audit ../data/independent-code-review --model claude
-bead-agent audit ../data/user-access-review --model claude
-bead-agent audit ../data/change-management --model claude
+# Audit a single control — auto-opens the HTML report when done.
+bead-agent audit ../data/independent-code-review
+bead-agent audit ../data/user-access-review
+bead-agent audit ../data/change-management
 
 # Swap models
 bead-agent audit ../data/independent-code-review --model openai
 bead-agent audit ../data/independent-code-review --model gemini
 
+# Peek at a control without spending API credit
+bead-agent info ../data/user-access-review
+
 # Score all three models against the hand-labeled golden set
 bead-agent eval ../data/independent-code-review --models claude,openai,gemini
 
-# Skip the FURTHER_EVIDENCE_REQUIRED verifier pass (faster; useful for eval sweeps)
-bead-agent audit ../data/independent-code-review --model claude --no-verify
+# Skip the FURTHER_EVIDENCE_REQUIRED verifier pass (useful for eval sweeps)
+bead-agent audit ../data/independent-code-review --no-verify
+
+# Regenerate the HTML report + Excel workpaper for a past run
+bead-agent report output/user-access-review/claude
+
+# Pretty-print a past assessment.json in the terminal
+bead-agent show output/user-access-review/claude/sample-1/assessment.json
 ```
 
-Outputs land in `output/<control>/<model>/<sample>/`:
-- `assessment.json` — structured verdicts (Bead's requested format)
-- `assessment.md` — human-readable workpaper
+Outputs land in `output/<control>/<model>/`:
+- `report.html` — Bead-themed HTML report (auto-opens on `audit`)
+- `<sample>/assessment.json` — structured verdicts (Bead's requested format)
+- `<sample>/assessment.md` — human-readable workpaper
+- `<sample>/workpaper.xlsx` — native Excel workpaper
 - Plus `control.json` (parsed control spec) and `trace.jsonl` (every LLM call, hashed)
+
+Run the tests + linter:
+
+```bash
+uv pip install pytest ruff
+pytest tests/ -v
+ruff check src/ tests/
+```
 
 See the top-level [README](../README.md) for the full architecture, model scoreboard, and design write-up.

@@ -62,9 +62,9 @@ cp .env.example .env       # then fill in ANTHROPIC_API_KEY
 # 3. audit
 bead-agent audit data/independent-code-review
 
-# 4. get the workpaper
-bead-agent report output/independent-code-review/claude --open
 ```
+
+The HTML report auto-opens in your browser when the audit finishes. Pass `--no-open` if you're running headless or in CI.
 
 That's it. Everything else is optional flags.
 
@@ -76,11 +76,11 @@ Every command has `--help`.
 
 | Command | What it does |
 | --- | --- |
-| `bead-agent audit <control-dir>` | Run the full pipeline. Get JSON + markdown verdicts. |
+| `bead-agent audit <control-dir>` | Run the full pipeline. Produces JSON + markdown + HTML report + Excel workpaper. Auto-opens the report in your browser. |
 | `bead-agent info <control-dir>` | Peek at a control without spending API credit — shows parsed attributes, discovered samples, estimated call count. |
-| `bead-agent show <assessment.json>` | Pretty-print a past verdict in the terminal. |
+| `bead-agent show <assessment.json>` | Pretty-print a past verdict in the terminal + surface links to the HTML report and Excel workpaper from the same run. |
 | `bead-agent trace <run-dir>` | Table of every LLM call: tokens, cost, latency. |
-| `bead-agent report <run-dir>` | **Self-contained HTML report** — Bead-themed, one file, opens offline. |
+| `bead-agent report <run-dir>` | Regenerate the HTML report + Excel workpaper for a past run and auto-open the HTML in your browser. |
 | `bead-agent eval <control-dir>` | Multi-model scoreboard against the hand-labelled golden set. |
 
 ### `audit` flags
@@ -91,6 +91,7 @@ Every command has `--help`.
 | `--out, -o` | `output/<control>/<model>/` | Where to write results |
 | `--no-verify` | off | Skip the second-pass re-read on hedged verdicts |
 | `--consistency, -k` | `1` | Run the judge N times per attribute, majority wins |
+| `--open/--no-open` | `--open` | Auto-open the HTML report when done. `--no-open` for CI. |
 
 ### `eval` flags
 
@@ -216,21 +217,24 @@ bead-agent audit data/<my-control>
 
 ```
 src/audit_agent/
-├── cli.py           # bead-agent audit / info / show / trace / report / eval
-├── pipeline.py      # ties everything together
-├── schemas.py       # every LLM output is Pydantic-validated
-├── pricing.py       # $/1M tokens per provider
-├── trace.py         # JSONL trace + cost totals
-├── html_report.py   # self-contained HTML report generator (Bead-themed)
-├── llm/             # provider Protocol + Claude/OpenAI/Gemini + retry
-├── control/loader.py       # markdown → structured Control
-├── evidence/               # router, screenshot extractor, xlsx parser, UAR reconciler
-├── judge/                  # attribute judge (with self-consistency) + verifier
-└── prompts/                # versioned .md prompts
+├── cli.py             # bead-agent audit / info / show / trace / report / eval
+├── pipeline.py        # ties everything together + deterministic narrative builder
+├── schemas.py         # every LLM output is Pydantic-validated
+├── pricing.py         # $/1M tokens per provider
+├── trace.py           # JSONL trace + cost totals
+├── html_report.py     # self-contained HTML report generator (Bead-themed)
+├── xlsx_workpaper.py  # native Excel workpaper writer (Cover / Verdicts / Citations / …)
+├── llm/               # provider Protocol + Claude/OpenAI/Gemini + tenacity retry
+├── control/loader.py  # markdown → structured Control
+├── evidence/          # router, screenshot extractor, xlsx parser, UAR reconciler
+├── judge/             # attribute judge (with self-consistency) + verifier
+└── prompts/           # versioned .md prompts
 
-evals/golden.jsonl   # hand-labelled ground truth
-data/                # three controls (two Bead-provided, one synthetic)
-output/              # committed model outputs — inspect without spending credits
+tests/                 # 13 unit tests around the reconciler + narrative builder
+evals/golden.jsonl     # hand-labelled ground truth (15 rows across 3 controls)
+data/                  # three controls (two Bead-provided + one synthetic)
+output/                # committed model outputs — inspect without spending credits
+.github/workflows/     # CI (ruff + pytest on every push)
 ```
 
 ### Output layout
@@ -241,9 +245,10 @@ Everything runs write to `output/<control>/<model>/`:
 | --- | --- |
 | `control.json` | Parsed control (attributes + testable criteria) |
 | `trace.jsonl` | Every LLM call: tokens, cache hits, cost, latency, hashes |
+| `report.html` | Bead-themed HTML report — BLUF banner, exec summary, findings, actions, evidence inventory, decision log, reviewer sign-off |
 | `<sample>/assessment.json` | Structured verdicts (Bead's requested format) |
 | `<sample>/assessment.md` | Readable workpaper |
-| `report.html` | Bead-themed HTML report (`bead-agent report`) |
+| `<sample>/workpaper.xlsx` | Native Excel workpaper (Cover / Attribute Verdicts / Evidence Citations / Reperformance / Evidence Inventory / Decision Log sheets) |
 
 ---
 
@@ -282,23 +287,23 @@ Bead said cost isn't a factor in the evaluation so I haven't optimised heavily f
 
 ## Limitations & what's next
 
-1. **PDF evidence.** Classified but not extracted. `pdfplumber` + vision fallback for scans is ~1 hour.
-2. **Verifier is single-pass.** In a real workflow it should be able to ask for missing evidence.
+1. **PDF evidence.** Router classifies but doesn't extract. `pdfplumber` + vision fallback for scans is ~1 hour.
+2. **Verifier is single-pass.** In a real workflow it should be able to ask for missing evidence back from the human.
 3. **Golden set is 15 rows.** Would want ~50 across ~6 controls for real statistical weight.
-4. **Reconciler is UAR-shaped.** Generalising to any two-workbook cross-check is ~1 hour.
-5. **Per-attribute judges run serially.** They're independent — `asyncio` cuts wall-clock ~3×.
+4. **Reconciler is UAR-shaped.** Generalising to any two-workbook cross-check (SoD, vendor risk, key-controls matrix) is ~1 hour.
+5. **Per-attribute judges run serially.** They're independent — `asyncio.gather` would cut wall-clock ~3×.
 
 ---
 
 ## Repo hygiene
 
-- **Prompts** live in `src/audit_agent/prompts/`
-- **Unit tests** in `tests/test_reconciler.py` — 7 tests with 5 synthetic fixture pairs stressing the reconciler's header/status detection. `pytest tests/ -v`.
-- **CI** at `.github/workflows/ci.yml` — runs `ruff check` + `pytest` on every push.
-- **Session notes** in `NOTES.md` — decisions, tradeoffs, what I'd invest in next, and the three questions a Bead engineer will grill me on with honest answers. Bead explicitly asks for this.
-- **Setup** in `src/README.md`
-- **Fork** of `bead-ai/challenge`; upstream `data/` preserved; my code in `src/`, `tests/`, `evals/`, plus one synthetic control at `data/change-management/`
-- Planned and iterated with Claude Code — kept scope honest, ran multi-model evals in the background, challenged the design when I was about to over-build
+- **Prompts** live in `src/audit_agent/prompts/` (versioned `.md` files, hashed into the trace log).
+- **Unit tests** in `tests/` — **13 tests** (7 reconciler + 6 narrative builder) with synthetic fixture pairs stressing header/status detection and the deterministic narrative. `pytest tests/ -v`.
+- **CI** at `.github/workflows/ci.yml` — runs `ruff check src/ tests/` + `pytest tests/ -v` on every push and PR.
+- **Session notes** in `NOTES.md` — decisions, tradeoffs, what I'd invest in next, plus a "three questions a Bead engineer will grill me on" section with honest answers to each.
+- **Setup** in `src/README.md`.
+- **Fork** of `bead-ai/challenge`; upstream `data/` preserved; my code in `src/`, `tests/`, `evals/`, plus one synthetic control at `data/change-management/`.
+- Planned and iterated with Claude Code — kept scope honest, ran multi-model evals in the background, challenged the design when I was about to over-build.
 
 ---
 
