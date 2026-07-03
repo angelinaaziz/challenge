@@ -1,0 +1,209 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Audit report — Independent Code Review</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>
+:root {
+  --bg: #0e1116;
+  --card: #161a22;
+  --card-hover: #1c2130;
+  --border: #232936;
+  --text: #d5dae4;
+  --muted: #7a8598;
+  --accent: #6c8fff;
+  --success: #4bcf87;
+  --success-bg: rgba(75, 207, 135, 0.10);
+  --fail: #ff6b6b;
+  --fail-bg: rgba(255, 107, 107, 0.10);
+  --warn: #f5c265;
+  --warn-bg: rgba(245, 194, 101, 0.10);
+  --code-bg: #0a0c11;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  font-size: 15px;
+}
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 32px 96px;
+}
+header.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+header.hero .eyebrow {
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+header.hero h1 { margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.01em; }
+header.hero .meta {
+  color: var(--muted);
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.badge.pass    { color: var(--success); background: var(--success-bg); }
+.badge.fail    { color: var(--fail);    background: var(--fail-bg); }
+.badge.warn    { color: var(--warn);    background: var(--warn-bg); }
+.badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.sample-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.sample-card h2 { margin: 0 0 16px 0; font-size: 20px; font-weight: 600; }
+.sample-card .sample-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 8px;
+}
+.sample-card .sample-meta strong { color: var(--text); }
+.section-title {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 24px 0 12px;
+}
+.reperformance {
+  background: rgba(108, 143, 255, 0.06);
+  border: 1px solid rgba(108, 143, 255, 0.25);
+  border-radius: 10px;
+  padding: 16px 20px;
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+details.attribute {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+details.attribute[data-verdict="SUCCESS"] { border-left-color: var(--success); }
+details.attribute[data-verdict="FAIL"]    { border-left-color: var(--fail); }
+details.attribute[data-verdict="FURTHER_EVIDENCE_REQUIRED"] { border-left-color: var(--warn); }
+details.attribute > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 22px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+}
+details.attribute > summary::-webkit-details-marker { display: none; }
+details.attribute > summary:hover { background: var(--card-hover); }
+details.attribute .verdict-icon { font-size: 20px; line-height: 1; }
+details.attribute .verdict-text {
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+details.attribute[data-verdict="SUCCESS"] .verdict-text { color: var(--success); }
+details.attribute[data-verdict="FAIL"] .verdict-text { color: var(--fail); }
+details.attribute[data-verdict="FURTHER_EVIDENCE_REQUIRED"] .verdict-text { color: var(--warn); }
+details.attribute .attr-title { font-weight: 500; font-size: 15px; color: var(--text); }
+details.attribute .attr-meta {
+  color: var(--muted);
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  white-space: nowrap;
+}
+details.attribute .body {
+  padding: 4px 22px 24px;
+  border-top: 1px solid var(--border);
+}
+details.attribute[open] > summary { border-bottom: 1px solid var(--border); }
+details.attribute .body h4 {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 20px 0 8px;
+}
+details.attribute .body p { margin: 12px 0 0; }
+details.attribute .body ul { list-style: none; padding: 0; margin: 8px 0 0; }
+details.attribute .body ul li {
+  padding: 10px 0 10px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+}
+details.attribute .body ul li:last-child { border-bottom: none; }
+details.attribute .body .file  { color: var(--accent); font-family: ui-monospace, monospace; font-size: 13px; }
+details.attribute .body .loc   { color: #d38dff; font-family: ui-monospace, monospace; font-size: 13px; }
+details.attribute .body .obs   { color: var(--muted); font-size: 13px; margin-top: 4px; }
+details.attribute .body .quote { color: var(--text); font-style: italic; padding-left: 12px; border-left: 2px solid var(--border); margin-top: 6px; font-size: 13px; }
+.coverage {
+  display: flex;
+  gap: 24px;
+  padding: 12px 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.coverage strong { color: var(--text); }
+.coverage .uncited { color: var(--warn); }
+.trace-section h2 {
+  font-size: 16px;
+  color: var(--text);
+  margin: 40px 0 12px;
+}
+.trace-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
+.trace-table th, .trace-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.trace-table th { color: var(--muted); font-weight: 500; text-transform: uppercase; font-size: 10px; letter-spacing: 0.10em; }
+.trace-table td.num  { text-align: right; }
+.trace-table td.cost { color: var(--success); text-align: right; }
+.footer {
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+.footer code { color: var(--text); background: var(--code-bg); padding: 2px 6px; border-radius: 4px; }
+</style></head><body><div class="container"><header class="hero"><div class="eyebrow">Bead audit report</div><h1>Independent Code Review</h1><div class="meta">model claude:claude-opus-4-7 · 2 sample(s)</div><div style="margin-top:12px;"><span class="badge warn"><span class="dot"></span>CONTROL_INCONCLUSIVE</span></div></header><section class="sample-card"><div class="badge pass"><span class="dot"></span>CONTROL_PASS</div><h2>Sample: sample-1</h2><div class="sample-meta"><span><strong>claude:claude-opus-4-7</strong></span><span>generated: 2026-07-03T02:33:21.548839+00:00</span></div><div class="section-title">Evidence coverage</div><div class="coverage"><div><strong>100%</strong> (3/3 files cited)</div></div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Code Reviews are performed prior to committing a change to the main branch</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">conf 0.90 · 4 citations</div></summary><div class="body"><h4>Rationale</h4><p>PR #62754 has a code review record: RyanCavanaugh approved the changes 17 hours ago, and the PR was merged 16 hours ago — the approval preceded the merge into microsoft:main. The change was merged with an associated review record (approval by RyanCavanaugh, plus a Copilot AI review). This attribute concerns timing/existence of a review prior to merge, not reviewer independence, which is judged separately.</p><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">PR conversation timeline - approval event</span></div><div class="obs">&#x27;RyanCavanaugh approved these changes 17 hours ago&#x27; with green check icon</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">PR conversation timeline - merge event</span></div><div class="obs">&#x27;jakebailey merged commit ea48ded into microsoft:main 16 hours ago&#x27; — merge occurred 1 hour after approval</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Merged status badge in header</span></div><div class="obs">Purple &#x27;Merged&#x27; badge and banner &#x27;Pull request successfully merged and closed&#x27; confirm the change reached main via the PR containing the review record</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Reviewers sidebar panel</span></div><div class="obs">RyanCavanaugh listed as reviewer with green approved check</div></li></ul><h4>Exceptions considered</h4><ul><li>Whether Copilot AI&#x27;s review satisfies independence — not relevant to this attribute (existence/timing of review); relevant to the separate independence attribute. Human review by RyanCavanaugh exists and precedes merge, which is sufficient for this criterion.</li></ul></div></details><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Code Review approvals are performed by independent code reviewers</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">conf 0.90 · 3 citations</div></summary><div class="body"><h4>Rationale</h4><p>PR #62754 was authored and committed by jakebailey and received an explicit approval from RyanCavanaugh (green check, &quot;approved these changes 17 hours ago&quot;), a different named human, satisfying the 4-eyes principle. The approval event appears in the timeline prior to the merge event (&quot;merged commit ea48ded ... 16 hours ago&quot;), so approval preceded merge. Copilot&#x27;s AI review is not relied upon for independence; the human approver RyanCavanaugh is not listed as a committer on the single commit 9e76dd2 by jakebailey.</p><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">PR conversation timeline - approval event</span></div><div class="obs">&#x27;RyanCavanaugh approved these changes 17 hours ago&#x27; with green check, and Reviewers sidebar shows RyanCavanaugh with green check.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">PR header and merge event</span></div><div class="obs">Header shows &#x27;jakebailey merged 1 commit into microsoft:main&#x27;; merge event says &#x27;jakebailey merged commit ea48ded ... 16 hours ago&#x27; — merge occurred after the 17-hours-ago approval.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Commits timeline entry</span></div><div class="obs">Single commit &#x27;9e76dd2 Shrink_relationComplexityError_test_size&#x27; attributed to jakebailey; RyanCavanaugh does not appear as an author/committer.</div></li></ul><h4>Exceptions considered</h4><ul><li>Copilot AI review was present but explicitly not treated as an independent human reviewer; independence relies on RyanCavanaugh, a distinct human from author jakebailey.</li></ul></div></details><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Testing is performed in accordance with the testing policy</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">conf 0.78 · 3 citations</div></summary><div class="body"><h4>Rationale</h4><p>The coverage report aggregate metrics comfortably exceed all policy thresholds: Statements 94.62%, Branches 89.48% (≥70%), Functions 94.79% (≥80%). CI ran on pull_request with 15 matrix jobs plus coverage, lint, knip, format, browser-integration, typecheck, smoke, package-size, self-check and baselines all green, and 36 of 37 checks passed at merge; the coverage artifact (39.2 MB) was produced and available for review. The change itself is a test-size reduction (Digits literals 10→8), which is a low-risk refactor with no security/payment/auth path implicated. Individual file rows below threshold (debug.ts 31.72%) are pre-existing legacy coverage, not new code introduced by this PR (+10/-10 in 4 files, test-only).</p><h4>Policy references</h4><ul><li><div><span class="file">testing-policy.md</span> § Code Coverage Thresholds</div><div class="quote">Unit Tests: Minimum 80% code coverage for all new code</div></li><li><div><span class="file">testing-policy.md</span> § Coverage Metrics</div><div class="quote">Branch coverage (minimum 70%) ... Function coverage (minimum 80%)</div></li><li><div><span class="file">testing-policy.md</span> § Test Execution Environment</div><div class="quote">Tests must run in CI/CD pipeline before merge ... Test results must be visible in pull request status checks</div></li><li><div><span class="file">testing-policy.md</span> § Mandatory Test Execution</div><div class="quote">All unit tests must pass with zero failures</div></li></ul><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-27-50 Coverage Report.png</span> @ <span class="loc">Summary row (aggregate metrics)</span></div><div class="obs">Statements 94.62%, Branches 89.48%, Functions 94.79%, Bytes 95.96% — all exceed policy minimums (80% statements, 70% branches, 80% functions).</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Merge status banner and checks summary</span></div><div class="obs">&#x27;36 of 37 checks passed&#x27; displayed at merge; PR merged as commit ea48ded. Diff is +10/-10 across 4 files, described as shrinking a test.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-29-21 Shrink relationComplexityError test size · microsoft_TypeScript@9e76dd2.png</span> @ <span class="loc">Workflow run header and jobs sidebar</span></div><div class="obs">CI run #34653 triggered on pull_request completed Successfully in 17m 44s; 15 matrix test jobs plus coverage (12m 37s), lint, knip, format, browser-integration, typecheck, smoke, self-check, baselines all show green checks. Coverage artifact (39.2 MB) generated.</div></li></ul><h4>Exceptions considered</h4><ul><li>Refactoring with no behavioral changes / test-only change: the PR only reduces the size of an existing test (Digits type from 10 to 8 literals) with +10/-10 diff in 4 files. Even without invoking an exception, thresholds are met, so no waiver reliance is required.</li><li>Legacy code clause: some individual files (e.g. debug.ts at 31.72%) fall below thresholds, but these are pre-existing project files not modified by this PR; the &#x27;new code&#x27; being added is test code and aggregate coverage improved/maintained.</li></ul></div></details></section><section class="sample-card"><div class="badge warn"><span class="dot"></span>CONTROL_INCONCLUSIVE</div><h2>Sample: sample-2</h2><div class="sample-meta"><span><strong>claude:claude-opus-4-7</strong></span><span>generated: 2026-07-03T02:34:54.598119+00:00</span></div><div class="section-title">Evidence coverage</div><div class="coverage"><div><strong>100%</strong> (2/2 files cited)</div></div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Code Reviews are performed prior to committing a change to the main branch</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">conf 0.90 · 3 citations</div></summary><div class="body"><h4>Rationale</h4><p>A PR review record exists for PR #31272: dsherret approved the changes 20 hours ago, and bartlomieju merged the PR into denoland:main 19 hours ago — the approval timestamp precedes the merge timestamp. The change was therefore not merged without an associated code review record. Reviewer independence from the author is a separate attribute and is not judged here.</p><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">Approval block near bottom of Conversation timeline</span></div><div class="obs">&#x27;dsherret approved these changes 20 hours ago&#x27; with LGTM comment and green check.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">Merge event line below the approval</span></div><div class="obs">&#x27;bartlomieju merged commit 7ada8d6 into denoland:main 19 hours ago&#x27; — merge occurred after the 20-hours-ago approval.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">PR header status badge</span></div><div class="obs">Purple &#x27;Merged&#x27; badge confirms the PR was the vehicle for merging the change; PR record exists.</div></li></ul><h4>Exceptions considered</h4><ul><li>Copilot AI review present but not relied upon here — human reviewer dsherret provided the approval; AI-review independence question is a separate attribute.</li></ul></div></details><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Code Review approvals are performed by independent code reviewers</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">conf 0.90 · 4 citations</div></summary><div class="body"><h4>Rationale</h4><p>PR #31272 has a recorded approval from dsherret (&quot;dsherret approved these changes 20 hours ago&quot; with LGTM), who is a distinct human from the author/committer bartlomieju. All 7 commits are attributed to bartlomieju, so the approver authored none of them. The approval occurred 20 hours ago while the merge occurred 19 hours ago, so approval preceded merge. The Copilot AI &quot;review&quot; is disregarded as it is not an independent human, but dsherret&#x27;s approval independently satisfies the criterion.</p><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">Approval block mid-page</span></div><div class="obs">&#x27;dsherret approved these changes 20 hours ago&#x27; with green check and LGTM comment</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">PR header</span></div><div class="obs">&#x27;bartlomieju merged 7 commits into denoland:main ... 19 hours ago&#x27; — merge occurred after the 20-hours-ago approval</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">Commits list</span></div><div class="obs">All 7 commits (3461bd5, 0f39d7d, 762a828, 8866044, 8f0236b, 0dbb629, 12cde71) authored by bartlomieju; dsherret is not a committer</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">Reviewers side panel</span></div><div class="obs">Reviewers listed: Copilot (AI bot) and dsherret (green check) — dsherret is the human approver</div></li></ul><h4>Exceptions considered</h4><ul><li>Copilot AI review considered but rejected as satisfying independence — an AI bot is not an independent human reviewer; however dsherret&#x27;s human approval independently meets the criterion.</li></ul></div></details><details class="attribute" data-verdict="FURTHER_EVIDENCE_REQUIRED"><summary><div class="verdict-icon">?</div><div class="attr-title"><div>Testing is performed in accordance with the testing policy</div><div class="verdict-text">FURTHER_EVIDENCE_REQUIRED</div></div><div class="attr-meta">conf 0.80 · 4 citations</div></summary><div class="body"><h4>Rationale</h4><p>The CI workflow run shows overall Success with all matrix test/lint/build jobs green, and the PR page shows 33 of 36 checks passed, which addresses some execution criteria. However, no coverage report is visible (no line/branch/function coverage numbers), no security scan results are shown, and 3 of 36 checks are unaccounted for (not shown which failed/skipped). Without a coverage report reviewed as part of the PR and evidence that the 3 non-passing checks are benign, criteria on 80% line / 70% branch / 80% function coverage, security scan review, and &quot;all tests pass&quot; cannot be confirmed. Coverage report artifact, security scan output, and identification of the 3 non-passing checks would resolve this.</p><h4>Policy references</h4><ul><li><div><span class="file">testing-policy.md</span> § Minimum Test Coverage Requirements - Code Coverage Thresholds &amp; Coverage Metrics</div><div class="quote">Unit Tests: Minimum 80% code coverage for all new code ... Branch coverage (minimum 70%) ... Function coverage (minimum 80%). Coverage reports must be generated and reviewed as part of the code review process.</div></li><li><div><span class="file">testing-policy.md</span> § Pre-Release Test Requirements - Mandatory Test Execution</div><div class="quote">Unit Tests: All unit tests must pass with zero failures ... Security Tests: Security scan results must be reviewed and approved</div></li><li><div><span class="file">testing-policy.md</span> § Test Execution Environment</div><div class="quote">Tests must run in CI/CD pipeline before merge ... Test results must be visible in pull request status checks</div></li></ul><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png</span> @ <span class="loc">Workflow run header + Jobs list</span></div><div class="obs">CI workflow #71281 status = &#x27;Success&#x27;; all test/lint/build matrix jobs (11 build, 3 lint, plus test debug/release across macOS/Windows/Linux x86_64 and aarch64) show green check completion. Annotations: 4 warnings and 1 notice (macOS runner deprecation, pwsh cleanup warning) — no test failures indicated.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">Checks summary near merge banner</span></div><div class="obs">&#x27;33 of 36 checks passed&#x27; — 3 checks did not pass; the page does not disclose which checks these are or whether they were failures or skips.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">Conversation timeline / Files changed tab counter</span></div><div class="obs">PR shows 19 files changed, +66 −51. No coverage report comment, artifact link, or coverage bot summary is visible in the conversation; no security scan review comment is visible.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png</span> @ <span class="loc">Artifacts section</span></div><div class="obs">Only 2 artifacts listed (deno-linux-x86_64-31272 binary, 99.3 MB) — no coverage report artifact visible.</div></li></ul><h4>Exceptions considered</h4><ul><li>Refactoring / behavioral-change exception: rejected — the PR is titled &#x27;feat(BREAKING): use Node.js timers by default&#x27; and describes a functional change to setTimeout/setInterval semantics, so it is not a documentation-only, dependency-bump, or no-behavioral-change refactor.</li></ul></div></details></section><section class="trace-section"><h2>LLM call trace <span style='color:var(--muted); font-size: 13px; font-weight: 400;'>· 11 calls · $2.0264</span></h2><table class="trace-table"><thead><tr><th>#</th><th>Purpose</th><th>In</th><th>Cache</th><th>Out</th><th>$</th><th>Latency</th></tr></thead><tbody><tr><td>1</td><td>screenshot:Screenshot 2025-11-14 at 14-27-50 Coverage Report.png</td><td class="num">6,675</td><td class="num">0</td><td class="num">1,689</td><td class="cost">$0.2268</td><td class="num">24254ms</td></tr><tr><td>2</td><td>screenshot:Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</td><td class="num">7,348</td><td class="num">0</td><td class="num">1,972</td><td class="cost">$0.2581</td><td class="num">27625ms</td></tr><tr><td>3</td><td>screenshot:Screenshot 2025-11-14 at 14-29-21 Shrink relationComplexityError test size · microsoft_TypeScript@9e76dd2.png</td><td class="num">7,300</td><td class="num">0</td><td class="num">1,522</td><td class="cost">$0.2236</td><td class="num">21921ms</td></tr><tr><td>4</td><td>judge:code-review-before-merge-to-main:sample-1</td><td class="num">6,161</td><td class="num">0</td><td class="num">1,014</td><td class="cost">$0.1784</td><td class="num">16150ms</td></tr><tr><td>5</td><td>judge:independent-reviewer-approval:sample-1</td><td class="num">6,160</td><td class="num">2,638</td><td class="num">995</td><td class="cost">$0.1314</td><td class="num">16897ms</td></tr><tr><td>6</td><td>judge:testing-per-testing-policy:sample-1</td><td class="num">8,012</td><td class="num">2,638</td><td class="num">1,435</td><td class="cost">$0.1922</td><td class="num">19762ms</td></tr><tr><td>7</td><td>screenshot:Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png</td><td class="num">7,264</td><td class="num">0</td><td class="num">1,639</td><td class="cost">$0.2319</td><td class="num">25475ms</td></tr><tr><td>8</td><td>screenshot:Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</td><td class="num">7,295</td><td class="num">0</td><td class="num">1,532</td><td class="cost">$0.2243</td><td class="num">24368ms</td></tr><tr><td>9</td><td>judge:code-review-before-merge-to-main:sample-2</td><td class="num">4,103</td><td class="num">2,638</td><td class="num">819</td><td class="cost">$0.0874</td><td class="num">10849ms</td></tr><tr><td>10</td><td>judge:independent-reviewer-approval:sample-2</td><td class="num">4,102</td><td class="num">2,638</td><td class="num">1,019</td><td class="cost">$0.1023</td><td class="num">12095ms</td></tr><tr><td>11</td><td>judge:testing-per-testing-policy:sample-2</td><td class="num">5,954</td><td class="num">2,638</td><td class="num">1,550</td><td class="cost">$0.1699</td><td class="num">20229ms</td></tr></tbody></table></section><div class="footer">Generated by <code>bead-agent report</code> · self-contained, no external assets.</div></div></body></html>

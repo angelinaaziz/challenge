@@ -111,6 +111,17 @@ Table of every LLM call from a past run: purpose, input/cache/output tokens, cos
 bead-agent trace output/user-access-review/claude
 ```
 
+### `bead-agent report <run-dir>`
+
+Generate a **self-contained HTML report** — single file, no external CSS/JS/CDN. Works offline, emailable as a single attachment.
+
+```bash
+bead-agent report output/user-access-review/claude
+bead-agent report output/user-access-review/claude --open   # open in browser after
+```
+
+Includes: control conclusion badge · reperformance summary · evidence coverage · expandable per-attribute cards with citations · full LLM call trace at the bottom. Committed sample reports live at `output/<control>/<model>/report.html` — inspectable without spending API credits.
+
 ### `bead-agent eval <control-dir>`
 
 Multi-model scoreboard. Runs the pipeline under each provider and scores against the hand-labelled golden set.
@@ -147,6 +158,7 @@ Everything lives under `output/<control>/<model>/`:
 | `trace.jsonl` | Every LLM call: purpose, tokens, cache hits, cost, latency, prompt hashes |
 | `<sample>/assessment.json` | The structured verdicts (Bead's requested format) |
 | `<sample>/assessment.md` | Human-readable workpaper — headline verdict, reperformance summary, evidence coverage, per-attribute verdicts with citations |
+| `report.html` | **Self-contained HTML report** (generated on demand via `bead-agent report`) — same content as the sample assessments, but as a single-file interactive workpaper. Committed for review. |
 
 ---
 

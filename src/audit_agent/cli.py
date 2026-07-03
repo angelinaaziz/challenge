@@ -6,6 +6,7 @@ Commands:
     bead-agent info  <control-dir>     Parse the control + list samples (no LLM audit)
     bead-agent show  <assessment.json> Pretty-print a past assessment file
     bead-agent trace <run-dir>         Show the trace log for a past run
+    bead-agent report <run-dir>        Generate a self-contained HTML report
 """
 
 from __future__ import annotations
@@ -17,8 +18,11 @@ from typing import Optional
 import typer
 from dotenv import load_dotenv
 from rich.console import Console
+from rich.padding import Padding
 from rich.panel import Panel
+from rich.rule import Rule
 from rich.table import Table
+from rich.text import Text
 
 from audit_agent.llm import make_provider
 from audit_agent.pipeline import RunConfig, run_audit
@@ -46,9 +50,9 @@ CONSOLE = Console()
 # --- Shared helpers ---------------------------------------------------------
 
 _VERDICT_STYLE = {
-    "SUCCESS": "green",
-    "FAIL": "red",
-    "FURTHER_EVIDENCE_REQUIRED": "yellow",
+    "SUCCESS": "bold green",
+    "FAIL": "bold red",
+    "FURTHER_EVIDENCE_REQUIRED": "bold yellow",
 }
 _VERDICT_EMOJI = {
     "SUCCESS": "✅",
@@ -58,6 +62,25 @@ _VERDICT_EMOJI = {
     "CONTROL_FAIL": "❌",
     "CONTROL_INCONCLUSIVE": "⚠️",
 }
+_CONCLUSION_STYLE = {
+    "CONTROL_PASS": "bold green",
+    "CONTROL_FAIL": "bold red",
+    "CONTROL_INCONCLUSIVE": "bold yellow",
+}
+
+
+def _short_rationale(text: str, max_chars: int = 220) -> str:
+    """Return the first sentence-ish, capped at max_chars — full text via `show`."""
+    text = text.replace("\n", " ").strip()
+    if len(text) <= max_chars:
+        return text
+    cut = text[:max_chars]
+    # Prefer to cut at the last sentence boundary if there is one.
+    for terminator in ". ! ?".split():
+        idx = cut.rfind(terminator)
+        if idx >= max_chars * 0.6:
+            return cut[: idx + 1] + " …"
+    return cut + " …"
 
 
 def _read_trace_summary(trace_path: Path) -> dict:
@@ -146,50 +169,156 @@ def audit(
     )
     assessments = run_audit(cfg)
 
-    # Attribute-level summary table
-    table = Table(title=f"Audit summary — {provider.name}:{provider.model}", show_lines=True)
-    table.add_column("Sample", style="cyan")
-    table.add_column("Attribute")
-    table.add_column("Verdict")
-    table.add_column("Conf", justify="right")
-    for sa in assessments:
-        for a in sa.attributes:
-            style = _VERDICT_STYLE[a.verdict.value]
-            table.add_row(
-                sa.sample_id,
-                a.attribute_text[:60] + ("…" if len(a.attribute_text) > 60 else ""),
-                f"[{style}]{a.verdict.value}[/{style}]",
-                f"{a.confidence:.2f}",
-            )
-    CONSOLE.print(table)
+    _render_audit_summary(assessments, provider, out)
 
-    # Sample-level rollup panel
-    rollup_lines = []
-    for sa in assessments:
-        e = _VERDICT_EMOJI[sa.control_conclusion.value]
-        rollup_lines.append(f"  {e} {sa.sample_id}: [bold]{sa.control_conclusion.value}[/]")
-        if sa.evidence_coverage:
-            cov = sa.evidence_coverage
-            rollup_lines.append(
-                f"     coverage: {int(cov.coverage_rate * 100)}% "
-                f"({len(cov.cited_files)}/{len(cov.all_files)} evidence files cited)"
-            )
-    CONSOLE.print(Panel("\n".join(rollup_lines), title="Control conclusion", border_style="dim"))
 
-    # Cost + cache stats
-    summary = _read_trace_summary(out / "trace.jsonl")
-    if summary:
-        CONSOLE.print(
-            f"[dim]Cost: [bold]${summary['cost']:.4f}[/bold] · "
-            f"{summary['calls']} calls · "
-            f"{summary['input_tokens']:,} in / {summary['output_tokens']:,} out tokens · "
-            f"cache-hit {summary['cache_hit_pct']:.0f}% ({summary['cache_read_tokens']:,} tokens)[/dim]"
+# --- audit rendering --------------------------------------------------------
+
+def _render_audit_summary(assessments, provider, out: Path) -> None:
+    """The scannable per-sample layout users see when a run finishes.
+
+    Design: one panel per sample. Big control-conclusion badge. Per-attribute
+    row with verdict icon, confidence bar, rationale preview. No truncated
+    column headers. Details available via `bead-agent show`.
+    """
+    CONSOLE.print()
+    header = Text.assemble(
+        ("Audit complete", "bold"),
+        ("  ·  ", "dim"),
+        (f"{provider.name}:{provider.model}", "cyan"),
+    )
+    CONSOLE.print(Padding(header, (0, 2)))
+    CONSOLE.print()
+
+    for sa in assessments:
+        _render_sample_summary(sa)
+
+    _render_cost_footer(out)
+
+    CONSOLE.print()
+    CONSOLE.print(Padding(f"Results: [bold]{out}[/]", (0, 2)))
+    CONSOLE.print(
+        Padding(
+            f"[dim]Inspect a sample: [cyan]bead-agent show {out}/<sample>/assessment.json[/]\n"
+            f"See LLM call cost breakdown: [cyan]bead-agent trace {out}[/]\n"
+            f"Generate HTML report: [cyan]bead-agent report {out}[/][/dim]",
+            (0, 2),
+        )
+    )
+
+
+def _render_sample_summary(sa) -> None:
+    conclusion_style = _CONCLUSION_STYLE[sa.control_conclusion.value]
+    conclusion_emoji = _VERDICT_EMOJI[sa.control_conclusion.value]
+
+    # Headline card — big verdict + coverage
+    heading = Text.assemble(
+        (f"{conclusion_emoji}  ", ""),
+        (sa.sample_id, "bold cyan"),
+        ("   ", ""),
+        (sa.control_conclusion.value, conclusion_style),
+    )
+    heading_lines = [heading]
+    if sa.evidence_coverage:
+        cov = sa.evidence_coverage
+        heading_lines.append(
+            Text.assemble(
+                ("evidence coverage: ", "dim"),
+                (f"{int(cov.coverage_rate * 100)}%", "bold"),
+                ("   ", ""),
+                (f"({len(cov.cited_files)}/{len(cov.all_files)} files cited)", "dim"),
+            )
+        )
+        if cov.uncited_files:
+            heading_lines.append(
+                Text.assemble(
+                    ("uncited: ", "dim yellow"),
+                    (", ".join(cov.uncited_files), "yellow"),
+                )
+            )
+    if sa.consistency_disagreement_rate is not None:
+        heading_lines.append(
+            Text.assemble(
+                ("model disagreement: ", "dim"),
+                (f"{sa.consistency_disagreement_rate:.0%}", "bold"),
+            )
         )
 
-    CONSOLE.print(f"\nResults written to [bold]{out}[/]")
+    heading_text = Text("\n").join(heading_lines)
     CONSOLE.print(
-        f"Inspect: [cyan]bead-agent show {out}/<sample>/assessment.json[/cyan]"
+        Panel(
+            heading_text,
+            border_style=conclusion_style.split()[-1],  # 'red'|'green'|'yellow'
+            padding=(1, 2),
+        )
     )
+
+    # Reperformance summary (UAR only)
+    if sa.reperformance_notes:
+        CONSOLE.print(
+            Padding(
+                Panel(
+                    Text(sa.reperformance_notes, style=""),
+                    title=Text("Reperformance", style="bold"),
+                    title_align="left",
+                    border_style="blue",
+                    padding=(0, 2),
+                ),
+                (0, 2),
+            )
+        )
+
+    # Attributes — one clean block per attribute
+    CONSOLE.print(Padding(Text("Attribute verdicts", style="dim underline"), (1, 2)))
+    for a in sa.attributes:
+        style = _VERDICT_STYLE[a.verdict.value]
+        base = style.split()[-1]
+        emoji = _VERDICT_EMOJI[a.verdict.value]
+
+        title_line = Text.assemble(
+            (f"{emoji}  ", ""),
+            (a.attribute_text, "bold"),
+        )
+        meta_line = Text.assemble(
+            (a.verdict.value, style),
+            ("   confidence ", "dim"),
+            (f"{a.confidence:.2f}", "bold"),
+            ("   citations ", "dim"),
+            (f"{len(a.evidence_refs)}", "bold"),
+        )
+        body = Text(_short_rationale(a.rationale), style="")
+
+        block = Text("\n").join([title_line, meta_line, Text(""), body])
+        CONSOLE.print(
+            Padding(
+                Panel(block, border_style=base, padding=(0, 2)),
+                (0, 4),
+            )
+        )
+    CONSOLE.print()
+
+
+def _render_cost_footer(out: Path) -> None:
+    summary = _read_trace_summary(out / "trace.jsonl")
+    if not summary:
+        return
+    text = Text.assemble(
+        ("Cost: ", "dim"),
+        (f"${summary['cost']:.4f}", "bold"),
+        ("   ", ""),
+        ("Calls: ", "dim"),
+        (f"{summary['calls']}", "bold"),
+        ("   ", ""),
+        ("Tokens: ", "dim"),
+        (f"{summary['input_tokens']:,} in / {summary['output_tokens']:,} out", "bold"),
+        ("   ", ""),
+        ("Cache-hit: ", "dim"),
+        (f"{summary['cache_hit_pct']:.0f}%", "bold green"),
+        (f" ({summary['cache_read_tokens']:,} tokens)", "dim"),
+    )
+    CONSOLE.print(Rule(style="dim"))
+    CONSOLE.print(Padding(text, (0, 2)))
+    CONSOLE.print(Rule(style="dim"))
 
 
 # --- info -------------------------------------------------------------------
@@ -284,54 +413,136 @@ def show(
     from audit_agent.schemas import SampleAssessment
 
     sa = SampleAssessment(**json.loads(assessment_path.read_text()))
+    style = _CONCLUSION_STYLE[sa.control_conclusion.value]
+    base = style.split()[-1]
     emoji = _VERDICT_EMOJI[sa.control_conclusion.value]
 
-    header = (
-        f"[bold]{sa.control}[/bold]  ·  sample: {sa.sample_id}\n"
-        f"model: {sa.model}\n"
-        f"generated: {sa.generated_at.isoformat()}\n"
-        f"\n{emoji}  [bold]{sa.control_conclusion.value}[/bold]"
+    # --- Header card
+    header_lines = [
+        Text.assemble((sa.control, "bold cyan")),
+        Text.assemble(
+            ("sample ", "dim"),
+            (sa.sample_id, "bold"),
+            ("  ·  ", "dim"),
+            (sa.model, "dim"),
+        ),
+    ]
+    header_lines.append(Text(""))
+    header_lines.append(
+        Text.assemble(
+            (f"{emoji}  ", ""),
+            (sa.control_conclusion.value, style),
+        )
     )
-    if sa.consistency_disagreement_rate is not None:
-        header += f"\nconsistency disagreement: {sa.consistency_disagreement_rate:.0%}"
     if sa.evidence_coverage:
         cov = sa.evidence_coverage
-        header += (
-            f"\nevidence coverage: {int(cov.coverage_rate * 100)}% — "
-            f"{len(cov.cited_files)}/{len(cov.all_files)} files cited"
+        header_lines.append(
+            Text.assemble(
+                ("evidence coverage: ", "dim"),
+                (f"{int(cov.coverage_rate * 100)}%", "bold"),
+                (" · ", "dim"),
+                (f"{len(cov.cited_files)}/{len(cov.all_files)} files cited", "dim"),
+            )
         )
         if cov.uncited_files:
-            header += f"\nuncited: {', '.join(cov.uncited_files)}"
-    CONSOLE.print(Panel(header, border_style="cyan"))
+            header_lines.append(
+                Text.assemble(
+                    ("uncited: ", "dim yellow"),
+                    (", ".join(cov.uncited_files), "yellow"),
+                )
+            )
+    if sa.consistency_disagreement_rate is not None:
+        header_lines.append(
+            Text.assemble(
+                ("model disagreement: ", "dim"),
+                (f"{sa.consistency_disagreement_rate:.0%}", "bold"),
+            )
+        )
 
+    CONSOLE.print()
+    CONSOLE.print(
+        Panel(Text("\n").join(header_lines), border_style=base, padding=(1, 2))
+    )
+
+    # --- Reperformance summary
     if sa.reperformance_notes:
-        CONSOLE.print(Panel(sa.reperformance_notes, title="Reperformance", border_style="dim"))
+        CONSOLE.print(
+            Padding(
+                Panel(
+                    Text(sa.reperformance_notes),
+                    title=Text("Reperformance summary", style="bold"),
+                    title_align="left",
+                    border_style="blue",
+                    padding=(0, 2),
+                ),
+                (0, 0),
+            )
+        )
 
+    # --- Attribute cards
     for a in sa.attributes:
-        style = _VERDICT_STYLE[a.verdict.value]
-        emoji_a = _VERDICT_EMOJI[a.verdict.value]
-        body_lines = [
-            f"[{style}]{emoji_a}  {a.verdict.value}[/{style}]  ·  confidence {a.confidence:.2f}",
-            "",
-            a.rationale,
-        ]
+        vstyle = _VERDICT_STYLE[a.verdict.value]
+        vbase = vstyle.split()[-1]
+        vemoji = _VERDICT_EMOJI[a.verdict.value]
+
+        lines: list[Text] = []
+        lines.append(
+            Text.assemble(
+                (a.verdict.value, vstyle),
+                ("   confidence ", "dim"),
+                (f"{a.confidence:.2f}", "bold"),
+                ("   citations ", "dim"),
+                (f"{len(a.evidence_refs)}", "bold"),
+            )
+        )
+        lines.append(Text(""))
+        lines.append(Text(a.rationale))
+
         if a.policy_references:
-            body_lines.append("")
-            body_lines.append("[bold]Policy references:[/bold]")
+            lines.append(Text(""))
+            lines.append(Text("Policy references", style="bold underline"))
             for p in a.policy_references:
-                body_lines.append(f"  • {p.source} § {p.section}: “{p.quote}”")
+                lines.append(
+                    Text.assemble(
+                        ("  • ", "dim"),
+                        (p.source, "cyan"),
+                        (" § ", "dim"),
+                        (p.section, ""),
+                    )
+                )
+                lines.append(Text(f'    "{p.quote}"', style="italic dim"))
+
         if a.evidence_refs:
-            body_lines.append("")
-            body_lines.append("[bold]Evidence:[/bold]")
+            lines.append(Text(""))
+            lines.append(Text("Evidence", style="bold underline"))
             for e in a.evidence_refs:
-                body_lines.append(f"  • {e.file} @ {e.locator}")
-                body_lines.append(f"    [dim]{e.observation}[/dim]")
+                lines.append(
+                    Text.assemble(
+                        ("  • ", "dim"),
+                        (e.file, "cyan"),
+                        ("  @  ", "dim"),
+                        (e.locator, "magenta"),
+                    )
+                )
+                lines.append(Text(f"    {e.observation}", style="dim"))
+
         if a.exceptions_considered:
-            body_lines.append("")
-            body_lines.append("[bold]Exceptions considered:[/bold]")
+            lines.append(Text(""))
+            lines.append(Text("Exceptions considered", style="bold underline"))
             for x in a.exceptions_considered:
-                body_lines.append(f"  • {x}")
-        CONSOLE.print(Panel("\n".join(body_lines), title=a.attribute_text))
+                lines.append(Text(f"  • {x}"))
+
+        block = Text("\n").join(lines)
+        CONSOLE.print()
+        CONSOLE.print(
+            Panel(
+                block,
+                title=Text.assemble((f"{vemoji}  ", ""), (a.attribute_text, "bold")),
+                title_align="left",
+                border_style=vbase,
+                padding=(1, 2),
+            )
+        )
 
 
 # --- trace ------------------------------------------------------------------
@@ -378,6 +589,37 @@ def trace(
         )
     CONSOLE.print(table)
     CONSOLE.print(f"\n[bold]Total: ${total_cost:.4f}[/bold]")
+
+
+# --- report -----------------------------------------------------------------
+
+@app.command()
+def report(
+    run_dir: Path = typer.Argument(
+        ...,
+        exists=True,
+        file_okay=False,
+        dir_okay=True,
+        help="Output directory containing sample assessment.json files and trace.jsonl.",
+    ),
+    open_browser: bool = typer.Option(
+        False, "--open", help="Open the report in the default browser after generating."
+    ),
+):
+    """Generate a self-contained HTML report of a past run.
+
+    Writes report.html into the same directory. No external dependencies —
+    styles are inlined so the file works offline and can be emailed as a
+    single attachment.
+    """
+    from audit_agent.html_report import build_report
+
+    out_path = build_report(run_dir)
+    CONSOLE.print(f"[green]Wrote[/] [bold]{out_path}[/]")
+    if open_browser:
+        import webbrowser
+
+        webbrowser.open(out_path.as_uri())
 
 
 # --- eval -------------------------------------------------------------------

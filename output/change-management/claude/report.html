@@ -1,0 +1,209 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Audit report — Change Management</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>
+:root {
+  --bg: #0e1116;
+  --card: #161a22;
+  --card-hover: #1c2130;
+  --border: #232936;
+  --text: #d5dae4;
+  --muted: #7a8598;
+  --accent: #6c8fff;
+  --success: #4bcf87;
+  --success-bg: rgba(75, 207, 135, 0.10);
+  --fail: #ff6b6b;
+  --fail-bg: rgba(255, 107, 107, 0.10);
+  --warn: #f5c265;
+  --warn-bg: rgba(245, 194, 101, 0.10);
+  --code-bg: #0a0c11;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  font-size: 15px;
+}
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 32px 96px;
+}
+header.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+header.hero .eyebrow {
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+header.hero h1 { margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.01em; }
+header.hero .meta {
+  color: var(--muted);
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.badge.pass    { color: var(--success); background: var(--success-bg); }
+.badge.fail    { color: var(--fail);    background: var(--fail-bg); }
+.badge.warn    { color: var(--warn);    background: var(--warn-bg); }
+.badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.sample-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.sample-card h2 { margin: 0 0 16px 0; font-size: 20px; font-weight: 600; }
+.sample-card .sample-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 8px;
+}
+.sample-card .sample-meta strong { color: var(--text); }
+.section-title {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 24px 0 12px;
+}
+.reperformance {
+  background: rgba(108, 143, 255, 0.06);
+  border: 1px solid rgba(108, 143, 255, 0.25);
+  border-radius: 10px;
+  padding: 16px 20px;
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+details.attribute {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+details.attribute[data-verdict="SUCCESS"] { border-left-color: var(--success); }
+details.attribute[data-verdict="FAIL"]    { border-left-color: var(--fail); }
+details.attribute[data-verdict="FURTHER_EVIDENCE_REQUIRED"] { border-left-color: var(--warn); }
+details.attribute > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 22px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+}
+details.attribute > summary::-webkit-details-marker { display: none; }
+details.attribute > summary:hover { background: var(--card-hover); }
+details.attribute .verdict-icon { font-size: 20px; line-height: 1; }
+details.attribute .verdict-text {
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+details.attribute[data-verdict="SUCCESS"] .verdict-text { color: var(--success); }
+details.attribute[data-verdict="FAIL"] .verdict-text { color: var(--fail); }
+details.attribute[data-verdict="FURTHER_EVIDENCE_REQUIRED"] .verdict-text { color: var(--warn); }
+details.attribute .attr-title { font-weight: 500; font-size: 15px; color: var(--text); }
+details.attribute .attr-meta {
+  color: var(--muted);
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  white-space: nowrap;
+}
+details.attribute .body {
+  padding: 4px 22px 24px;
+  border-top: 1px solid var(--border);
+}
+details.attribute[open] > summary { border-bottom: 1px solid var(--border); }
+details.attribute .body h4 {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 20px 0 8px;
+}
+details.attribute .body p { margin: 12px 0 0; }
+details.attribute .body ul { list-style: none; padding: 0; margin: 8px 0 0; }
+details.attribute .body ul li {
+  padding: 10px 0 10px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+}
+details.attribute .body ul li:last-child { border-bottom: none; }
+details.attribute .body .file  { color: var(--accent); font-family: ui-monospace, monospace; font-size: 13px; }
+details.attribute .body .loc   { color: #d38dff; font-family: ui-monospace, monospace; font-size: 13px; }
+details.attribute .body .obs   { color: var(--muted); font-size: 13px; margin-top: 4px; }
+details.attribute .body .quote { color: var(--text); font-style: italic; padding-left: 12px; border-left: 2px solid var(--border); margin-top: 6px; font-size: 13px; }
+.coverage {
+  display: flex;
+  gap: 24px;
+  padding: 12px 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.coverage strong { color: var(--text); }
+.coverage .uncited { color: var(--warn); }
+.trace-section h2 {
+  font-size: 16px;
+  color: var(--text);
+  margin: 40px 0 12px;
+}
+.trace-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
+.trace-table th, .trace-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.trace-table th { color: var(--muted); font-weight: 500; text-transform: uppercase; font-size: 10px; letter-spacing: 0.10em; }
+.trace-table td.num  { text-align: right; }
+.trace-table td.cost { color: var(--success); text-align: right; }
+.footer {
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+.footer code { color: var(--text); background: var(--code-bg); padding: 2px 6px; border-radius: 4px; }
+</style></head><body><div class="container"><header class="hero"><div class="eyebrow">Bead audit report</div><h1>Change Management</h1><div class="meta">model claude:claude-opus-4-7 · 2 sample(s)</div><div style="margin-top:12px;"><span class="badge fail"><span class="dot"></span>CONTROL_FAIL</span></div></header><section class="sample-card"><div class="badge fail"><span class="dot"></span>CONTROL_FAIL</div><h2>Sample: sample-1</h2><div class="sample-meta"><span><strong>claude:claude-opus-4-7</strong></span><span>generated: 2026-07-03T02:00:41.644951+00:00</span></div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Every production change has a corresponding change request that documents scope, risk classification, and rollback plan</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">conf 0.95 · 6 citations</div></summary><div class="body"><h4>Rationale</h4><p>The change-request.md document CHG-2026-0847 satisfies every documentation criterion: identifier matches CHG-YYYY-NNNN, scope lists affected systems/repos, risk is Medium, a detailed rollback plan is present, requester (Marcus Bell) and approver (Priya Nadkarni) are named, planned window is documented, category is Normal, and a CAB review (CAB-2026-W25) is recorded. This attribute is limited to documentation completeness; approval validity/independence are judged elsewhere.</p><h4>Policy references</h4><ul><li><div><span class="file">change-management-policy.md</span> § Required Documentation</div><div class="quote">Every change (regardless of category) must include: A change request identifier (e.g. CHG-YYYY-NNNN); Scope: systems affected, code repositories, config surfaces; Risk classification (Low / Medium / High); Rollback plan; Named requester and named approver; Planned start and end times</div></li><li><div><span class="file">change-management-policy.md</span> § Change Categories</div><div class="quote">Normal | Non-routine change with a defined risk assessment | 2 (Change Coordinator + Change Approver from CAB) | Yes</div></li></ul><h4>Evidence</h4><ul><li><div><span class="file">change-request.md</span> @ <span class="loc">Title line</span></div><div class="obs">Identifier &#x27;CHG-2026-0847&#x27; matches CHG-YYYY-NNNN format.</div></li><li><div><span class="file">change-request.md</span> @ <span class="loc">Header block (Category/Risk/Systems/Repositories/Planned window)</span></div><div class="obs">Category=Normal, Risk=Medium, systems affected (payments-primary RDS, payments-api), repo northpeak/infra-terraform PR #2411, planned window 2026-06-24 20:00–22:00 UTC.</div></li><li><div><span class="file">change-request.md</span> @ <span class="loc">Scope section</span></div><div class="obs">Documents Postgres 15.7→16.3 upgrade and pg library bump; no schema changes.</div></li><li><div><span class="file">change-request.md</span> @ <span class="loc">Rollback plan section</span></div><div class="obs">Three-step rollback with snapshot ID, redeploy pinned version, healthcheck; RTO 25 minutes validated in staging drill.</div></li><li><div><span class="file">change-request.md</span> @ <span class="loc">Requester and Approver sections</span></div><div class="obs">Named requester Marcus Bell and named approver Priya Nadkarni (CAB Change Approver).</div></li><li><div><span class="file">change-request.md</span> @ <span class="loc">Approval record section</span></div><div class="obs">CAB reference CAB-2026-W25 recorded with approval decision and timestamp — CAB review documented for the Normal change.</div></li></ul><h4>Exceptions considered</h4><ul><li>Documentation-only exception rejected — change is a Postgres major-version upgrade on production, not README/comments.</li><li>Emergency retrospective CAB clause not applicable — change is categorised Normal, not Emergency.</li></ul></div></details><details class="attribute" data-verdict="FAIL"><summary><div class="verdict-icon">✕</div><div class="attr-title"><div>Production changes are approved by an authorised change approver prior to deployment</div><div class="verdict-text">FAIL</div></div><div class="attr-meta">conf 0.75 · 5 citations</div></summary><div class="body"><h4>Rationale</h4><p>On careful re-read, the change is explicitly categorised as Normal (Medium risk), which per the change management policy requires two approvers: a Change Coordinator AND a Change Approver from CAB. The change-request.md documents only one named approver — Priya Nadkarni (Change Approver, CAB) — and the deployment log likewise references only priya.nadkarni. No Change Coordinator approval is recorded anywhere in the evidence bundle. The first-pass judge hedged on the basis that CAB minutes (cab-minutes-w25.pdf) might contain a second approver, but that document is explicitly excluded from the bundle and cannot be relied upon; the evidence on record shows a single approver for a Normal change, which contradicts the two-approver requirement. This is a positive contradiction (only one approver listed) rather than mere absence, so a FAIL verdict is defensible now. Other criteria (four-eyes, timestamp before window) are met, but the two-approver rule for Normal changes is not. If cab-minutes-w25.pdf were produced showing an additional Change Coordinator approval before 2026-06-24 20:00 UTC, this could flip to SUCCESS; absent that, the on-record evidence fails the control.</p><h4>Policy references</h4><ul><li><div><span class="file">change-management-policy.md</span> § Change Categories</div><div class="quote">Normal | Non-routine change with a defined risk assessment | 2 (Change Coordinator + Change Approver from CAB) | Yes</div></li><li><div><span class="file">change-management-policy.md</span> § Approval Rules</div><div class="quote">The approver must be a different named human from the requester (four-eyes principle). Approvers must hold the Change Approver role in the identity provider. Approval must occur before the deployment window opens.</div></li></ul><h4>Evidence</h4><ul><li><div><span class="file">change-request.md</span> @ <span class="loc">Header: Category / Risk</span></div><div class="obs">Category: Normal; Risk: Medium — triggers the 2-approver requirement under policy.</div></li><li><div><span class="file">change-request.md</span> @ <span class="loc">Approver section</span></div><div class="obs">Only one approver named: Priya Nadkarni (Change Approver, CAB). No Change Coordinator listed.</div></li><li><div><span class="file">change-request.md</span> @ <span class="loc">Approval record section</span></div><div class="obs">Approval record cites CAB-2026-W25 and a single approval decision timestamped 2026-06-23 15:42 UTC; notes cab-minutes-w25.pdf is NOT included in the evidence bundle.</div></li><li><div><span class="file">deployment-log.txt</span> @ <span class="loc">Line 2026-06-24 20:00:15 UTC</span></div><div class="obs">Runner records &#x27;approval OK — CHG-2026-0847 approved by priya.nadkarni&#x27; — a single approver, no second approval referenced.</div></li><li><div><span class="file">change-request.md</span> @ <span class="loc">Requester section vs Approver section</span></div><div class="obs">Requester Marcus Bell distinct from approver Priya Nadkarni — four-eyes satisfied; timestamp 2026-06-23 15:42 UTC precedes 2026-06-24 20:00 UTC window.</div></li></ul><h4>Exceptions considered</h4><ul><li>Retrospective approval exception — not applicable; approval preceded deployment by ~28 hours.</li><li>Whether cab-minutes-w25.pdf might contain a Change Coordinator approval — disregarded because the document is explicitly excluded from the bundle and cannot be assumed to exist favourably.</li><li>Whether &#x27;CAB approval&#x27; implicitly covers both roles — policy language distinguishes Change Coordinator from CAB Change Approver as two separate approvers, so a single CAB sign-off does not satisfy both.</li></ul></div></details><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Pre-deployment testing is completed and evidence retained before release</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">conf 0.90 · 3 citations</div></summary><div class="body"><h4>Rationale</h4><p>Change is Normal category. Test plan and test results are attached via pre-deployment-test-results.xlsx, which the change request references (42 test cases including 12 functional smoke tests). Sampled functional smoke tests (TC-001..TC-005) all show PASS, executed 2026-06-23 14:12–14:14 UTC — before the deployment window start of 2026-06-24 20:00 UTC. No failed tests are indicated, so the block-on-failure criterion is not triggered.</p><h4>Policy references</h4><ul><li><div><span class="file">change-management-policy.md</span> § Testing Requirements</div><div class="quote">Standard and Normal changes: pre-deployment testing evidence (test plan + test results) must be attached to the change request.</div></li><li><div><span class="file">change-management-policy.md</span> § Testing Requirements</div><div class="quote">Testing must include, at minimum, functional smoke tests of the affected surfaces.</div></li><li><div><span class="file">change-management-policy.md</span> § Testing Requirements</div><div class="quote">Failed tests block deployment for Standard/Normal changes; must be documented as accepted risk for Emergency changes.</div></li></ul><h4>Evidence</h4><ul><li><div><span class="file">change-request.md</span> @ <span class="loc">Category field / Testing evidence section</span></div><div class="obs">Category = Normal; references pre-deployment-test-results.xlsx with 42 test cases (12 functional smoke, 24 regression, 6 rollback).</div></li><li><div><span class="file">pre-deployment-test-results.xlsx</span> @ <span class="loc">Test Cases sheet, rows TC-001–TC-005</span></div><div class="obs">Five functional smoke tests covering payments API /healthz, ledger insert/read, transaction id constraint, and currency conversion — all Result = PASS, executed 2026-06-23 14:12–14:14.</div></li><li><div><span class="file">deployment-log.txt</span> @ <span class="loc">window start line</span></div><div class="obs">Deployment window started 2026-06-24 20:00:02 UTC — after test execution timestamps on 2026-06-23, satisfying the pre-deployment timing criterion.</div></li></ul><h4>Exceptions considered</h4><ul><li>Documentation-only exception: not applicable — change is a Postgres major version upgrade affecting production.</li></ul></div></details></section><section class="sample-card"><div class="badge fail"><span class="dot"></span>CONTROL_FAIL</div><h2>Sample: sample-2</h2><div class="sample-meta"><span><strong>claude:claude-opus-4-7</strong></span><span>generated: 2026-07-03T02:01:20.816490+00:00</span></div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="FAIL"><summary><div class="verdict-icon">✕</div><div class="attr-title"><div>Every production change has a corresponding change request that documents scope, risk classification, and rollback plan</div><div class="verdict-text">FAIL</div></div><div class="attr-meta">conf 0.90 · 3 citations</div></summary><div class="body"><h4>Rationale</h4><p>The change request documents scope, risk classification (Medium), rollback plan, requester, approver, planned window, ID (CHG-2026-0912), and category (Normal). However, the attribute requires that IF the change is Normal THEN a CAB review is recorded. This change is categorised as Normal but the CAB meeting reference is explicitly &quot;(none — deployed under standing team autonomy waiver)&quot; with a retroactive CAB scheduled after deployment. No CAB review is recorded, which fails the Normal-change criterion.</p><h4>Policy references</h4><ul><li><div><span class="file">change-management-policy.md</span> § Change Categories</div><div class="quote">Normal | Non-routine change with a defined risk assessment | 2 (Change Coordinator + Change Approver from CAB) | Yes</div></li></ul><h4>Evidence</h4><ul><li><div><span class="file">change-request.md</span> @ <span class="loc">Header + Approval record section</span></div><div class="obs">Category: Normal; CAB meeting reference: (none — deployed under standing team autonomy waiver); Approval decision: Self-approved; retroactive CAB scheduled 2026-07-02.</div></li><li><div><span class="file">change-request.md</span> @ <span class="loc">System(s) affected / Repositories touched / Scope / Risk assessment / Rollback plan / Planned window</span></div><div class="obs">Documents scope (reports-api, reports-worker, reports-db; repos northpeak/reports-service PR#47 and northpeak/infra-terraform PR#2438), risk Medium, rollback plan with 3 steps, planned window 2026-06-28 15:00–17:00 UTC.</div></li><li><div><span class="file">change-request.md</span> @ <span class="loc">Title line</span></div><div class="obs">Change request ID &#x27;CHG-2026-0912&#x27; matches CHG-YYYY-NNNN format.</div></li></ul><h4>Exceptions considered</h4><ul><li>Documentation-only exception — rejected: this is a new production service deployment, not documentation.</li><li>Emergency retrospective CAB — rejected: change is categorised Normal, not Emergency, so retrospective CAB is not a valid substitute.</li></ul></div></details><details class="attribute" data-verdict="FAIL"><summary><div class="verdict-icon">✕</div><div class="attr-title"><div>Production changes are approved by an authorised change approver prior to deployment</div><div class="verdict-text">FAIL</div></div><div class="attr-meta">conf 0.99 · 4 citations</div></summary><div class="body"><h4>Rationale</h4><p>The change request lists Marcus Bell as both requester and approver, and the approval decision is explicitly &quot;Self-approved&quot;. This violates the four-eyes principle criterion. Additionally, CHG-2026-0912 is categorised as Normal, which requires 2 approvers (Change Coordinator + Change Approver from CAB); only a single self-approval is recorded, and the CAB review was explicitly skipped. Retrospective CAB is scheduled but retrospective approval is only permitted for Emergency changes.</p><h4>Policy references</h4><ul><li><div><span class="file">change-management-policy.md</span> § Approval Rules</div><div class="quote">The approver must be a different named human from the requester (four-eyes principle).</div></li><li><div><span class="file">change-management-policy.md</span> § Change Categories</div><div class="quote">Normal | Non-routine change with a defined risk assessment | 2 (Change Coordinator + Change Approver from CAB) | Yes</div></li><li><div><span class="file">change-management-policy.md</span> § Approval Rules</div><div class="quote">Retrospective approvals are only valid for Emergency changes and must be documented as such.</div></li></ul><h4>Evidence</h4><ul><li><div><span class="file">change-request.md</span> @ <span class="loc">Category field header</span></div><div class="obs">Change is categorised as Normal, Risk Medium.</div></li><li><div><span class="file">change-request.md</span> @ <span class="loc">Requester and Approver sections</span></div><div class="obs">Both requester and approver are listed as Marcus Bell (marcus.bell@northpeakfinancial.com).</div></li><li><div><span class="file">change-request.md</span> @ <span class="loc">Approval record section</span></div><div class="obs">Approval decision recorded as &#x27;Self-approved&#x27;; CAB meeting reference states &#x27;(none — deployed under standing team autonomy waiver)&#x27;; note states CAB was skipped to hit demo deadline with a retroactive CAB scheduled 2026-07-02.</div></li><li><div><span class="file">deployment-log.txt</span> @ <span class="loc">approval verification line at 15:04:20 UTC</span></div><div class="obs">Deployment runner logs &#x27;approval OK — CHG-2026-0912 approved by marcus.bell at 2026-06-28T14:47:00Z (self-approved)&#x27;.</div></li></ul><h4>Exceptions considered</h4><ul><li>Retrospective/emergency exception: rejected because the change is documented as Normal, not Emergency, so retrospective CAB approval is not permitted.</li><li>Documentation-only exception: rejected — this is a new production service and RDS provisioning, clearly in scope.</li></ul></div></details><details class="attribute" data-verdict="FAIL"><summary><div class="verdict-icon">✕</div><div class="attr-title"><div>Pre-deployment testing is completed and evidence retained before release</div><div class="verdict-text">FAIL</div></div><div class="attr-meta">conf 0.97 · 4 citations</div></summary><div class="body"><h4>Rationale</h4><p>Change is Normal, so failed tests must block deployment. The test workbook shows TC-002 (Functional) and TC-004 (Regression) FAILED on 2026-06-28, yet the deployment log shows the change was deployed at 15:04–15:31 UTC with an explicit &quot;override applied — accepting canary failure for demo&quot;. The change request itself admits &quot;3 test cases failed on staging... Deployment proceeded pending post-deployment fix.&quot; This directly violates the criterion that failed tests block deployment for Standard/Normal changes.</p><h4>Policy references</h4><ul><li><div><span class="file">change-management-policy.md</span> § Testing Requirements</div><div class="quote">Failed tests block deployment for Standard/Normal changes; must be documented as accepted risk for Emergency changes.</div></li><li><div><span class="file">change-management-policy.md</span> § Testing Requirements</div><div class="quote">Standard and Normal changes: pre-deployment testing evidence (test plan + test results) must be attached to the change request.</div></li></ul><h4>Evidence</h4><ul><li><div><span class="file">pre-deployment-test-results.xlsx</span> @ <span class="loc">Test Cases!D3 (TC-002 Result)</span></div><div class="obs">Functional test TC-002 &#x27;reports service returns Q2 aggregate correctly&#x27; Result = FAIL, executed 2026-06-28 09:03.</div></li><li><div><span class="file">pre-deployment-test-results.xlsx</span> @ <span class="loc">Test Cases!D5 (TC-004 Result)</span></div><div class="obs">Regression test TC-004 &#x27;legacy report export CSV columns unchanged&#x27; Result = FAIL, executed 2026-06-28 09:05.</div></li><li><div><span class="file">change-request.md</span> @ <span class="loc">Category / Testing evidence sections</span></div><div class="obs">Change is classified Normal; testing section states &#x27;3 test cases failed on staging (2 functional, 1 performance). Deployment proceeded pending post-deployment fix.&#x27;</div></li><li><div><span class="file">deployment-log.txt</span> @ <span class="loc">Lines at 15:19:41–15:31:02 UTC</span></div><div class="obs">Canary transactions failed; override applied to accept failure; deployment completed with status DEPLOYED despite known defects.</div></li></ul><h4>Exceptions considered</h4><ul><li>Emergency accepted-risk exception: rejected because the change is explicitly classified Normal, not Emergency.</li><li>Documentation-only exception: rejected because the change deploys new production services and infrastructure.</li></ul></div></details></section><section class="trace-section"><h2>LLM call trace <span style='color:var(--muted); font-size: 13px; font-weight: 400;'>· 7 calls · $0.0000</span></h2><table class="trace-table"><thead><tr><th>#</th><th>Purpose</th><th>In</th><th>Cache</th><th>Out</th><th>$</th><th>Latency</th></tr></thead><tbody><tr><td>1</td><td>judge:change-request-documented:sample-1</td><td class="num">6,742</td><td class="num">0</td><td class="num">1,219</td><td class="cost">$0.0000</td><td class="num">15091ms</td></tr><tr><td>2</td><td>judge:authorised-approver-pre-deployment:sample-1</td><td class="num">6,733</td><td class="num">0</td><td class="num">1,208</td><td class="cost">$0.0000</td><td class="num">14211ms</td></tr><tr><td>3</td><td>verify:authorised-approver-pre-deployment:sample-1</td><td class="num">6,066</td><td class="num">0</td><td class="num">1,478</td><td class="cost">$0.0000</td><td class="num">19082ms</td></tr><tr><td>4</td><td>judge:pre-deployment-testing-evidence:sample-1</td><td class="num">6,739</td><td class="num">0</td><td class="num">979</td><td class="cost">$0.0000</td><td class="num">11841ms</td></tr><tr><td>5</td><td>judge:change-request-documented:sample-2</td><td class="num">6,599</td><td class="num">0</td><td class="num">943</td><td class="cost">$0.0000</td><td class="num">11826ms</td></tr><tr><td>6</td><td>judge:authorised-approver-pre-deployment:sample-2</td><td class="num">6,590</td><td class="num">0</td><td class="num">1,162</td><td class="cost">$0.0000</td><td class="num">14428ms</td></tr><tr><td>7</td><td>judge:pre-deployment-testing-evidence:sample-2</td><td class="num">6,596</td><td class="num">0</td><td class="num">1,060</td><td class="cost">$0.0000</td><td class="num">12898ms</td></tr></tbody></table></section><div class="footer">Generated by <code>bead-agent report</code> · self-contained, no external assets.</div></div></body></html>

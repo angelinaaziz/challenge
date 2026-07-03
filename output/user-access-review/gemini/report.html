@@ -1,0 +1,209 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Audit report — User Access Review</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>
+:root {
+  --bg: #0e1116;
+  --card: #161a22;
+  --card-hover: #1c2130;
+  --border: #232936;
+  --text: #d5dae4;
+  --muted: #7a8598;
+  --accent: #6c8fff;
+  --success: #4bcf87;
+  --success-bg: rgba(75, 207, 135, 0.10);
+  --fail: #ff6b6b;
+  --fail-bg: rgba(255, 107, 107, 0.10);
+  --warn: #f5c265;
+  --warn-bg: rgba(245, 194, 101, 0.10);
+  --code-bg: #0a0c11;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  font-size: 15px;
+}
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 32px 96px;
+}
+header.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+header.hero .eyebrow {
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+header.hero h1 { margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.01em; }
+header.hero .meta {
+  color: var(--muted);
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.badge.pass    { color: var(--success); background: var(--success-bg); }
+.badge.fail    { color: var(--fail);    background: var(--fail-bg); }
+.badge.warn    { color: var(--warn);    background: var(--warn-bg); }
+.badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.sample-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.sample-card h2 { margin: 0 0 16px 0; font-size: 20px; font-weight: 600; }
+.sample-card .sample-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 8px;
+}
+.sample-card .sample-meta strong { color: var(--text); }
+.section-title {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 24px 0 12px;
+}
+.reperformance {
+  background: rgba(108, 143, 255, 0.06);
+  border: 1px solid rgba(108, 143, 255, 0.25);
+  border-radius: 10px;
+  padding: 16px 20px;
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+details.attribute {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+details.attribute[data-verdict="SUCCESS"] { border-left-color: var(--success); }
+details.attribute[data-verdict="FAIL"]    { border-left-color: var(--fail); }
+details.attribute[data-verdict="FURTHER_EVIDENCE_REQUIRED"] { border-left-color: var(--warn); }
+details.attribute > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 22px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+}
+details.attribute > summary::-webkit-details-marker { display: none; }
+details.attribute > summary:hover { background: var(--card-hover); }
+details.attribute .verdict-icon { font-size: 20px; line-height: 1; }
+details.attribute .verdict-text {
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+details.attribute[data-verdict="SUCCESS"] .verdict-text { color: var(--success); }
+details.attribute[data-verdict="FAIL"] .verdict-text { color: var(--fail); }
+details.attribute[data-verdict="FURTHER_EVIDENCE_REQUIRED"] .verdict-text { color: var(--warn); }
+details.attribute .attr-title { font-weight: 500; font-size: 15px; color: var(--text); }
+details.attribute .attr-meta {
+  color: var(--muted);
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  white-space: nowrap;
+}
+details.attribute .body {
+  padding: 4px 22px 24px;
+  border-top: 1px solid var(--border);
+}
+details.attribute[open] > summary { border-bottom: 1px solid var(--border); }
+details.attribute .body h4 {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 20px 0 8px;
+}
+details.attribute .body p { margin: 12px 0 0; }
+details.attribute .body ul { list-style: none; padding: 0; margin: 8px 0 0; }
+details.attribute .body ul li {
+  padding: 10px 0 10px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+}
+details.attribute .body ul li:last-child { border-bottom: none; }
+details.attribute .body .file  { color: var(--accent); font-family: ui-monospace, monospace; font-size: 13px; }
+details.attribute .body .loc   { color: #d38dff; font-family: ui-monospace, monospace; font-size: 13px; }
+details.attribute .body .obs   { color: var(--muted); font-size: 13px; margin-top: 4px; }
+details.attribute .body .quote { color: var(--text); font-style: italic; padding-left: 12px; border-left: 2px solid var(--border); margin-top: 6px; font-size: 13px; }
+.coverage {
+  display: flex;
+  gap: 24px;
+  padding: 12px 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.coverage strong { color: var(--text); }
+.coverage .uncited { color: var(--warn); }
+.trace-section h2 {
+  font-size: 16px;
+  color: var(--text);
+  margin: 40px 0 12px;
+}
+.trace-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
+.trace-table th, .trace-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.trace-table th { color: var(--muted); font-weight: 500; text-transform: uppercase; font-size: 10px; letter-spacing: 0.10em; }
+.trace-table td.num  { text-align: right; }
+.trace-table td.cost { color: var(--success); text-align: right; }
+.footer {
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+.footer code { color: var(--text); background: var(--code-bg); padding: 2px 6px; border-radius: 4px; }
+</style></head><body><div class="container"><header class="hero"><div class="eyebrow">Bead audit report</div><h1>User Access Review</h1><div class="meta">model gemini:gemini-3.1-pro-preview · 1 sample(s)</div><div style="margin-top:12px;"><span class="badge warn"><span class="dot"></span>CONTROL_INCONCLUSIVE</span></div></header><section class="sample-card"><div class="badge warn"><span class="dot"></span>CONTROL_INCONCLUSIVE</div><h2>Sample: sample-1</h2><div class="sample-meta"><span><strong>gemini:gemini-3.1-pro-preview</strong></span><span>generated: 2026-07-03T01:27:54.319868+00:00</span></div><div class="section-title">Reperformance summary</div><div class="reperformance">System export: 334 rows | HRIS roster: 720 rows | Reviewer sheet: 334 rows | Matched to HRIS: 332 | Orphans (no HRIS record): 2 | Terminated but active in system: 2 | On leave but active in system: 8 | Reviewer missed (terminated + retained): 1</div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="FURTHER_EVIDENCE_REQUIRED"><summary><div class="verdict-icon">?</div><div class="attr-title"><div>Access reviews are performed on a periodic basis (e.g. quarterly)</div><div class="verdict-text">FURTHER_EVIDENCE_REQUIRED</div></div><div class="attr-meta">conf 1.00 · 1 citations</div></summary><div class="body"><h4>Rationale</h4><p>I agree with the first-pass verdict. The evidence confirms a &#x27;Periodic (Quarterly) User Access Review&#x27; was completed for Q2 2026 on 2026-06-30. However, to evaluate whether this review occurred within the defined periodic interval (quarterly) since the previous review, we must establish the completion date of the prior review. Please provide the Q1 2026 access review documentation (or equivalent evidence) showing its completion date.</p><h4>Evidence</h4><ul><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover sheet</span></div><div class="obs">The cover sheet notes the review period is &#x27;Q2 2026&#x27; and the review type is &#x27;Periodic (Quarterly) User Access Review&#x27;, completed on 2026-06-30. There is no indication of when the prior review was completed.</div></li></ul></div></details><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Access is reviewed and approved by an appropriate system or data owner</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">conf 1.00 · 2 citations</div></summary><div class="body"><h4>Rationale</h4><p>The access review evidence includes an explicit electronic sign-off by Priya Nadkarni on 2026-06-30. The review cover sheet documents Priya Nadkarni as the System Owner and Director of Finance Systems, satisfying the requirement for the review to be approved by an appropriate system owner.</p><h4>Evidence</h4><ul><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover sheet</span></div><div class="obs">The &#x27;Reviewer Sign-off&#x27; field states that the review was approved electronically by Priya Nadkarni on 2026-06-30. The &#x27;Reviewer / Approver&#x27; field documents Priya Nadkarni as the Director, Finance Systems and System Owner.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Access Review sheet, Column G</span></div><div class="obs">Priya Nadkarni is listed as the individual who reviewed the specific access line items.</div></li></ul></div></details><details class="attribute" data-verdict="FURTHER_EVIDENCE_REQUIRED"><summary><div class="verdict-icon">?</div><div class="attr-title"><div>Inappropriate or excessive access identified during the review is remediated in a timely manner</div><div class="verdict-text">FURTHER_EVIDENCE_REQUIRED</div></div><div class="attr-meta">conf 1.00 · 1 citations</div></summary><div class="body"><h4>Rationale</h4><p>The access review identified one user (Danielle Goodwin) whose access needed to be revoked, and it noted that deprovisioning ticket ITSM-48217 was raised. However, the provided evidence does not include the closed ticket or any system audit logs to demonstrate that the access was successfully removed, nor does it provide the timestamp of the removal to assess timeliness. To resolve this, evidence of the completed ticket ITSM-48217 or system logs showing the actual deprovisioning event and timestamp is required.</p><h4>Evidence</h4><ul><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover!Observation 1</span></div><div class="obs">Observation 1 explicitly notes that Danielle Goodwin retained active access despite being terminated, and that ticket ITSM-48217 was raised for remediation. However, no evidence of the ticket&#x27;s resolution is provided.</div></li></ul></div></details></section><section class="trace-section"><h2>LLM call trace <span style='color:var(--muted); font-size: 13px; font-weight: 400;'>· 5 calls · $0.0000</span></h2><table class="trace-table"><thead><tr><th>#</th><th>Purpose</th><th>In</th><th>Cache</th><th>Out</th><th>$</th><th>Latency</th></tr></thead><tbody><tr><td>1</td><td>judge:periodic-access-reviews:sample-1</td><td class="num">18,302</td><td class="num">0</td><td class="num">304</td><td class="cost">$0.0000</td><td class="num">11884ms</td></tr><tr><td>2</td><td>verify:periodic-access-reviews:sample-1</td><td class="num">18,056</td><td class="num">0</td><td class="num">323</td><td class="cost">$0.0000</td><td class="num">10657ms</td></tr><tr><td>3</td><td>judge:reviewed-and-approved-by-owner:sample-1</td><td class="num">18,301</td><td class="num">0</td><td class="num">344</td><td class="cost">$0.0000</td><td class="num">11951ms</td></tr><tr><td>4</td><td>judge:remediation-of-inappropriate-access:sample-1</td><td class="num">18,331</td><td class="num">0</td><td class="num">295</td><td class="cost">$0.0000</td><td class="num">11624ms</td></tr><tr><td>5</td><td>verify:remediation-of-inappropriate-access:sample-1</td><td class="num">18,074</td><td class="num">0</td><td class="num">323</td><td class="cost">$0.0000</td><td class="num">8593ms</td></tr></tbody></table></section><div class="footer">Generated by <code>bead-agent report</code> · self-contained, no external assets.</div></div></body></html>

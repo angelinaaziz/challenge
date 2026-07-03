@@ -1,0 +1,209 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Audit report — User Access Review</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>
+:root {
+  --bg: #0e1116;
+  --card: #161a22;
+  --card-hover: #1c2130;
+  --border: #232936;
+  --text: #d5dae4;
+  --muted: #7a8598;
+  --accent: #6c8fff;
+  --success: #4bcf87;
+  --success-bg: rgba(75, 207, 135, 0.10);
+  --fail: #ff6b6b;
+  --fail-bg: rgba(255, 107, 107, 0.10);
+  --warn: #f5c265;
+  --warn-bg: rgba(245, 194, 101, 0.10);
+  --code-bg: #0a0c11;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  font-size: 15px;
+}
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 32px 96px;
+}
+header.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+header.hero .eyebrow {
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+header.hero h1 { margin: 0; font-size: 32px; font-weight: 600; letter-spacing: -0.01em; }
+header.hero .meta {
+  color: var(--muted);
+  font-size: 13px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.badge.pass    { color: var(--success); background: var(--success-bg); }
+.badge.fail    { color: var(--fail);    background: var(--fail-bg); }
+.badge.warn    { color: var(--warn);    background: var(--warn-bg); }
+.badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.sample-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  margin-bottom: 24px;
+}
+.sample-card h2 { margin: 0 0 16px 0; font-size: 20px; font-weight: 600; }
+.sample-card .sample-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 8px;
+}
+.sample-card .sample-meta strong { color: var(--text); }
+.section-title {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 24px 0 12px;
+}
+.reperformance {
+  background: rgba(108, 143, 255, 0.06);
+  border: 1px solid rgba(108, 143, 255, 0.25);
+  border-radius: 10px;
+  padding: 16px 20px;
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+details.attribute {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  transition: border-color 0.15s ease;
+}
+details.attribute[data-verdict="SUCCESS"] { border-left-color: var(--success); }
+details.attribute[data-verdict="FAIL"]    { border-left-color: var(--fail); }
+details.attribute[data-verdict="FURTHER_EVIDENCE_REQUIRED"] { border-left-color: var(--warn); }
+details.attribute > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 22px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+}
+details.attribute > summary::-webkit-details-marker { display: none; }
+details.attribute > summary:hover { background: var(--card-hover); }
+details.attribute .verdict-icon { font-size: 20px; line-height: 1; }
+details.attribute .verdict-text {
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+details.attribute[data-verdict="SUCCESS"] .verdict-text { color: var(--success); }
+details.attribute[data-verdict="FAIL"] .verdict-text { color: var(--fail); }
+details.attribute[data-verdict="FURTHER_EVIDENCE_REQUIRED"] .verdict-text { color: var(--warn); }
+details.attribute .attr-title { font-weight: 500; font-size: 15px; color: var(--text); }
+details.attribute .attr-meta {
+  color: var(--muted);
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  white-space: nowrap;
+}
+details.attribute .body {
+  padding: 4px 22px 24px;
+  border-top: 1px solid var(--border);
+}
+details.attribute[open] > summary { border-bottom: 1px solid var(--border); }
+details.attribute .body h4 {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 20px 0 8px;
+}
+details.attribute .body p { margin: 12px 0 0; }
+details.attribute .body ul { list-style: none; padding: 0; margin: 8px 0 0; }
+details.attribute .body ul li {
+  padding: 10px 0 10px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+}
+details.attribute .body ul li:last-child { border-bottom: none; }
+details.attribute .body .file  { color: var(--accent); font-family: ui-monospace, monospace; font-size: 13px; }
+details.attribute .body .loc   { color: #d38dff; font-family: ui-monospace, monospace; font-size: 13px; }
+details.attribute .body .obs   { color: var(--muted); font-size: 13px; margin-top: 4px; }
+details.attribute .body .quote { color: var(--text); font-style: italic; padding-left: 12px; border-left: 2px solid var(--border); margin-top: 6px; font-size: 13px; }
+.coverage {
+  display: flex;
+  gap: 24px;
+  padding: 12px 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.coverage strong { color: var(--text); }
+.coverage .uncited { color: var(--warn); }
+.trace-section h2 {
+  font-size: 16px;
+  color: var(--text);
+  margin: 40px 0 12px;
+}
+.trace-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
+.trace-table th, .trace-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+.trace-table th { color: var(--muted); font-weight: 500; text-transform: uppercase; font-size: 10px; letter-spacing: 0.10em; }
+.trace-table td.num  { text-align: right; }
+.trace-table td.cost { color: var(--success); text-align: right; }
+.footer {
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+.footer code { color: var(--text); background: var(--code-bg); padding: 2px 6px; border-radius: 4px; }
+</style></head><body><div class="container"><header class="hero"><div class="eyebrow">Bead audit report</div><h1>User Access Review</h1><div class="meta">model openai:gpt-5.4 · 1 sample(s)</div><div style="margin-top:12px;"><span class="badge fail"><span class="dot"></span>CONTROL_FAIL</span></div></header><section class="sample-card"><div class="badge fail"><span class="dot"></span>CONTROL_FAIL</div><h2>Sample: sample-1</h2><div class="sample-meta"><span><strong>openai:gpt-5.4</strong></span><span>generated: 2026-07-03T01:24:52.422306+00:00</span></div><div class="section-title">Reperformance summary</div><div class="reperformance">System export: 334 rows | HRIS roster: 720 rows | Reviewer sheet: 334 rows | Matched to HRIS: 332 | Orphans (no HRIS record): 2 | Terminated but active in system: 2 | On leave but active in system: 8 | Reviewer missed (terminated + retained): 1</div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Access reviews are performed on a periodic basis (e.g. quarterly)</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">conf 0.74 · 6 citations</div></summary><div class="body"><h4>Rationale</h4><p>The evidence shows a recurring quarterly cadence because the cover sheet identifies the review as &quot;Periodic (Quarterly) User Access Review&quot; for review period &quot;Q2 2026.&quot; The review for the period under examination was completed, with the cover sheet showing &quot;Review Completed: 2026-06-30&quot; and electronic reviewer sign-off on the same date. The access review tab also shows completed reviewer decisions across reviewed accounts, each populated with reviewer name &quot;Priya Nadkarni&quot; and review date &quot;2026-06-30,&quot; supporting that the Q2 2026 review was executed.</p><h4>Evidence</h4><ul><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover sheet</span></div><div class="obs">The cover sheet states Review Period is Q2 2026 and Review Type is Periodic (Quarterly) User Access Review.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover sheet</span></div><div class="obs">The cover sheet states Review Completed on 2026-06-30 and Reviewer Sign-off approved electronically by Priya Nadkarni on 2026-06-30.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Access Review sheet</span></div><div class="obs">Reviewed account rows include populated Reviewer Decision, Reviewed By as Priya Nadkarni, and Review Date as 2026-06-30.</div></li><li><div><span class="file">deterministic reperformance</span> @ <span class="loc">cover_sheet</span></div><div class="obs">Reperformance extracted the cover sheet fields showing Review Type as Periodic (Quarterly) User Access Review, Review Period as Q2 2026, and Review Completed as 2026-06-30.</div></li><li><div><span class="file">deterministic reperformance</span> @ <span class="loc">unique_review_dates</span></div><div class="obs">Reperformance identified a single review date of 2026-06-30 across the review sheet.</div></li><li><div><span class="file">deterministic reperformance</span> @ <span class="loc">reviewer_sheet_rows</span></div><div class="obs">Reperformance found 334 rows on the reviewer sheet, indicating the review worksheet was populated for the period.</div></li></ul><h4>Exceptions considered</h4><ul><li>Service accounts were marked out of scope on the cover sheet and in reperformance (2 accounts), but this does not affect the attribute of whether the review occurred periodically and was completed for Q2 2026.</li></ul></div></details><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Access is reviewed and approved by an appropriate system or data owner</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">conf 0.94 · 3 citations</div></summary><div class="body"><h4>Rationale</h4><p>The workbook evidences an approval decision because the cover sheet states &quot;Reviewer Sign-off: Approved electronically by Priya Nadkarni on 2026-06-30,&quot; and the Access Review sheet contains reviewer decisions for the reviewed population. The approver’s identity and role are verifiable from the cover sheet, which lists &quot;Priya Nadkarni, Director, Finance Systems (System Owner)&quot; as &quot;Reviewer / Approver.&quot; This role is appropriate for the reviewed system because the same cover sheet identifies the system under review as &quot;NetSuite (Production),&quot; directly tying the approval to the named system owner.</p><h4>Evidence</h4><ul><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover sheet</span></div><div class="obs">The cover information identifies the system as NetSuite (Production), names the Reviewer / Approver as Priya Nadkarni, Director, Finance Systems (System Owner), and states Reviewer Sign-off was approved electronically by Priya Nadkarni on 2026-06-30.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Access Review sheet</span></div><div class="obs">The review sheet contains decision fields including Reviewer Decision, Reviewed By, and Review Date, and sampled rows show decisions such as Retain reviewed by Priya Nadkarni on 2026-06-30.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover sheet</span></div><div class="obs">The cover sheet states the review scope is all human user accounts with access to NetSuite Production, supporting that the named system owner approval applies to the reviewed system.</div></li></ul><h4>Exceptions considered</h4><ul><li>Service/integration accounts were explicitly marked out of scope on the cover sheet and in deterministic reperformance; this does not affect the owner-approval attribute for the in-scope human-user review population.</li></ul></div></details><details class="attribute" data-verdict="FAIL"><summary><div class="verdict-icon">✕</div><div class="attr-title"><div>Inappropriate or excessive access identified during the review is remediated in a timely manner</div><div class="verdict-text">FAIL</div></div><div class="attr-meta">conf 0.95 · 8 citations</div></summary><div class="body"><h4>Rationale</h4><p>The evidence shows one inappropriate active account was identified during the review: Danielle Goodwin was flagged for revocation and the cover sheet states remediation was initiated via ITSM-48217 with a 5-business-day due date. However, deterministic reperformance found a second terminated user, Kevin Lewis, still active in NetSuite while the reviewer marked the account &quot;retain,&quot; so not every identified inappropriate/excessive access exception was initiated for remediation. Because criterion 1 failed for Kevin Lewis, the attribute fails even though Danielle Goodwin appears to have been raised and tracked for remediation.</p><h4>Evidence</h4><ul><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover sheet / Observation 1</span></div><div class="obs">The review conclusion states Danielle Goodwin retained active access despite termination, and remediation was to raise deprovisioning ticket ITSM-48217 assigned to IT with a due date within 5 business days.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Access Review!E90</span></div><div class="obs">Danielle Goodwin&#x27;s reviewer decision is recorded as revoke.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">System Access Export!C90</span></div><div class="obs">Danielle Goodwin appears in the system access export as an active NetSuite account.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">System Access Export!C187</span></div><div class="obs">Kevin Lewis appears in the system access export as an active account.</div></li><li><div><span class="file">hris-employee-export.xlsx</span> @ <span class="loc">Employees!D127</span></div><div class="obs">Deterministic reperformance identifies Kevin Lewis as terminated in HRIS at the cited row.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Access Review!E187</span></div><div class="obs">Kevin Lewis&#x27;s reviewer decision is recorded as retain, not revoke.</div></li><li><div><span class="file">Deterministic reperformance</span> @ <span class="loc">reviewer_missed_findings</span></div><div class="obs">Reperformance states Kevin Lewis was a terminated-but-active account that should have been revoked, but the reviewer missed the finding.</div></li><li><div><span class="file">Deterministic reperformance</span> @ <span class="loc">terminated_but_active_in_system</span></div><div class="obs">Reperformance lists two terminated-but-active accounts: Danielle Goodwin and Kevin Lewis.</div></li></ul><h4>Exceptions considered</h4><ul><li>Service/integration accounts were considered and rejected as exceptions for this attribute because the cover sheet marks them out of scope and the reperformance lists them separately as service accounts without HRIS records.</li><li>On-leave users were considered and not treated as failures for this attribute because the reperformance explicitly notes they are not necessarily findings and are policy-dependent.</li><li>Accounts already inactive in the system were considered and not treated as remediation exceptions because reperformance states no further action was needed for those terminated-but-inactive accounts.</li></ul></div></details></section><section class="trace-section"><h2>LLM call trace <span style='color:var(--muted); font-size: 13px; font-weight: 400;'>· 3 calls · $0.0000</span></h2><table class="trace-table"><thead><tr><th>#</th><th>Purpose</th><th>In</th><th>Cache</th><th>Out</th><th>$</th><th>Latency</th></tr></thead><tbody><tr><td>1</td><td>judge:access-reviews-are-performed-on-a-periodic-basis-eg-quarterly:sample-1</td><td class="num">16,691</td><td class="num">0</td><td class="num">534</td><td class="cost">$0.0000</td><td class="num">5013ms</td></tr><tr><td>2</td><td>judge:access-is-reviewed-and-approved-by-an-appropriate-system-or-data-owner:sample-1</td><td class="num">16,697</td><td class="num">0</td><td class="num">436</td><td class="cost">$0.0000</td><td class="num">3913ms</td></tr><tr><td>3</td><td>judge:inappropriate-or-excessive-access-identified-during-the-review-is-remediated-in-a-timely-manner:sample-1</td><td class="num">16,715</td><td class="num">0</td><td class="num">643</td><td class="cost">$0.0000</td><td class="num">5276ms</td></tr></tbody></table></section><div class="footer">Generated by <code>bead-agent report</code> · self-contained, no external assets.</div></div></body></html>
