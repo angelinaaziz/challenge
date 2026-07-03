@@ -7,6 +7,7 @@ __pycache__/
 # We DO commit output/ so reviewers can inspect verdicts without API credits.
 # We skip trace.jsonl though — reproducible from the code + prompts, but big.
 output/**/trace.jsonl
+data/**/.control-cache-*.json
 evals/results/
 uv.lock
 dist/

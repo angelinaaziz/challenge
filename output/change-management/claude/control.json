@@ -3,52 +3,52 @@
   "description": "Production changes are documented, approved, tested, and deployed under the change management process before being released. This control ensures that unauthorised or untested changes cannot reach production and creates an auditable record of who approved what, when, and against which policy.",
   "attributes": [
     {
-      "id": "change-request-documents-scope-risk-rollback",
+      "id": "change-request-documented",
       "text": "Every production change has a corresponding change request that documents scope, risk classification, and rollback plan",
       "testable_criteria": [
         "A change request exists for the production change",
-        "The change request has a change request identifier in the format CHG-YYYY-NNNN",
+        "The change request has a change request identifier following the CHG-YYYY-NNNN format",
         "The change request documents scope, including systems affected, code repositories, and config surfaces",
-        "The change request records a risk classification of Low, Medium, or High",
+        "The change request documents a risk classification of Low, Medium, or High",
         "The change request documents a rollback plan",
         "The change request identifies a named requester",
         "The change request identifies a named approver",
-        "The change request records planned start and end times",
-        "The change request records a change category of Standard, Normal, or Emergency",
-        "The change is not an out-of-scope exception (documentation-only change, incident-response hotfix, or dev/staging change)"
+        "The change request documents planned start and end times",
+        "The change request is categorised as Standard, Normal, or Emergency",
+        "The change is not an out-of-scope exception (documentation-only change, Incident Response break-fix hotfix, or change to development/staging environments)"
       ],
       "relevant_policies": [
         "change-management-policy.md"
       ]
     },
     {
-      "id": "approved-by-authorised-approver-pre-deployment",
+      "id": "authorised-approver-pre-deployment",
       "text": "Production changes are approved by an authorised change approver prior to deployment",
       "testable_criteria": [
-        "The change request has a recorded approval",
+        "The change request has a recorded approval from a named approver",
         "The approver is a different named human from the requester (four-eyes principle)",
-        "The approver holds the Change Approver role in the identity provider (or Duty Change Approver for Emergency changes)",
-        "Approval timestamp is before the deployment window opens (except for Emergency changes where retrospective approval is permitted)",
-        "IF the change is a Standard change THEN at least 1 approver (Change Coordinator) has approved",
-        "IF the change is a Normal change THEN at least 2 approvers (Change Coordinator plus a Change Approver from CAB) have approved and CAB review is recorded",
-        "IF the change is an Emergency change THEN a Duty Change Approver has approved and retrospective CAB review is documented as occurring within 5 business days",
-        "IF the approval is retrospective THEN the change is documented as an Emergency change"
+        "The approver holds the Change Approver role in the identity provider",
+        "For Standard changes, at least 1 approver (Change Coordinator) approved the change",
+        "For Normal changes, at least 2 approvers (Change Coordinator + Change Approver from CAB) approved the change",
+        "For Normal changes, CAB review is evidenced",
+        "For Emergency changes, a Duty Change Approver approved the change AND retrospective CAB review occurred within 5 business days",
+        "Approval timestamp is before the deployment window opens (except Emergency changes, which must be explicitly documented as retrospective)"
       ],
       "relevant_policies": [
         "change-management-policy.md"
       ]
     },
     {
-      "id": "pre-deployment-testing-evidence-retained",
+      "id": "pre-deployment-testing-evidence",
       "text": "Pre-deployment testing is completed and evidence retained before release",
       "testable_criteria": [
-        "IF the change is Standard or Normal THEN a test plan is attached to the change request prior to deployment",
-        "IF the change is Standard or Normal THEN test results are attached to the change request prior to deployment",
+        "For Standard and Normal changes, a test plan is attached to the change request",
+        "For Standard and Normal changes, test results are attached to the change request",
         "Testing evidence includes, at minimum, functional smoke tests of the affected surfaces",
-        "IF any tests failed AND the change is Standard or Normal THEN the deployment was blocked (i.e., not released)",
-        "IF the change is Emergency THEN post-deployment verification test evidence is captured within 24 hours of deployment",
-        "IF the change is Emergency AND tests failed THEN the failed tests are documented as accepted risk",
-        "Testing evidence is retained and attached to (or linked from) the change request"
+        "For Standard and Normal changes, testing evidence is dated prior to deployment",
+        "For Standard/Normal changes, if any tests failed, deployment did not proceed",
+        "For Emergency changes, post-deployment verification test evidence is captured within 24 hours of deployment",
+        "For Emergency changes with failed tests, the failed tests are documented as accepted risk"
       ],
       "relevant_policies": [
         "change-management-policy.md"

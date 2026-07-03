@@ -1,42 +1,43 @@
 {
   "control": "Independent Code Review",
   "sample_id": "sample-2",
-  "generated_at": "2026-07-03T03:15:16.006143Z",
+  "generated_at": "2026-07-03T03:51:17.211425Z",
   "model": "claude:claude-opus-4-7",
   "attributes": [
     {
       "control": "Independent Code Review",
       "sample_id": "sample-2",
-      "attribute_id": "code-review-prior-to-main-merge",
+      "attribute_id": "code-review-prior-to-merge",
       "attribute_text": "Code Reviews are performed prior to committing a change to the main branch",
       "verdict": "SUCCESS",
-      "confidence": 0.85,
-      "rationale": "A pull request (#31272) exists for the change and shows a 'Merged' status, evidencing a code review record. dsherret approved the PR 20 hours ago, and the merge into denoland:main occurred 19 hours ago — the approval timestamp precedes the merge timestamp. The change reached main via the PR merge (commit 7ada8d6), not via a direct commit. Note: independence of the reviewer (dsherret vs. author bartlomieju) is a separate attribute; here the criterion is simply that a review occurred before merge, which it did.",
+      "confidence": 0.9,
+      "rationale": "A pull request (PR #31272) exists for the change and shows an approval by dsherret 20 hours ago, followed by the merge to denoland:main 19 hours ago — approval precedes merge by ~1 hour. The PR footer confirms it was \"successfully merged and closed\" with merge commit 7ada8d6, indicating the change went to main via the PR rather than by direct commit. Independence of the reviewer is a separate attribute; this attribute only requires that the review occurred before the merge, which the evidence positively demonstrates.",
       "policy_references": [],
       "evidence_refs": [
         {
           "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "Reviewers panel / approval event",
+          "observation": "'dsherret approved these changes 20 hours ago' with green check icon; Copilot also listed but as AI reviewer."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
+          "locator": "Merge event line near footer",
+          "observation": "'bartlomieju merged commit 7ada8d6 into denoland:main 19 hours ago' — merge occurred 1 hour after the 20-hour-ago approval."
+        },
+        {
+          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
           "locator": "PR header / status badge",
-          "observation": "Purple 'Merged' badge on PR #31272; header states 'bartlomieju merged 7 commits into denoland:main from bartlomieju:node_timers 19 hours ago'."
+          "observation": "PR #31272 exists with 'Merged' badge; header states '7 commits into denoland:main from bartlomieju:node_timers', confirming the change reached main via the PR."
         },
         {
           "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
-          "locator": "Timeline — approval event",
-          "observation": "'dsherret approved these changes 20 hours ago' with green check icon and LGTM comment."
-        },
-        {
-          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
-          "locator": "Timeline — merge event",
-          "observation": "'bartlomieju merged commit 7ada8d6 into denoland:main 19 hours ago' — occurred after the 20-hours-ago approval."
-        },
-        {
-          "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
-          "locator": "Reviewers panel",
-          "observation": "dsherret listed with green approval checkmark; Copilot listed with comment icon (non-approval)."
+          "locator": "Footer banner",
+          "observation": "'Pull request successfully merged and closed — the branch has been merged.'"
         }
       ],
       "exceptions_considered": [
-        "Reviewer independence (author vs. reviewer being distinct humans) is a separate attribute in this control and is not evaluated here; this attribute only requires that a review occurred before merge."
+        "Independence of dsherret vs. author bartlomieju is relevant to a separate 'independent reviewer' attribute and is not judged here.",
+        "Copilot AI review noted but not relied upon — this attribute is satisfied by the human approval from dsherret regardless."
       ]
     },
     {
@@ -45,33 +46,33 @@
       "attribute_id": "independent-reviewer-approval",
       "attribute_text": "Code Review approvals are performed by independent code reviewers",
       "verdict": "SUCCESS",
-      "confidence": 0.9,
-      "rationale": "PR #31272 has a recorded approval from dsherret (green check, \"approved these changes 20 hours ago\"), who is a different human from the author/committer bartlomieju, satisfying the 4-eyes principle. dsherret is labelled 'Member' of the denoland org, indicating authority to approve in the repo, and does not appear as a committer or co-author on the 7 commits (all authored by bartlomieju and Verified). The Copilot AI review is disregarded as it is not an independent human reviewer, but dsherret's approval independently satisfies the criteria.",
+      "confidence": 0.85,
+      "rationale": "The PR author/committer is bartlomieju and the approving reviewer is dsherret — a different named human — who approved 20 hours ago, before the merge 19 hours ago. Copilot (AI) is also listed as a reviewer but is not relied on for independence; dsherret's human approval satisfies the 4-eyes principle. No indication that dsherret committed or co-authored the 7 commits, all of which are attributed to bartlomieju.",
       "policy_references": [],
       "evidence_refs": [
         {
           "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
-          "locator": "Timeline / approval event",
-          "observation": "'dsherret approved these changes 20 hours ago' with a green check icon; comment 'LGTM' labelled 'Member'."
+          "locator": "Reviewers panel / approval event",
+          "observation": "dsherret (Member) shown with green check; timeline shows 'dsherret approved these changes 20 hours ago' with LGTM comment."
         },
         {
           "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
-          "locator": "PR header",
-          "observation": "'bartlomieju merged 7 commits into denoland:main from bartlomieju:node_timers' — author and committer is bartlomieju, distinct from approver dsherret."
+          "locator": "PR header and commit list",
+          "observation": "Header: 'bartlomieju merged 7 commits into denoland:main from bartlomieju:node_timers 19 hours ago'. All 7 listed commits (3461bd5, 0f39d7d, 762a828, 8866044, 8f0236b, 0dbb629, 12cde71) are attributed to bartlomieju; dsherret does not appear as a committer or co-author."
         },
         {
           "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
-          "locator": "Commits list",
-          "observation": "All 7 commits (3461bd5, 0f39d7d, 762a828, 8866044, 8f0236b, 0dbb629, 12cde71) added by bartlomieju and Verified; dsherret does not appear as a committer or co-author."
+          "locator": "Merge footer",
+          "observation": "Merge event occurred 19 hours ago, after dsherret's approval 20 hours ago — approval precedes merge."
         },
         {
           "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
-          "locator": "Reviewers side panel",
-          "observation": "Reviewers panel lists dsherret with a green checkmark (approval); Copilot has a comment icon indicating no explicit approval."
+          "locator": "Reviewers panel — Copilot entry",
+          "observation": "Copilot listed as reviewer with comment icon (AI review). Not counted toward human independence; dsherret provides the independent human approval."
         }
       ],
       "exceptions_considered": [
-        "Copilot AI review was considered but rejected as an independent reviewer — bots/AI do not satisfy the human 4-eyes requirement. However, dsherret independently provides the required human approval."
+        "Copilot AI 'review' considered and rejected as satisfying independence — bots/AI do not qualify as an independent human reviewer, but dsherret's human approval independently satisfies the criterion."
       ]
     },
     {
@@ -80,57 +81,50 @@
       "attribute_id": "testing-per-policy",
       "attribute_text": "Testing is performed in accordance with the testing policy",
       "verdict": "FURTHER_EVIDENCE_REQUIRED",
-      "confidence": 0.8,
-      "rationale": "The CI workflow run summary shows overall Success with the matrix build (11 jobs), lint (3 jobs), test debug/release across macOS/Windows/Linux, and bench jobs all completing green, which addresses unit/integration/E2E execution and CI-visible status. However, the PR page shows only \"33 of 36 checks passed\" — 3 checks did not pass and their identity/severity is not visible. In addition, no coverage report is present in evidence (line/branch/function coverage percentages, ≥80%/≥70%/≥80% thresholds), no security scan review artifact is visible, and there is no indication of manual smoke tests. To flip to SUCCESS, evidence needed: (a) identity/status of the 3 non-passing checks (skipped vs failed), (b) a coverage report showing line ≥80%, branch ≥70%, function ≥80% reviewed as part of the PR, and (c) security scan results and their review/approval.",
+      "confidence": 0.85,
+      "rationale": "The evidence shows CI ran and completed with Success status, and the PR merged with \"33 of 36 checks passed\" — but no coverage report is present in the evidence bundle. I cannot verify the policy's numeric thresholds (line ≥80%, branch ≥70%, function ≥80%, integration ≥60%). Additionally, \"33 of 36 checks passed\" implies 3 checks did not pass — the disposition of those 3 (skipped vs failed) is not shown, and the policy requires all unit/integration/E2E tests to pass with zero failures. A coverage report screenshot for this PR and a breakdown of the 3 non-passing checks would resolve this to SUCCESS or FAIL.",
       "policy_references": [
         {
           "source": "testing-policy.md",
-          "section": "Minimum Test Coverage Requirements - Code Coverage Thresholds",
-          "quote": "Unit Tests: Minimum 80% code coverage for all new code"
-        },
-        {
-          "source": "testing-policy.md",
           "section": "Coverage Metrics",
-          "quote": "Line coverage (primary metric); Branch coverage (minimum 70%); Function coverage (minimum 80%). Coverage reports must be generated and reviewed as part of the code review process."
+          "quote": "Coverage is measured using: Line coverage (primary metric); Branch coverage (minimum 70%); Function coverage (minimum 80%). Coverage reports must be generated and reviewed as part of the code review process."
         },
         {
           "source": "testing-policy.md",
-          "section": "Pre-Release Checklist",
-          "quote": "All automated tests pass; Test coverage meets minimum thresholds; No known critical or high-severity bugs; Performance tests pass (if applicable); Security tests pass; Manual smoke tests completed for critical features"
+          "section": "Mandatory Test Execution",
+          "quote": "Unit Tests: All unit tests must pass with zero failures; Integration Tests: All integration tests must pass; End-to-End Tests: Critical user journeys must pass."
         },
         {
           "source": "testing-policy.md",
-          "section": "Test Execution Environment",
-          "quote": "Tests must run in CI/CD pipeline before merge; Test results must be visible in pull request status checks"
+          "section": "Code Coverage Thresholds",
+          "quote": "Unit Tests: Minimum 80% code coverage for all new code; Integration Tests: Minimum 60% coverage for critical integration points."
         }
       ],
       "evidence_refs": [
         {
           "file": "Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png",
-          "locator": "CI workflow run summary header and jobs sidebar",
-          "observation": "Overall run status 'Success', duration 39m 22s; all test/build/lint jobs across macOS/Windows/Linux debug+release and bench show green checks; publish canary skipped."
+          "locator": "CI workflow run header and jobs list",
+          "observation": "Workflow 'ci' run #71281 (Latest #2) Status: Success, 39m 22s duration; all matrix build (11), matrix lint (3), and test jobs show green success icons; 4 warnings/1 notice are environmental (pwsh cleanup, macOS runner deprecation) and not test failures. No coverage numbers are visible on this page."
         },
         {
           "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
-          "locator": "Merge status area below merge event",
-          "observation": "'33 of 36 checks passed' — 3 checks did not pass; their names and pass/fail/skip status are not visible on this screenshot."
+          "locator": "Merge footer line",
+          "observation": "Merge event states '33 of 36 checks passed' — indicating 3 of 36 checks did not pass (state — skipped, cancelled, or failed — not disclosed on this screen). Checks tab shows 18 but no per-check pass/fail detail is captured."
         },
         {
           "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
-          "locator": "Checks tab counter and Files changed counter",
-          "observation": "Checks tab shows 18; Files changed 19 (+66/-51); no coverage report, security scan summary, or smoke test note is referenced in the conversation."
-        },
-        {
-          "file": "Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png",
-          "locator": "Annotations section",
-          "observation": "4 warnings and 1 notice; warnings relate to pwsh Login cleanup and PowerShell module path on macOS, and a macOS-13 deprecation notice — no indication of failing tests, but no coverage or security scan output either."
+          "locator": "PR body and diff indicator",
+          "observation": "Diff is +66 −51 across 19 files touching timer behavior (setTimeout/setInterval switching to Node.js APIs) — not a documentation-only, dependency-bump, or refactor-only change, so no policy exception clearly applies. No coverage report screenshot or link is visible on the PR page."
         }
       ],
       "exceptions_considered": [
-        "Considered whether the change qualifies as a documentation-only or refactor exception — rejected: PR modifies runtime timer implementation (switches from Web API timers to Node.js timers, marked BREAKING originally), which is a behavioral code change, not exempt."
+        "Documentation-only — rejected: PR modifies runtime timer behavior across 19 files.",
+        "Dependency bump / behavior-preserving refactor — rejected: PR is labeled feat(BREAKING) and changes default timer implementation, a behavioral change.",
+        "Build/deployment scripts — rejected: change is to application logic, not CI/build config."
       ]
     }
   ],
+  "ipe_checks": [],
   "control_conclusion": "CONTROL_INCONCLUSIVE",
   "executive_summary": "The control cannot be signed off from this evidence bundle. 1 attribute(s) need further evidence, 2 passed, and none positively failed. Request the missing evidence and re-audit.",
   "key_findings": [
@@ -148,7 +142,7 @@
     }
   ],
   "recommended_actions": [
-    "Provide additional evidence to close “Testing is performed in accordance with the testing policy”. Specifically: The CI workflow run summary shows overall Success with the matrix build (11 jobs), lint (3 jobs), test debug/release across macOS/Windows/Linux, and bench jobs all completing green, which addresses unit/integration/E2E execution and CI-visible status."
+    "Provide additional evidence to close “Testing is performed in accordance with the testing policy”. Specifically: The evidence shows CI ran and completed with Success status, and the PR merged with \"33 of 36 checks passed\" — but no coverage report is present in the evidence bundle."
   ],
   "evidence_coverage": {
     "all_files": [
@@ -166,9 +160,8 @@
       "file": "Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png",
       "kind": "screenshot",
       "bytes_size": 828793,
-      "extraction_summary": "GitHub Actions workflow run summary · 23 facts extracted · 1 people · 5 ambiguity flag(s)",
+      "extraction_summary": "GitHub Actions workflow run summary page · 19 facts extracted · 1 people · 5 ambiguity flag(s)",
       "cited_by_attributes": [
-        "testing-per-policy",
         "testing-per-policy"
       ]
     },
@@ -176,12 +169,12 @@
       "file": "Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png",
       "kind": "screenshot",
       "bytes_size": 1526323,
-      "extraction_summary": "GitHub Pull Request page · 27 facts extracted · 4 people · 4 ambiguity flag(s)",
+      "extraction_summary": "GitHub Pull Request page · 1 facts extracted · 4 people · 3 ambiguity flag(s)",
       "cited_by_attributes": [
-        "code-review-prior-to-main-merge",
-        "code-review-prior-to-main-merge",
-        "code-review-prior-to-main-merge",
-        "code-review-prior-to-main-merge",
+        "code-review-prior-to-merge",
+        "code-review-prior-to-merge",
+        "code-review-prior-to-merge",
+        "code-review-prior-to-merge",
         "independent-reviewer-approval",
         "independent-reviewer-approval",
         "independent-reviewer-approval",

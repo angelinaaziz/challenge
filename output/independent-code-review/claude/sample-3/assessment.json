@@ -1,0 +1,195 @@
+{
+  "control": "Independent Code Review",
+  "sample_id": "sample-3",
+  "generated_at": "2026-07-03T03:53:22.089577Z",
+  "model": "claude:claude-opus-4-7",
+  "attributes": [
+    {
+      "control": "Independent Code Review",
+      "sample_id": "sample-3",
+      "attribute_id": "code-review-prior-to-merge",
+      "attribute_text": "Code Reviews are performed prior to committing a change to the main branch",
+      "verdict": "SUCCESS",
+      "confidence": 0.85,
+      "rationale": "A pull request record (#139018) exists for the change and the PR shows an APPROVED state (lgtm + approved labels, \"[APPROVALNOTIFIER] This PR is APPROVED — approved by: BenTheElder, dims\") applied 14 hours ago, prior to the merge which occurred 3 hours ago. The merge was performed via the PR (merge commit cbe5c16 into kubernetes:master), indicating the change was not committed directly to main bypassing review. Approval timestamp (14h ago) precedes merge timestamp (3h ago), satisfying the ordering criterion. Note: independence of the reviewer is a separate attribute and not judged here.",
+      "policy_references": [],
+      "evidence_refs": [
+        {
+          "file": "kubernetes-pr.png",
+          "locator": "Timeline — approval notifier entry 14 hours ago",
+          "observation": "'[APPROVALNOTIFIER] This PR is APPROVED — This pull-request has been approved by: BenTheElder, dims'; lgtm label added 14 hours ago; dims commented '/approve' '/lgtm' 14 hours ago."
+        },
+        {
+          "file": "kubernetes-pr.png",
+          "locator": "Merge footer — bottom of timeline",
+          "observation": "'kubernetes-prow[bot] merged commit cbe5c16 into kubernetes:master 3 hours ago — 13 checks passed'. Merge occurred after the approval 14 hours ago."
+        },
+        {
+          "file": "kubernetes-pr-checks.png",
+          "locator": "Header merge line and status badge",
+          "observation": "Purple 'Merged' badge and header 'kubernetes-prow[bot] merged 1 commit into kubernetes:master from BenTheElder:fix-tests 3 hours ago' confirms change reached main via the PR, not a direct commit."
+        },
+        {
+          "file": "kubernetes-pr.png",
+          "locator": "Labels row near PR header",
+          "observation": "Labels include 'approved' and 'lgtm', indicating the PR passed Kubernetes' review gating before merge."
+        }
+      ],
+      "exceptions_considered": [
+        "Independence of reviewer (dims vs. author BenTheElder) is a separate attribute; not evaluated here."
+      ]
+    },
+    {
+      "control": "Independent Code Review",
+      "sample_id": "sample-3",
+      "attribute_id": "independent-reviewer-approval",
+      "attribute_text": "Code Review approvals are performed by independent code reviewers",
+      "verdict": "FAIL",
+      "confidence": 0.85,
+      "rationale": "The PR author is BenTheElder. The first approval notifier states \"This pull-request has been approved by: BenTheElder\" — i.e., the author self-approved. A second approval was later added by dims (/approve /lgtm) 14 hours before merge, and dims is a different individual from the author, which does satisfy independence on its face. However, the initial APPROVED state was driven by the author himself, and the criterion \"The approving reviewer is a different individual than the author\" is contradicted by the first approval record. Additionally, natasha40575's Jun 3 review is ambiguous (no explicit Approved badge), so it cannot be relied on as the independent approval. Since one recorded approval on this PR is by the author, this fails the independence attribute even though dims provides a secondary independent approval.",
+      "policy_references": [],
+      "evidence_refs": [
+        {
+          "file": "kubernetes-pr.png",
+          "locator": "PR header / opening comment",
+          "observation": "PR #139018 authored by BenTheElder (labelled 'Member'), opening comment on May 13."
+        },
+        {
+          "file": "kubernetes-pr.png",
+          "locator": "Approval notifier comment (first occurrence, May 13)",
+          "observation": "kubernetes-prow[bot] posts '[APPROVALNOTIFIER] This PR is APPROVED — This pull-request has been approved by: BenTheElder' — the author himself is listed as the approver."
+        },
+        {
+          "file": "kubernetes-pr.png",
+          "locator": "dims comment 14 hours ago and second approval notifier",
+          "observation": "dims commented '/approve' and '/lgtm'; subsequent APPROVALNOTIFIER lists 'BenTheElder, dims'. dims is a distinct individual from the author."
+        },
+        {
+          "file": "kubernetes-pr.png",
+          "locator": "natasha40575 review Jun 3 (ambiguity note)",
+          "observation": "natasha40575 'reviewed on Jun 3' but no explicit Approved/Changes-requested badge visible; substantive comment raises concerns and suggests waiting for #139453."
+        },
+        {
+          "file": "kubernetes-pr.png",
+          "locator": "Merge line header",
+          "observation": "kubernetes-prow[bot] merged 1 commit into master from BenTheElder:fix-tests 3 hours ago (merge commit cbe5c16); bot is the merger, not a human reviewer."
+        }
+      ],
+      "exceptions_considered": [
+        "Considered that dims's independent /approve provides an independent second-eye and could satisfy the attribute in isolation. Rejected as a clean SUCCESS because the recorded approval set explicitly includes the author (BenTheElder), directly contradicting the 'approver ≠ author' criterion for at least one of the approvals — this is a Kubernetes/Prow OWNERS convention where /approve from the author is recorded as an approval, which does not meet the 4-eyes standard.",
+        "Considered whether natasha40575's Jun 3 review could serve as the independent approval — rejected due to ambiguity: no explicit Approved badge is visible and the comment expresses reservations rather than approval."
+      ]
+    },
+    {
+      "control": "Independent Code Review",
+      "sample_id": "sample-3",
+      "attribute_id": "testing-per-policy",
+      "attribute_text": "Testing is performed in accordance with the testing policy",
+      "verdict": "FURTHER_EVIDENCE_REQUIRED",
+      "confidence": 0.8,
+      "rationale": "The evidence indicates that \"13 checks passed\" at merge time, showing CI ran and was green, and the PR is scoped to e2e test code (removing the opencontainers/cgroups dependency). However, no coverage report screenshot or artefact is included in the evidence bundle, so the policy thresholds (≥80% line, ≥70% branch, ≥80% function, ≥60% integration) cannot be verified. The change is arguably a test-only / refactor change (natasha40575's review discusses unit test coverage gaps and a follow-up PR #139453 is being tracked), which could qualify for a documented exception, but no exception is explicitly identified/justified on the PR. A coverage report for merge commit cbe5c16 and/or an explicit exception declaration on the PR would resolve this.",
+      "policy_references": [
+        {
+          "source": "testing-policy.md",
+          "section": "Minimum Test Coverage Requirements — Coverage Metrics",
+          "quote": "Coverage is measured using: Line coverage (primary metric); Branch coverage (minimum 70%); Function coverage (minimum 80%). Coverage reports must be generated and reviewed as part of the code review process."
+        },
+        {
+          "source": "testing-policy.md",
+          "section": "Exceptions and Waivers — Exception Process",
+          "quote": "Refactoring with No Behavioral Changes: Code refactoring that maintains exact functional behavior and is verified through existing test coverage"
+        }
+      ],
+      "evidence_refs": [
+        {
+          "file": "kubernetes-pr.png",
+          "locator": "Merge status line near bottom ('kubernetes-prow[bot] merged commit cbe5c16 ... 13 checks passed')",
+          "observation": "PR was merged with '13 checks passed' shown, indicating CI test suites completed successfully prior to merge."
+        },
+        {
+          "file": "kubernetes-pr-checks.png",
+          "locator": "Checks tab panel body",
+          "observation": "Checks tab shows '0' and panel reads 'Workflow runs completed with no jobs' — no coverage report artefact is visible in the GitHub Actions Checks view (CI likely ran externally via Prow)."
+        },
+        {
+          "file": "kubernetes-pr.png",
+          "locator": "PR description 'What this PR does' and natasha40575 review on Jun 3",
+          "observation": "PR removes opencontainers/cgroups dependency from e2e tests; reviewer discusses unit test coverage gaps and references follow-up PR #139453 for expanded coverage, but no explicit exception label/justification (e.g., 'refactor / test-only exception') is recorded on the PR."
+        },
+        {
+          "file": "kubernetes-pr.png",
+          "locator": "Labels row in sidebar",
+          "observation": "Labels include 'kind/cleanup', 'area/test', 'lgtm', 'approved', 'release-note-none' — no exception waiver label is present, and no coverage report is linked in the PR conversation."
+        }
+      ],
+      "exceptions_considered": [
+        "Refactoring with no behavioral changes / test-only change: PR modifies e2e tests only ('remove opencontainers/cgroups dependency from e2e tests', release-note-none, kind/cleanup label). This could plausibly qualify, but the exception is not explicitly identified or justified on the PR as the policy requires, so it cannot be accepted on its face."
+      ]
+    }
+  ],
+  "ipe_checks": [],
+  "control_conclusion": "CONTROL_FAIL",
+  "executive_summary": "The control failed. 1 of 3 attribute(s) were positively contradicted by the evidence. 1 attribute(s) also require additional evidence to close. The auditee has open remediation to complete before this control can be signed off.",
+  "key_findings": [
+    {
+      "severity": "fail",
+      "text": "Code Review approvals are performed by independent code reviewers"
+    },
+    {
+      "severity": "warn",
+      "text": "Insufficient evidence: Testing is performed in accordance with the testing policy"
+    },
+    {
+      "severity": "pass",
+      "text": "Code Reviews are performed prior to committing a change to the main branch"
+    }
+  ],
+  "recommended_actions": [
+    "Remediate the root cause of the FAIL on “Code Review approvals are performed by independent code reviewers”, then re-submit for testing. Rationale: The PR author is BenTheElder.",
+    "Provide additional evidence to close “Testing is performed in accordance with the testing policy”. Specifically: The evidence indicates that \"13 checks passed\" at merge time, showing CI ran and was green, and the PR is scoped to e2e test code (removing the opencontainers/cgroups dependency)."
+  ],
+  "evidence_coverage": {
+    "all_files": [
+      "kubernetes-pr-checks.png",
+      "kubernetes-pr.png"
+    ],
+    "cited_files": [
+      "kubernetes-pr-checks.png",
+      "kubernetes-pr.png"
+    ],
+    "uncited_files": []
+  },
+  "evidence_inventory": [
+    {
+      "file": "kubernetes-pr-checks.png",
+      "kind": "screenshot",
+      "bytes_size": 103439,
+      "extraction_summary": "GitHub Pull Request page — Checks tab · 11 facts extracted · 2 people · 3 ambiguity flag(s)",
+      "cited_by_attributes": [
+        "code-review-prior-to-merge",
+        "testing-per-policy"
+      ]
+    },
+    {
+      "file": "kubernetes-pr.png",
+      "kind": "screenshot",
+      "bytes_size": 1187667,
+      "extraction_summary": "GitHub Pull Request page (kubernetes/kubernetes #139018) · 67 facts extracted · 14 people · 8 ambiguity flag(s)",
+      "cited_by_attributes": [
+        "code-review-prior-to-merge",
+        "code-review-prior-to-merge",
+        "code-review-prior-to-merge",
+        "independent-reviewer-approval",
+        "independent-reviewer-approval",
+        "independent-reviewer-approval",
+        "independent-reviewer-approval",
+        "independent-reviewer-approval",
+        "testing-per-policy",
+        "testing-per-policy",
+        "testing-per-policy"
+      ]
+    }
+  ],
+  "consistency_disagreement_rate": null,
+  "reperformance_notes": null
+}

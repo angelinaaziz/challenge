@@ -20,7 +20,16 @@ I hand-labelled 15 correct answers across three controls (Bead's two + one I inv
 
 GPT-5.4 wins UAR outright — 3/3 including the correct `FAIL` on remediation (0.95 confidence). Gemini and GPT both lose ICR testing on strictness (called `FAIL` where the exception clause meant `SUCCESS`). All three struggle on my synthetic Change Management control where the attributes are genuinely ambiguous.
 
-**Available lift not used for this scoreboard:** `--consistency 3` runs the judge 3× per attribute and takes majority. Because Anthropic prompt caching kicks in after the first call, it costs ~1.2× not 3×. On single-run flake it reliably lifts accuracy but I published the single-run figures so the scoreboard is honest about what happens out of the box.
+**Tested `--consistency 3` on UAR + Change Management:** all three rounds converged on the same verdict for every attribute. **0% disagreement rate.** On these specific evidence bundles the judgments are already stable — voting is pure overhead. `--consistency` remains a useful lever for future controls where the model *is* unsure; the pipeline surfaces the disagreement_rate per sample so it's visible when it matters.
+
+## Tested on unseen real-world PRs
+
+To prove the ICR pipeline generalises beyond Bead's provided samples, I fetched two real recent PRs from major public repos and ran them through the same pipeline with **no code changes**:
+
+- **`sample-3`** — [Kubernetes PR #139018](https://github.com/kubernetes/kubernetes/pull/139018) (remove `opencontainers/cgroups` dependency from e2e tests). The pipeline flagged a real independence concern: **the author (BenTheElder) appears in the OWNERS approval list alongside a second reviewer (dims)**. Verdict `FAIL` on independent-reviewer-approval with the specific rationale that the author-self-approval taints the four-eyes principle even though a second human also approved.
+- **`sample-4`** — [Next.js PR #95391](https://github.com/vercel/next.js/pull/95391) (recent Next.js canary merge). Two distinct human reviewers (gnoff, acdlite) both approved before merge; the pipeline correctly landed `SUCCESS` on independence. It also noticed **"129 of 130 checks passed"** and correctly hedged the testing attribute to `FURTHER_EVIDENCE_REQUIRED` — a real defect finding on an unseen PR.
+
+These are unseen public data. The pipeline surfaced real audit findings on both.
 
 ---
 

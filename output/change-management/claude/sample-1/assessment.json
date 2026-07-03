@@ -1,17 +1,17 @@
 {
   "control": "Change Management",
   "sample_id": "sample-1",
-  "generated_at": "2026-07-03T03:36:18.315306Z",
+  "generated_at": "2026-07-03T03:42:20.433666Z",
   "model": "claude:claude-opus-4-7",
   "attributes": [
     {
       "control": "Change Management",
       "sample_id": "sample-1",
-      "attribute_id": "change-request-documents-scope-risk-rollback",
+      "attribute_id": "change-request-documented",
       "attribute_text": "Every production change has a corresponding change request that documents scope, risk classification, and rollback plan",
       "verdict": "SUCCESS",
-      "confidence": 0.97,
-      "rationale": "The change request CHG-2026-0847 exists with the correct CHG-YYYY-NNNN identifier format and documents all required elements: scope (payments-primary RDS, payments-api, repo northpeak/infra-terraform PR #2411, config surfaces), risk classification (Medium), rollback plan (3-step PITR + redeploy + verify), named requester (Marcus Bell), named approver (Priya Nadkarni), planned start/end times (2026-06-24 20:00→22:00 UTC), and change category (Normal). The change is a Postgres major upgrade on production — not a documentation-only, hotfix, or dev/staging change, so no exception applies.",
+      "confidence": 0.95,
+      "rationale": "Change request CHG-2026-0847 exists and satisfies every documentation criterion: identifier follows CHG-YYYY-NNNN format; scope lists systems (payments-primary RDS, payments-api) and repo (northpeak/infra-terraform PR #2411); risk classified Medium; rollback plan has three concrete steps with validated RTO; named requester (Marcus Bell) and named approver (Priya Nadkarni); planned window 2026-06-24 20:00–22:00 UTC; category Normal. Change targets production payments cluster, so no out-of-scope exception applies.",
       "policy_references": [
         {
           "source": "change-management-policy.md",
@@ -27,49 +27,44 @@
       "evidence_refs": [
         {
           "file": "change-request.md",
-          "locator": "Title line",
-          "observation": "Change request identifier 'CHG-2026-0847' present in CHG-YYYY-NNNN format, titled 'Upgrade Postgres 15 → 16 on payments-primary cluster'."
+          "locator": "Header line",
+          "observation": "Title reads 'CHG-2026-0847 — Upgrade Postgres 15 → 16 on payments-primary cluster' — identifier matches CHG-YYYY-NNNN format."
         },
         {
           "file": "change-request.md",
-          "locator": "Header metadata block (Category/Risk/Systems/Repos/Window)",
-          "observation": "Category: Normal; Risk: Medium; systems affected payments-primary (RDS) and payments-api; repository northpeak/infra-terraform PR #2411; planned window 2026-06-24 20:00 UTC → 22:00 UTC."
+          "locator": "Category/Risk/Systems header block",
+          "observation": "Category: Normal; Risk: Medium; Systems affected: payments-primary (RDS), payments-api; Repositories touched: northpeak/infra-terraform PR #2411; Planned window 2026-06-24 20:00–22:00 UTC."
         },
         {
           "file": "change-request.md",
           "locator": "Scope section",
-          "observation": "Documents Postgres 15.7→16.3 upgrade and pg library bump from 8.11 to 8.13, no schema changes."
+          "observation": "Documents Postgres 15.7→16.3 upgrade and pg library bump 8.11→8.13, no schema changes."
         },
         {
           "file": "change-request.md",
           "locator": "Rollback plan section",
-          "observation": "Three-step rollback: PITR snapshot restore (snap-payments-2026-06-24-1955), redeploy payments-api pinned to pg@8.11, verify via /healthz and canary; RTO 25 min, validated in staging drill 2026-06-19."
+          "observation": "Three-step rollback with snapshot ID snap-payments-2026-06-24-1955, redeploy pinned pg@8.11, health verification; RTO 25 min validated in staging drill 2026-06-19."
         },
         {
           "file": "change-request.md",
           "locator": "Requester and Approver sections",
           "observation": "Named requester Marcus Bell (Platform Engineer); named approver Priya Nadkarni (Change Approver, CAB)."
-        },
-        {
-          "file": "deployment-log.txt",
-          "locator": "Deployment log header",
-          "observation": "Confirms target is production payments-primary + payments-api — not dev/staging, not documentation-only, not an incident-response hotfix."
         }
       ],
       "exceptions_considered": [
-        "Documentation-only exception rejected: change is a Postgres major version upgrade with code and infra changes.",
-        "Dev/staging exception rejected: deployment log shows target is payments-primary production cluster.",
-        "Incident-response hotfix exception rejected: change is a planned Normal category change with CAB approval, not a break-fix."
+        "Documentation-only exception: rejected — change alters production Postgres cluster and application code.",
+        "Dev/staging exception: rejected — target is payments-primary production RDS.",
+        "Incident Response hotfix: rejected — planned Normal change with CAB approval, not break-fix."
       ]
     },
     {
       "control": "Change Management",
       "sample_id": "sample-1",
-      "attribute_id": "approved-by-authorised-approver-pre-deployment",
+      "attribute_id": "authorised-approver-pre-deployment",
       "attribute_text": "Production changes are approved by an authorised change approver prior to deployment",
       "verdict": "FURTHER_EVIDENCE_REQUIRED",
       "confidence": 0.7,
-      "rationale": "The change request records approval by Priya Nadkarni (Change Approver, CAB), a different named human from requester Marcus Bell, timestamped 2026-06-23 15:42 UTC — before the 2026-06-24 20:00 UTC window. However, this is a Normal change requiring TWO approvers (Change Coordinator + Change Approver from CAB); only one approver (Priya) is named on the change request. Additionally, the CAB minutes (`cab-minutes-w25.pdf`) that would document CAB review and any second approver are explicitly not included in the evidence bundle, and there is no IdP role assignment evidence confirming Priya holds the Change Approver role. Providing the CAB minutes (showing CAB review and Change Coordinator approval) plus an IdP role screenshot for Priya would resolve this to SUCCESS.",
+      "rationale": "The change request names Priya Nadkarni (Change Approver, CAB) as approver, separate from requester Marcus Bell, with an approval timestamp of 2026-06-23 15:42 UTC — before the 2026-06-24 20:00 UTC deployment window. The deployment log independently corroborates this approval. However, this is a Normal change requiring 2 approvers (Change Coordinator + Change Approver from CAB); only Priya (CAB Approver) is documented — no Change Coordinator approval is shown. Additionally, the signed CAB minutes (`cab-minutes-w25.pdf`) evidencing CAB review are explicitly not included in the bundle, and the IdP role assignment for Priya as Change Approver is not provided. Providing the CAB minutes, an IdP role listing confirming Priya's Change Approver role, and evidence of a second Change Coordinator approval would resolve this to SUCCESS.",
       "policy_references": [
         {
           "source": "change-management-policy.md",
@@ -85,33 +80,33 @@
       "evidence_refs": [
         {
           "file": "change-request.md",
-          "locator": "Category / Requester / Approver / Approval record sections",
-          "observation": "Category = Normal; Requester = Marcus Bell; Approver = Priya Nadkarni (Change Approver, CAB); approval timestamp 2026-06-23 15:42 UTC; only one approver listed; CAB minutes referenced as CAB-2026-W25 but attached file cab-minutes-w25.pdf is explicitly not included in the evidence bundle."
+          "locator": "Category / Approver / Approval record sections",
+          "observation": "Category is 'Normal'; approver named as Priya Nadkarni (Change Approver, CAB); approval timestamp 2026-06-23 15:42 UTC noted as before deployment window; CAB reference CAB-2026-W25 cited; signed CAB minutes referenced as `cab-minutes-w25.pdf` but explicitly 'not included in this evidence bundle'. Only one approver is listed — no Change Coordinator approval documented."
         },
         {
           "file": "change-request.md",
-          "locator": "Planned window line",
-          "observation": "Deployment window planned 2026-06-24 20:00 UTC to 22:00 UTC — approval at 2026-06-23 15:42 UTC precedes window opening."
+          "locator": "Requester section",
+          "observation": "Requester is Marcus Bell (Platform Engineer), distinct human from approver Priya Nadkarni — four-eyes principle satisfied on the recorded approver."
         },
         {
           "file": "deployment-log.txt",
-          "locator": "line 'approval OK — CHG-2026-0847 approved by priya.nadkarni at 2026-06-23T15:42:00Z (CAB-2026-W25)'",
-          "observation": "Runner verified approval by priya.nadkarni tied to CAB-2026-W25 prior to deployment start at 2026-06-24 20:00:02 UTC. Only one approver named; no second Change Coordinator approval logged."
+          "locator": "Line at 2026-06-24 20:00:15 UTC",
+          "observation": "Runner logs 'approval OK — CHG-2026-0847 approved by priya.nadkarni at 2026-06-23T15:42:00Z (CAB-2026-W25)', corroborating the approval timestamp precedes the 20:00:02 UTC deployment window start."
         }
       ],
       "exceptions_considered": [
-        "Emergency retrospective-approval clause — not applicable; change is classified Normal and approval is prospective.",
-        "Documentation-only exception — not applicable; change is a Postgres major version upgrade affecting production."
+        "Documentation-only exception — rejected; this is a Postgres major-version upgrade on a production cluster, clearly in-scope.",
+        "Emergency retrospective approval — not applicable; change is classified Normal and approval is pre-deployment."
       ]
     },
     {
       "control": "Change Management",
       "sample_id": "sample-1",
-      "attribute_id": "pre-deployment-testing-evidence-retained",
+      "attribute_id": "pre-deployment-testing-evidence",
       "attribute_text": "Pre-deployment testing is completed and evidence retained before release",
       "verdict": "SUCCESS",
       "confidence": 0.9,
-      "rationale": "The change is categorised Normal, and the change request references an attached test results workbook. pre-deployment-test-results.xlsx contains 12 test cases including functional smoke tests (e.g., /healthz, ledger insert/read) all with PASS results, executed 2026-06-23 (before the 2026-06-24 20:00 UTC deployment window). No failed tests, so the deployment-block criterion is not triggered. Testing evidence is retained and linked from the change request.",
+      "rationale": "Change is Normal category and has both a test plan and test results attached (pre-deployment-test-results.xlsx referenced in the change request, listing 42 planned test cases including 12 functional smoke tests). All sampled functional smoke tests executed on 2026-06-23, prior to the deployment window opening on 2026-06-24 20:00 UTC. All sampled results show PASS; no failed tests observed that would block deployment. Emergency-change criteria are not applicable.",
       "policy_references": [
         {
           "source": "change-management-policy.md",
@@ -132,31 +127,32 @@
       "evidence_refs": [
         {
           "file": "change-request.md",
-          "locator": "Header — Category",
-          "observation": "Change categorised as Normal, Risk Medium."
+          "locator": "Testing evidence section",
+          "observation": "References pre-deployment-test-results.xlsx with 42 planned test cases: 12 functional smoke, 24 regression, 6 rollback validation — all pass on staging."
         },
         {
           "file": "change-request.md",
-          "locator": "Testing evidence section",
-          "observation": "References pre-deployment-test-results.xlsx with 42 test cases passing on staging, including 12 functional smoke, 24 regression, 6 rollback validation."
+          "locator": "Header — Category / Planned window",
+          "observation": "Change is Normal category; planned deployment window 2026-06-24 20:00–22:00 UTC."
         },
         {
           "file": "pre-deployment-test-results.xlsx",
           "locator": "Test Cases!A1:F13",
-          "observation": "12 test cases listed; sampled rows TC-001..TC-005 all Functional smoke (payments API /healthz, ledger insert/read, monotonic constraint, currency-conversion) with Result=PASS, executed 2026-06-23 14:12–14:14, i.e., before deployment window start of 2026-06-24 20:00 UTC."
+          "observation": "Sheet contains 12 rows of test cases with columns Test ID, Category, Description, Result, Executed By, Executed At. Sampled rows TC-001 through TC-005 are Functional smoke tests covering payments API /healthz, ledger insert/read, transaction id constraint, and currency conversion — all Result=PASS, executed 2026-06-23 14:12–14:14 by test-bot."
         },
         {
           "file": "deployment-log.txt",
           "locator": "window start line",
-          "observation": "Deployment window began 2026-06-24 20:00:02 UTC, after test execution on 2026-06-23; deployment ultimately status SUCCESS with no failed tests triggering block."
+          "observation": "Deployment began 2026-06-24 20:00:02 UTC, which is after test execution on 2026-06-23 — testing dated prior to deployment."
         }
       ],
       "exceptions_considered": [
-        "Documentation-only exception — not applicable; this is a Postgres major-version upgrade with code dependency changes.",
-        "Emergency post-deployment testing branch — not applicable; change is Normal, not Emergency."
+        "Emergency-change post-deployment verification (within 24h) criterion — rejected as inapplicable because the change is categorised Normal.",
+        "Failed-test / accepted-risk criterion — not triggered; all sampled test results are PASS."
       ]
     }
   ],
+  "ipe_checks": [],
   "control_conclusion": "CONTROL_INCONCLUSIVE",
   "executive_summary": "The control cannot be signed off from this evidence bundle. 1 attribute(s) need further evidence, 2 passed, and none positively failed. Request the missing evidence and re-audit.",
   "key_findings": [
@@ -174,7 +170,7 @@
     }
   ],
   "recommended_actions": [
-    "Provide additional evidence to close “Production changes are approved by an authorised change approver prior to deployment”. Specifically: The change request records approval by Priya Nadkarni (Change Approver, CAB), a different named human from requester Marcus Bell, timestamped 2026-06-23 15:42 UTC — before the 2026-06-24 20:00 UTC window."
+    "Provide additional evidence to close “Production changes are approved by an authorised change approver prior to deployment”. Specifically: The change request names Priya Nadkarni (Change Approver, CAB) as approver, separate from requester Marcus Bell, with an approval timestamp of 2026-06-23 15:42 UTC — before the 2026-06-24 20:00 UTC deployment window."
   ],
   "evidence_coverage": {
     "all_files": [
@@ -196,15 +192,15 @@
       "bytes_size": 1744,
       "extraction_summary": "Text · 220 words, inlined verbatim into the judge prompt",
       "cited_by_attributes": [
-        "change-request-documents-scope-risk-rollback",
-        "change-request-documents-scope-risk-rollback",
-        "change-request-documents-scope-risk-rollback",
-        "change-request-documents-scope-risk-rollback",
-        "change-request-documents-scope-risk-rollback",
-        "approved-by-authorised-approver-pre-deployment",
-        "approved-by-authorised-approver-pre-deployment",
-        "pre-deployment-testing-evidence-retained",
-        "pre-deployment-testing-evidence-retained"
+        "change-request-documented",
+        "change-request-documented",
+        "change-request-documented",
+        "change-request-documented",
+        "change-request-documented",
+        "authorised-approver-pre-deployment",
+        "authorised-approver-pre-deployment",
+        "pre-deployment-testing-evidence",
+        "pre-deployment-testing-evidence"
       ]
     },
     {
@@ -213,9 +209,8 @@
       "bytes_size": 1493,
       "extraction_summary": "Text · 165 words, inlined verbatim into the judge prompt",
       "cited_by_attributes": [
-        "change-request-documents-scope-risk-rollback",
-        "approved-by-authorised-approver-pre-deployment",
-        "pre-deployment-testing-evidence-retained"
+        "authorised-approver-pre-deployment",
+        "pre-deployment-testing-evidence"
       ]
     },
     {
@@ -224,7 +219,7 @@
       "bytes_size": 6264,
       "extraction_summary": "Workbook · 2 sheet(s), 12 rows total. Sheets: Test Cases, Summary",
       "cited_by_attributes": [
-        "pre-deployment-testing-evidence-retained"
+        "pre-deployment-testing-evidence"
       ]
     }
   ],
