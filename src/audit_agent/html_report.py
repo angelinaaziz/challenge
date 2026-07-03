@@ -83,48 +83,76 @@ body {
   padding: 64px 40px 96px;
 }
 
-/* --- Header --- */
-header.hero {
-  padding-bottom: 36px;
-  margin-bottom: 44px;
-  border-bottom: 1px solid var(--border);
+/* --- Header (deep forest hero, Bead-brand-forward) --- */
+.hero-wrap {
+  background: linear-gradient(180deg, #052b22 0%, #0b362c 100%);
+  margin: -64px -40px 52px;   /* bleed past the container padding */
+  padding: 64px 40px 52px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 4px 4px;
+}
+.hero-wrap::before {
+  /* Subtle mint glow in the top-right corner */
+  content: "";
+  position: absolute;
+  top: -120px; right: -120px;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(136, 217, 141, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-wrap .hero-inner {
+  max-width: 840px;
+  margin: 0 auto;
+  position: relative;
 }
 header.hero .eyebrow {
   font-family: var(--font-mono);
-  color: var(--accent);
+  color: var(--accent-2);
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.20em;
   text-transform: uppercase;
   font-weight: 400;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 header.hero .eyebrow::before {
   content: "";
-  width: 7px; height: 7px;
+  width: 8px; height: 8px;
   border-radius: 50%;
   background: var(--accent-2);
-  box-shadow: 0 0 0 4px var(--accent-soft);
+  box-shadow: 0 0 12px rgba(136, 217, 141, 0.6), 0 0 0 4px rgba(136, 217, 141, 0.15);
 }
 header.hero h1 {
   font-family: var(--font-display);
   margin: 0;
-  font-size: 42px;
+  font-size: 44px;
   font-weight: 500;
-  letter-spacing: -0.028em;
-  color: var(--ink);
+  letter-spacing: -0.03em;
+  color: #f5f2ea;
   line-height: 1.1;
 }
 header.hero .meta {
   font-family: var(--font-mono);
-  color: var(--muted);
+  color: rgba(219, 218, 212, 0.65);
   font-size: 12px;
-  margin-top: 14px;
-  letter-spacing: 0.01em;
+  margin-top: 18px;
+  letter-spacing: 0.02em;
 }
-header.hero .meta strong { color: var(--ink); font-weight: 400; }
+header.hero .meta strong { color: var(--accent-2); font-weight: 400; }
+
+/* Hero-integrated verdict badge (sits inside the green band) */
+.hero-wrap .badge {
+  margin-top: 22px;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(136, 217, 141, 0.35);
+  color: var(--accent-2);
+}
+.hero-wrap .badge.pass { color: #a5e6a8; background: rgba(136, 217, 141, 0.12); border-color: rgba(136, 217, 141, 0.45); }
+.hero-wrap .badge.fail { color: #f4b5ad; background: rgba(246, 176, 170, 0.10); border-color: rgba(246, 176, 170, 0.35); }
+.hero-wrap .badge.warn { color: #ecd39a; background: rgba(232, 192, 122, 0.10); border-color: rgba(232, 192, 122, 0.40); }
 
 /* --- BLUF (bottom-line-up-front) verdict banner --- */
 .bluf {
@@ -1118,6 +1146,7 @@ def build_report(run_dir: Path) -> Path:
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
         f"<style>{_CSS}</style></head><body>",
         '<div class="container">',
+        '<div class="hero-wrap"><div class="hero-inner">',
         '<header class="hero">',
         '<div class="eyebrow">Bead audit workpaper</div>',
         f'<h1 class="display">{_esc(control)}</h1>',
@@ -1125,7 +1154,11 @@ def build_report(run_dir: Path) -> Path:
         f"Tested by <strong>{_esc(model)}</strong> across "
         f"<strong>{len(assessments)}</strong> sample{'s' if len(assessments) != 1 else ''}",
         "</div>",
+        # Verdict badge inside the green hero.
+        f'<span class="badge {_BADGE_CLASS[run_verdict]}"><span class="dot"></span>'
+        f"{run_verdict.replace('_', ' ')}</span>",
         "</header>",
+        "</div></div>",
         # BLUF banner
         f'<div class="bluf {bluf_class}">',
         f'<div class="verdict-icon-lg">{_VERDICT_ICON[run_verdict]}</div>',

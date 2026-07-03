@@ -64,48 +64,76 @@ body {
   padding: 64px 40px 96px;
 }
 
-/* --- Header --- */
-header.hero {
-  padding-bottom: 36px;
-  margin-bottom: 44px;
-  border-bottom: 1px solid var(--border);
+/* --- Header (deep forest hero, Bead-brand-forward) --- */
+.hero-wrap {
+  background: linear-gradient(180deg, #052b22 0%, #0b362c 100%);
+  margin: -64px -40px 52px;   /* bleed past the container padding */
+  padding: 64px 40px 52px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 4px 4px;
+}
+.hero-wrap::before {
+  /* Subtle mint glow in the top-right corner */
+  content: "";
+  position: absolute;
+  top: -120px; right: -120px;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(136, 217, 141, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-wrap .hero-inner {
+  max-width: 840px;
+  margin: 0 auto;
+  position: relative;
 }
 header.hero .eyebrow {
   font-family: var(--font-mono);
-  color: var(--accent);
+  color: var(--accent-2);
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.20em;
   text-transform: uppercase;
   font-weight: 400;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 header.hero .eyebrow::before {
   content: "";
-  width: 7px; height: 7px;
+  width: 8px; height: 8px;
   border-radius: 50%;
   background: var(--accent-2);
-  box-shadow: 0 0 0 4px var(--accent-soft);
+  box-shadow: 0 0 12px rgba(136, 217, 141, 0.6), 0 0 0 4px rgba(136, 217, 141, 0.15);
 }
 header.hero h1 {
   font-family: var(--font-display);
   margin: 0;
-  font-size: 42px;
+  font-size: 44px;
   font-weight: 500;
-  letter-spacing: -0.028em;
-  color: var(--ink);
+  letter-spacing: -0.03em;
+  color: #f5f2ea;
   line-height: 1.1;
 }
 header.hero .meta {
   font-family: var(--font-mono);
-  color: var(--muted);
+  color: rgba(219, 218, 212, 0.65);
   font-size: 12px;
-  margin-top: 14px;
-  letter-spacing: 0.01em;
+  margin-top: 18px;
+  letter-spacing: 0.02em;
 }
-header.hero .meta strong { color: var(--ink); font-weight: 400; }
+header.hero .meta strong { color: var(--accent-2); font-weight: 400; }
+
+/* Hero-integrated verdict badge (sits inside the green band) */
+.hero-wrap .badge {
+  margin-top: 22px;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(136, 217, 141, 0.35);
+  color: var(--accent-2);
+}
+.hero-wrap .badge.pass { color: #a5e6a8; background: rgba(136, 217, 141, 0.12); border-color: rgba(136, 217, 141, 0.45); }
+.hero-wrap .badge.fail { color: #f4b5ad; background: rgba(246, 176, 170, 0.10); border-color: rgba(246, 176, 170, 0.35); }
+.hero-wrap .badge.warn { color: #ecd39a; background: rgba(232, 192, 122, 0.10); border-color: rgba(232, 192, 122, 0.40); }
 
 /* --- BLUF (bottom-line-up-front) verdict banner --- */
 .bluf {
@@ -678,7 +706,7 @@ details.attribute .body .quote {
   details.attribute[open] > summary { background: none; }
   details.attribute .body { display: block !important; }
 }
-</style></head><body><div class="container"><header class="hero"><div class="eyebrow">Bead audit workpaper</div><h1 class="display">Change Management</h1><div class="meta">Tested by <strong>gemini:gemini-3.1-pro-preview</strong> across <strong>2</strong> samples</div></header><div class="bluf fail"><div class="verdict-icon-lg">✕</div><div class="verdict-body"><div class="verdict-label">Control failed</div><h2 class="verdict-headline">4 attributes positively contradicted by the evidence.</h2><div class="verdict-context">See recommended actions per sample below.</div></div></div><section class="sample-card"><div class="sample-header"><div><div class="sample-label">Sample</div><h2>sample-1</h2></div><div class="badge fail" style="margin-top:0;"><span class="dot"></span>CONTROL FAIL</div></div><div class="sample-meta"><span><strong>gemini:gemini-3.1-pro-preview</strong></span><span>generated 03 Jul 2026, 01:56 UTC</span></div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Every production change has a corresponding change request that documents scope, risk classification, and rollback plan</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>1.00</strong><br>3 citations</div></summary><div class="body"><h4>Rationale</h4><p>The change request contains all required documentation according to policy. It includes a standard change identifier (CHG-2026-0847), defines the scope with affected systems and repositories, and explicitly lists the risk classification as &#x27;Medium&#x27;. Additionally, the rollback plan, named requester/approver, and planned start/end times are all clearly documented.</p><h4>Policy references</h4><ul><li><div><span class="file">change-management-policy.md</span> § Required Documentation</div><div class="quote">Every change (regardless of category) must include:
+</style></head><body><div class="container"><div class="hero-wrap"><div class="hero-inner"><header class="hero"><div class="eyebrow">Bead audit workpaper</div><h1 class="display">Change Management</h1><div class="meta">Tested by <strong>gemini:gemini-3.1-pro-preview</strong> across <strong>2</strong> samples</div><span class="badge fail"><span class="dot"></span>CONTROL FAIL</span></header></div></div><div class="bluf fail"><div class="verdict-icon-lg">✕</div><div class="verdict-body"><div class="verdict-label">Control failed</div><h2 class="verdict-headline">4 attributes positively contradicted by the evidence.</h2><div class="verdict-context">See recommended actions per sample below.</div></div></div><section class="sample-card"><div class="sample-header"><div><div class="sample-label">Sample</div><h2>sample-1</h2></div><div class="badge fail" style="margin-top:0;"><span class="dot"></span>CONTROL FAIL</div></div><div class="sample-meta"><span><strong>gemini:gemini-3.1-pro-preview</strong></span><span>generated 03 Jul 2026, 01:56 UTC</span></div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Every production change has a corresponding change request that documents scope, risk classification, and rollback plan</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>1.00</strong><br>3 citations</div></summary><div class="body"><h4>Rationale</h4><p>The change request contains all required documentation according to policy. It includes a standard change identifier (CHG-2026-0847), defines the scope with affected systems and repositories, and explicitly lists the risk classification as &#x27;Medium&#x27;. Additionally, the rollback plan, named requester/approver, and planned start/end times are all clearly documented.</p><h4>Policy references</h4><ul><li><div><span class="file">change-management-policy.md</span> § Required Documentation</div><div class="quote">Every change (regardless of category) must include:
 - A change request identifier (e.g. CHG-YYYY-NNNN)
 - Scope: systems affected, code repositories, config surfaces
 - Risk classification (Low / Medium / High)

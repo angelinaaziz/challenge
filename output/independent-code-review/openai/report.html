@@ -64,48 +64,76 @@ body {
   padding: 64px 40px 96px;
 }
 
-/* --- Header --- */
-header.hero {
-  padding-bottom: 36px;
-  margin-bottom: 44px;
-  border-bottom: 1px solid var(--border);
+/* --- Header (deep forest hero, Bead-brand-forward) --- */
+.hero-wrap {
+  background: linear-gradient(180deg, #052b22 0%, #0b362c 100%);
+  margin: -64px -40px 52px;   /* bleed past the container padding */
+  padding: 64px 40px 52px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 4px 4px;
+}
+.hero-wrap::before {
+  /* Subtle mint glow in the top-right corner */
+  content: "";
+  position: absolute;
+  top: -120px; right: -120px;
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(136, 217, 141, 0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-wrap .hero-inner {
+  max-width: 840px;
+  margin: 0 auto;
+  position: relative;
 }
 header.hero .eyebrow {
   font-family: var(--font-mono);
-  color: var(--accent);
+  color: var(--accent-2);
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.20em;
   text-transform: uppercase;
   font-weight: 400;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 header.hero .eyebrow::before {
   content: "";
-  width: 7px; height: 7px;
+  width: 8px; height: 8px;
   border-radius: 50%;
   background: var(--accent-2);
-  box-shadow: 0 0 0 4px var(--accent-soft);
+  box-shadow: 0 0 12px rgba(136, 217, 141, 0.6), 0 0 0 4px rgba(136, 217, 141, 0.15);
 }
 header.hero h1 {
   font-family: var(--font-display);
   margin: 0;
-  font-size: 42px;
+  font-size: 44px;
   font-weight: 500;
-  letter-spacing: -0.028em;
-  color: var(--ink);
+  letter-spacing: -0.03em;
+  color: #f5f2ea;
   line-height: 1.1;
 }
 header.hero .meta {
   font-family: var(--font-mono);
-  color: var(--muted);
+  color: rgba(219, 218, 212, 0.65);
   font-size: 12px;
-  margin-top: 14px;
-  letter-spacing: 0.01em;
+  margin-top: 18px;
+  letter-spacing: 0.02em;
 }
-header.hero .meta strong { color: var(--ink); font-weight: 400; }
+header.hero .meta strong { color: var(--accent-2); font-weight: 400; }
+
+/* Hero-integrated verdict badge (sits inside the green band) */
+.hero-wrap .badge {
+  margin-top: 22px;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(136, 217, 141, 0.35);
+  color: var(--accent-2);
+}
+.hero-wrap .badge.pass { color: #a5e6a8; background: rgba(136, 217, 141, 0.12); border-color: rgba(136, 217, 141, 0.45); }
+.hero-wrap .badge.fail { color: #f4b5ad; background: rgba(246, 176, 170, 0.10); border-color: rgba(246, 176, 170, 0.35); }
+.hero-wrap .badge.warn { color: #ecd39a; background: rgba(232, 192, 122, 0.10); border-color: rgba(232, 192, 122, 0.40); }
 
 /* --- BLUF (bottom-line-up-front) verdict banner --- */
 .bluf {
@@ -678,7 +706,7 @@ details.attribute .body .quote {
   details.attribute[open] > summary { background: none; }
   details.attribute .body { display: block !important; }
 }
-</style></head><body><div class="container"><header class="hero"><div class="eyebrow">Bead audit workpaper</div><h1 class="display">Independent Code Review</h1><div class="meta">Tested by <strong>openai:gpt-5.4</strong> across <strong>2</strong> samples</div></header><div class="bluf fail"><div class="verdict-icon-lg">✕</div><div class="verdict-body"><div class="verdict-label">Control failed</div><h2 class="verdict-headline">2 attributes positively contradicted by the evidence.</h2><div class="verdict-context">See recommended actions per sample below.</div></div></div><section class="sample-card"><div class="sample-header"><div><div class="sample-label">Sample</div><h2>sample-1</h2></div><div class="badge fail" style="margin-top:0;"><span class="dot"></span>CONTROL FAIL</div></div><div class="sample-meta"><span><strong>openai:gpt-5.4</strong></span><span>generated 03 Jul 2026, 01:25 UTC</span></div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Code Reviews are performed prior to committing a change to the main branch</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>0.95</strong><br>5 citations</div></summary><div class="body"><h4>Rationale</h4><p>The pull request evidence is tied to the specific merged change: PR #62754 titled &quot;Shrink relationComplexityError test size&quot; shows it was merged into microsoft:main from branch relationComplexityErrorSmaller, with 1 commit and 4 files changed. The same PR timeline shows RyanCavanaugh approved the changes 17 hours ago, while the merge occurred 16 hours ago, demonstrating review happened before merge. I treated Copilot as non-independent AI review, but the human approval from RyanCavanaugh separately satisfies the review criterion.</p><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Pull request header</span></div><div class="obs">The page is for microsoft/TypeScript PR #62754 titled &quot;Shrink relationComplexityError test size,&quot; marked Merged, and states jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Tabs and diff summary below PR title</span></div><div class="obs">The PR shows Commits 1 and Files changed 4, linking the review record to the specific change set being merged.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Timeline entries in conversation</span></div><div class="obs">The timeline shows RyanCavanaugh approved these changes 17 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Merge timeline entry</span></div><div class="obs">The timeline shows jakebailey merged commit ea48ded into microsoft:main 16 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Reviewers section in right sidebar</span></div><div class="obs">The Reviewers section lists RyanCavanaugh with a green check mark and also lists Copilot as a reviewer.</div></li></ul><h4>Exceptions considered</h4><ul><li>AI review exception considered: Copilot appears as an AI reviewer and was not treated as an independent human reviewer. This did not affect the conclusion because RyanCavanaugh, a different named human from author jakebailey, approved before merge.</li><li>No documentation-only or similar testing-policy exception was needed because the evidence directly shows a human review before merge.</li></ul></div></details><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Code Review approvals are performed by independent code reviewers</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>0.95</strong><br>4 citations</div></summary><div class="body"><h4>Rationale</h4><p>The PR evidence shows the author/merger was jakebailey, while RyanCavanaugh approved the changes, so the approver is a different named human from the author. The timeline shows RyanCavanaugh approved 17 hours ago and jakebailey merged 16 hours ago, demonstrating at least one independent approval existed before merge to main. I did not rely on the Copilot review for independence because it is an AI reviewer, but the human approval from RyanCavanaugh is sufficient.</p><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">PR header / merge status header</span></div><div class="obs">The pull request is marked Merged, and the header states jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Conversation timeline entry for review request and approval</span></div><div class="obs">The timeline shows jakebailey requested review from RyanCavanaugh and Copilot 17 hours ago, and RyanCavanaugh approved these changes 17 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Conversation timeline entry for merge</span></div><div class="obs">The timeline shows jakebailey merged commit ea48ded into microsoft:main 16 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Right sidebar - Reviewers section</span></div><div class="obs">The Reviewers section lists RyanCavanaugh with a green check mark and also lists Copilot as a reviewer.</div></li></ul><h4>Exceptions considered</h4><ul><li>AI/bot reviewer exception considered: Copilot appears as an AI reviewer and was not treated as an independent human reviewer. This was rejected as the basis for compliance, but a separate human approval from RyanCavanaugh satisfies the attribute.</li><li>No documentation-only or similar change exception was applied; the attribute requires independent review evidence, and such evidence is present.</li></ul></div></details><details class="attribute" data-verdict="FAIL"><summary><div class="verdict-icon">✕</div><div class="attr-title"><div>Testing is performed in accordance with the testing policy</div><div class="verdict-text">FAIL</div></div><div class="attr-meta">Confidence <strong>0.94</strong><br>5 citations</div></summary><div class="body"><h4>Rationale</h4><p>The evidence contradicts the requirement that all automated tests pass before release: the merged PR shows &quot;36 of 37 checks passed,&quot; so at least one check did not pass at merge time. While a CI run tied to PR #62754 shows a successful workflow with visible jobs including coverage, browser-integration, and smoke, the PR status at merge still indicates not all checks passed. Coverage thresholds shown in the coverage report exceed the policy minimums at the summary level (Branches 89.48%, Functions 94.79%), but that does not cure the failed criterion that all tests/checks must pass before merge.</p><h4>Policy references</h4><ul><li><div><span class="file">testing-policy.md</span> § Pre-Release Checklist</div><div class="quote">Before any release, the following must be verified:
+</style></head><body><div class="container"><div class="hero-wrap"><div class="hero-inner"><header class="hero"><div class="eyebrow">Bead audit workpaper</div><h1 class="display">Independent Code Review</h1><div class="meta">Tested by <strong>openai:gpt-5.4</strong> across <strong>2</strong> samples</div><span class="badge fail"><span class="dot"></span>CONTROL FAIL</span></header></div></div><div class="bluf fail"><div class="verdict-icon-lg">✕</div><div class="verdict-body"><div class="verdict-label">Control failed</div><h2 class="verdict-headline">2 attributes positively contradicted by the evidence.</h2><div class="verdict-context">See recommended actions per sample below.</div></div></div><section class="sample-card"><div class="sample-header"><div><div class="sample-label">Sample</div><h2>sample-1</h2></div><div class="badge fail" style="margin-top:0;"><span class="dot"></span>CONTROL FAIL</div></div><div class="sample-meta"><span><strong>openai:gpt-5.4</strong></span><span>generated 03 Jul 2026, 01:25 UTC</span></div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Code Reviews are performed prior to committing a change to the main branch</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>0.95</strong><br>5 citations</div></summary><div class="body"><h4>Rationale</h4><p>The pull request evidence is tied to the specific merged change: PR #62754 titled &quot;Shrink relationComplexityError test size&quot; shows it was merged into microsoft:main from branch relationComplexityErrorSmaller, with 1 commit and 4 files changed. The same PR timeline shows RyanCavanaugh approved the changes 17 hours ago, while the merge occurred 16 hours ago, demonstrating review happened before merge. I treated Copilot as non-independent AI review, but the human approval from RyanCavanaugh separately satisfies the review criterion.</p><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Pull request header</span></div><div class="obs">The page is for microsoft/TypeScript PR #62754 titled &quot;Shrink relationComplexityError test size,&quot; marked Merged, and states jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Tabs and diff summary below PR title</span></div><div class="obs">The PR shows Commits 1 and Files changed 4, linking the review record to the specific change set being merged.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Timeline entries in conversation</span></div><div class="obs">The timeline shows RyanCavanaugh approved these changes 17 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Merge timeline entry</span></div><div class="obs">The timeline shows jakebailey merged commit ea48ded into microsoft:main 16 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Reviewers section in right sidebar</span></div><div class="obs">The Reviewers section lists RyanCavanaugh with a green check mark and also lists Copilot as a reviewer.</div></li></ul><h4>Exceptions considered</h4><ul><li>AI review exception considered: Copilot appears as an AI reviewer and was not treated as an independent human reviewer. This did not affect the conclusion because RyanCavanaugh, a different named human from author jakebailey, approved before merge.</li><li>No documentation-only or similar testing-policy exception was needed because the evidence directly shows a human review before merge.</li></ul></div></details><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Code Review approvals are performed by independent code reviewers</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>0.95</strong><br>4 citations</div></summary><div class="body"><h4>Rationale</h4><p>The PR evidence shows the author/merger was jakebailey, while RyanCavanaugh approved the changes, so the approver is a different named human from the author. The timeline shows RyanCavanaugh approved 17 hours ago and jakebailey merged 16 hours ago, demonstrating at least one independent approval existed before merge to main. I did not rely on the Copilot review for independence because it is an AI reviewer, but the human approval from RyanCavanaugh is sufficient.</p><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">PR header / merge status header</span></div><div class="obs">The pull request is marked Merged, and the header states jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Conversation timeline entry for review request and approval</span></div><div class="obs">The timeline shows jakebailey requested review from RyanCavanaugh and Copilot 17 hours ago, and RyanCavanaugh approved these changes 17 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Conversation timeline entry for merge</span></div><div class="obs">The timeline shows jakebailey merged commit ea48ded into microsoft:main 16 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Right sidebar - Reviewers section</span></div><div class="obs">The Reviewers section lists RyanCavanaugh with a green check mark and also lists Copilot as a reviewer.</div></li></ul><h4>Exceptions considered</h4><ul><li>AI/bot reviewer exception considered: Copilot appears as an AI reviewer and was not treated as an independent human reviewer. This was rejected as the basis for compliance, but a separate human approval from RyanCavanaugh satisfies the attribute.</li><li>No documentation-only or similar change exception was applied; the attribute requires independent review evidence, and such evidence is present.</li></ul></div></details><details class="attribute" data-verdict="FAIL"><summary><div class="verdict-icon">✕</div><div class="attr-title"><div>Testing is performed in accordance with the testing policy</div><div class="verdict-text">FAIL</div></div><div class="attr-meta">Confidence <strong>0.94</strong><br>5 citations</div></summary><div class="body"><h4>Rationale</h4><p>The evidence contradicts the requirement that all automated tests pass before release: the merged PR shows &quot;36 of 37 checks passed,&quot; so at least one check did not pass at merge time. While a CI run tied to PR #62754 shows a successful workflow with visible jobs including coverage, browser-integration, and smoke, the PR status at merge still indicates not all checks passed. Coverage thresholds shown in the coverage report exceed the policy minimums at the summary level (Branches 89.48%, Functions 94.79%), but that does not cure the failed criterion that all tests/checks must pass before merge.</p><h4>Policy references</h4><ul><li><div><span class="file">testing-policy.md</span> § Pre-Release Checklist</div><div class="quote">Before any release, the following must be verified:
 
 - [ ] All automated tests pass</div></li><li><div><span class="file">testing-policy.md</span> § Pre-Release Test Requirements &gt; Mandatory Test Execution</div><div class="quote">All code must pass the following test suites before release:
 
