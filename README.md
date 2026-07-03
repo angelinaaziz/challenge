@@ -42,7 +42,18 @@ These are unseen public data. The pipeline surfaced real audit findings on both.
 
 ## What you get out
 
-Three outputs per run — from raw JSON for machines to a Bead-themed HTML workpaper you can hand to a SOX reviewer.
+Bead's brief asks for *"for each sample and control attribute, provide a JSON object that includes the assessments and contextual details of how the conclusion was formed. The assessment can be SUCCESS, FAIL, FURTHER_EVIDENCE_REQUIRED"*. That's the primary output: `<sample>/assessment.json` — one JSON object per sample, containing an `attributes[]` array with one entry per control attribute, each carrying:
+
+- `verdict`: `SUCCESS` / `FAIL` / `FURTHER_EVIDENCE_REQUIRED` (the required Bead field)
+- `confidence`: 0.0–1.0
+- `rationale`: how the conclusion was formed, in plain English
+- `evidence_refs`: file + locator + observation citations grounding the verdict (schema-enforced non-empty)
+- `policy_references`: verbatim policy citations that shaped the judgment
+- `exceptions_considered`: any policy exceptions the judge actively weighed
+
+Everything else (HTML report, Excel workpaper, markdown, JSONL trace) is layered on top for the auditor — but the assessment.json is what Bead's brief asked for and is what every downstream artefact reads from.
+
+Four outputs per run — from raw JSON for machines to a Bead-themed HTML workpaper you can hand to a SOX reviewer.
 
 | Format | Best for |
 | --- | --- |
