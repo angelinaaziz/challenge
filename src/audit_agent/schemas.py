@@ -176,6 +176,30 @@ class AttributeAssessment(BaseModel):
     )
 
 
+class EvidenceItem(BaseModel):
+    """Per-file inventory row shown in the workpaper.
+
+    Answers "what did the pipeline actually see in this sample?" — every file
+    listed with its type, size, what got extracted, and whether any verdict
+    cited it. This is one of the first things a reviewing auditor would check.
+    """
+    file: str
+    kind: str = Field(description="screenshot | xlsx | markdown | text | pdf | csv | other")
+    bytes_size: int
+    extraction_summary: str = Field(
+        description="Human-readable one-liner: '18 facts extracted', '334 rows across 3 sheets', "
+        "'8 KB markdown, 1240 words', 'Not extracted (unsupported)', etc."
+    )
+    cited_by_attributes: list[str] = Field(
+        default_factory=list,
+        description="Attribute IDs that cite this file in their evidence_refs.",
+    )
+
+    @property
+    def cited(self) -> bool:
+        return bool(self.cited_by_attributes)
+
+
 class EvidenceCoverage(BaseModel):
     """Which evidence files got cited by at least one verdict.
 
@@ -193,6 +217,12 @@ class EvidenceCoverage(BaseModel):
         return len(self.cited_files) / len(self.all_files) if self.all_files else 1.0
 
 
+class AuditFinding(BaseModel):
+    """One-line finding surfaced in the executive summary."""
+    severity: Literal["pass", "warn", "fail"]
+    text: str
+
+
 class SampleAssessment(BaseModel):
     control: str
     sample_id: str
@@ -202,7 +232,26 @@ class SampleAssessment(BaseModel):
     control_conclusion: "ControlConclusion" = Field(
         description="Sample-level rollup: PASS if all attributes SUCCESS, FAIL if any attribute FAIL, INCONCLUSIVE otherwise."
     )
+    executive_summary: Optional[str] = Field(
+        default=None,
+        description=(
+            "One-paragraph plain-English answer to 'what happened and why?' — derived "
+            "deterministically from the attribute verdicts + reperformance findings."
+        ),
+    )
+    key_findings: list[AuditFinding] = Field(
+        default_factory=list,
+        description="Bulleted list of what the audit found, one line per finding.",
+    )
+    recommended_actions: list[str] = Field(
+        default_factory=list,
+        description="What the auditor should do next — grounded in the failed/hedged verdicts.",
+    )
     evidence_coverage: Optional[EvidenceCoverage] = None
+    evidence_inventory: list[EvidenceItem] = Field(
+        default_factory=list,
+        description="Per-file inventory: what was ingested, what was extracted, and who cited it.",
+    )
     consistency_disagreement_rate: Optional[float] = Field(
         default=None,
         description=(

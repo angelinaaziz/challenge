@@ -146,6 +146,11 @@ def audit(
         help="Self-consistency voting: run the judge N times per attribute and take majority. "
         "N=3 costs ~3x tokens on the judge step (cheaper with cache warm) but lifts accuracy.",
     ),
+    open_report: bool = typer.Option(
+        False,
+        "--open",
+        help="Auto-open the HTML report in the default browser after the run finishes.",
+    ),
 ):
     """Audit a control folder and emit per-sample assessments.
 
@@ -173,17 +178,19 @@ def audit(
     )
     assessments = run_audit(cfg)
 
-    _render_audit_summary(assessments, provider, out)
+    _render_audit_summary(assessments, provider, out, open_report=open_report)
 
 
 # --- audit rendering --------------------------------------------------------
 
-def _render_audit_summary(assessments, provider, out: Path) -> None:
+def _render_audit_summary(
+    assessments, provider, out: Path, open_report: bool = False
+) -> None:
     """The scannable per-sample layout users see when a run finishes.
 
-    Design: one panel per sample. Big control-conclusion badge. Per-attribute
-    row with verdict icon, confidence bar, rationale preview. No truncated
-    column headers. Details available via `bead-agent show`.
+    Design: one panel per sample. Big control-conclusion badge, executive
+    summary answering "what happened and why", key findings, recommended
+    actions. Attribute detail via `bead-agent show`.
     """
     CONSOLE.print()
     header = Text.assemble(
@@ -201,13 +208,27 @@ def _render_audit_summary(assessments, provider, out: Path) -> None:
 
     _render_cost_footer(out)
 
+    # Auto-generate + surface the HTML report as a clickable link.
+    from audit_agent.html_report import build_report
+
+    report_path = build_report(out)
+    report_uri = report_path.resolve().as_uri()
     CONSOLE.print()
-    CONSOLE.print(Padding(f"Results: [bold]{out}[/]", (0, 2)))
+    link_text = Text.assemble(
+        ("Report ", f"bold {_ACCENT}"),
+        ("open in browser: ", "dim"),
+        (report_uri, f"{_ACCENT} underline link " + report_uri),
+    )
+    CONSOLE.print(Padding(link_text, (0, 2)))
+    if open_report:
+        import webbrowser
+        webbrowser.open(report_uri)
+
     CONSOLE.print(
         Padding(
-            f"[dim]Inspect a sample: [cyan]bead-agent show {out}/<sample>/assessment.json[/]\n"
-            f"See LLM call cost breakdown: [cyan]bead-agent trace {out}[/]\n"
-            f"Generate HTML report: [cyan]bead-agent report {out}[/][/dim]",
+            f"[dim]Also see:  "
+            f"[cyan]bead-agent show {out}/<sample>/assessment.json[/]  ·  "
+            f"[cyan]bead-agent trace {out}[/][/dim]",
             (0, 2),
         )
     )
@@ -220,7 +241,7 @@ def _render_sample_summary(sa) -> None:
     # Headline card — big verdict + coverage
     heading = Text.assemble(
         (f"{conclusion_emoji}  ", ""),
-        (sa.sample_id, "bold cyan"),
+        (sa.sample_id, f"bold {_PAPER}"),
         ("   ", ""),
         (sa.control_conclusion.value, conclusion_style),
     )
@@ -229,8 +250,8 @@ def _render_sample_summary(sa) -> None:
         cov = sa.evidence_coverage
         heading_lines.append(
             Text.assemble(
-                ("evidence coverage: ", "dim"),
-                (f"{int(cov.coverage_rate * 100)}%", "bold"),
+                ("evidence coverage ", "dim"),
+                (f"{int(cov.coverage_rate * 100)}%", f"bold {_PAPER}"),
                 ("   ", ""),
                 (f"({len(cov.cited_files)}/{len(cov.all_files)} files cited)", "dim"),
             )
@@ -238,15 +259,15 @@ def _render_sample_summary(sa) -> None:
         if cov.uncited_files:
             heading_lines.append(
                 Text.assemble(
-                    ("uncited: ", "dim yellow"),
-                    (", ".join(cov.uncited_files), "yellow"),
+                    ("uncited ", "dim"),
+                    (", ".join(cov.uncited_files), "#e8c07a"),
                 )
             )
     if sa.consistency_disagreement_rate is not None:
         heading_lines.append(
             Text.assemble(
-                ("model disagreement: ", "dim"),
-                (f"{sa.consistency_disagreement_rate:.0%}", "bold"),
+                ("model disagreement ", "dim"),
+                (f"{sa.consistency_disagreement_rate:.0%}", f"bold {_PAPER}"),
             )
         )
 
@@ -254,10 +275,41 @@ def _render_sample_summary(sa) -> None:
     CONSOLE.print(
         Panel(
             heading_text,
-            border_style=conclusion_style.split()[-1],  # 'red'|'green'|'yellow'
+            border_style=conclusion_style.split()[-1],
             padding=(1, 2),
         )
     )
+
+    # Executive summary — the "why" answer.
+    if sa.executive_summary:
+        CONSOLE.print(Padding(Text("Executive summary", style="dim underline"), (1, 2)))
+        CONSOLE.print(Padding(Text(sa.executive_summary, style=_PAPER), (0, 4)))
+
+    # Key findings.
+    if sa.key_findings:
+        CONSOLE.print(Padding(Text("Key findings", style="dim underline"), (1, 2)))
+        sev_style = {
+            "pass": f"{_ACCENT}",
+            "warn": "#e8c07a",
+            "fail": "#f6b0aa",
+        }
+        sev_icon = {"pass": "●", "warn": "▲", "fail": "■"}
+        for f in sa.key_findings:
+            line = Text.assemble(
+                (f"  {sev_icon[f.severity]}  ", sev_style[f.severity]),
+                (f.text, _PAPER if f.severity == "fail" else _MUTED),
+            )
+            CONSOLE.print(Padding(line, (0, 2)))
+
+    # Recommended actions.
+    if sa.recommended_actions:
+        CONSOLE.print(Padding(Text("What to do next", style="dim underline"), (1, 2)))
+        for i, act in enumerate(sa.recommended_actions, 1):
+            line = Text.assemble(
+                (f"  {i}. ", f"bold {_ACCENT}"),
+                (act, _PAPER),
+            )
+            CONSOLE.print(Padding(line, (0, 2)))
 
     # Reperformance summary (UAR only)
     if sa.reperformance_notes:
@@ -265,42 +317,29 @@ def _render_sample_summary(sa) -> None:
             Padding(
                 Panel(
                     Text(sa.reperformance_notes, style=""),
-                    title=Text("Reperformance", style="bold"),
+                    title=Text("Reperformance", style=f"bold {_ACCENT}"),
                     title_align="left",
-                    border_style="blue",
+                    border_style=_ACCENT,
                     padding=(0, 2),
                 ),
-                (0, 2),
+                (1, 2),
             )
         )
 
-    # Attributes — one clean block per attribute
+    # Attribute verdicts — collapsed one-liners, full detail via `show`.
     CONSOLE.print(Padding(Text("Attribute verdicts", style="dim underline"), (1, 2)))
     for a in sa.attributes:
         style = _VERDICT_STYLE[a.verdict.value]
-        base = style.split()[-1]
         emoji = _VERDICT_EMOJI[a.verdict.value]
-
-        title_line = Text.assemble(
-            (f"{emoji}  ", ""),
-            (a.attribute_text, "bold"),
-        )
-        meta_line = Text.assemble(
+        line = Text.assemble(
+            (f"  {emoji}  ", style),
+            (a.attribute_text, _PAPER),
+            ("  ", ""),
             (a.verdict.value, style),
-            ("   confidence ", "dim"),
-            (f"{a.confidence:.2f}", "bold"),
-            ("   citations ", "dim"),
-            (f"{len(a.evidence_refs)}", "bold"),
+            ("  ", ""),
+            (f"conf {a.confidence:.2f}", "dim"),
         )
-        body = Text(_short_rationale(a.rationale), style="")
-
-        block = Text("\n").join([title_line, meta_line, Text(""), body])
-        CONSOLE.print(
-            Padding(
-                Panel(block, border_style=base, padding=(0, 2)),
-                (0, 4),
-            )
-        )
+        CONSOLE.print(Padding(line, (0, 2)))
     CONSOLE.print()
 
 

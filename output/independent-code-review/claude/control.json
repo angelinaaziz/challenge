@@ -3,12 +3,13 @@
   "description": "Changes are reviewed by an independent code reviewer prior to code being merged and released to production. Independent code review restricts the ability for anyone individual from taking a change production without involving an independent party (4-eyes principle).",
   "attributes": [
     {
-      "id": "code-review-before-merge-to-main",
+      "id": "code-review-prior-to-main-merge",
       "text": "Code Reviews are performed prior to committing a change to the main branch",
       "testable_criteria": [
-        "A code review record exists for the change (e.g., pull/merge request with review comments or approval).",
-        "The code review was completed BEFORE the change was merged into the main branch (review timestamp precedes merge timestamp).",
-        "The change was not merged to main without an associated code review record."
+        "A code review record (e.g. pull request) exists for the change.",
+        "The code review was completed before the change was merged into the main branch (review timestamp precedes merge timestamp).",
+        "The change was not committed directly to the main branch without an associated code review.",
+        "The code review covers the actual code changes that were merged (no additional commits merged after review approval without further review)."
       ],
       "relevant_policies": []
     },
@@ -16,35 +17,34 @@
       "id": "independent-reviewer-approval",
       "text": "Code Review approvals are performed by independent code reviewers",
       "testable_criteria": [
-        "The change has at least one recorded approval on the pull/merge request.",
-        "The approver is a different individual from the author/committer of the change (4-eyes principle).",
-        "The approver did not author any of the commits included in the change under review.",
-        "The approval was granted prior to merge to the main branch."
+        "The code review has at least one recorded approval.",
+        "The approver is a different individual from the author of the change (4-eyes principle).",
+        "The approver did not commit or co-author code on the change being reviewed.",
+        "The approver has authority/permissions to approve code reviews for the repository."
       ],
       "relevant_policies": []
     },
     {
-      "id": "testing-per-testing-policy",
+      "id": "testing-per-policy",
       "text": "Testing is performed in accordance with the testing policy",
       "testable_criteria": [
-        "Unit tests achieve minimum 80% code coverage for new code.",
-        "Integration tests achieve minimum 60% coverage for critical integration points.",
-        "IF the change touches security-sensitive, payment, or authentication flows THEN 100% coverage is achieved for those critical paths.",
-        "IF the change modifies legacy code THEN existing coverage levels are maintained or improved.",
-        "Branch coverage is at least 70%.",
-        "Function coverage is at least 80%.",
-        "A coverage report was generated and reviewed as part of the code review.",
-        "All unit tests passed with zero failures prior to release.",
-        "All integration tests passed prior to release.",
-        "End-to-end tests for critical user journeys passed prior to release.",
-        "IF performance tests are applicable THEN performance benchmarks were met.",
-        "Security scan results were reviewed and approved prior to release.",
+        "All unit tests executed for the change passed with zero failures.",
+        "All integration tests executed for the change passed.",
+        "End-to-end tests covering critical user journeys passed.",
+        "Performance tests passed where applicable.",
+        "Security tests/scans were executed and results were reviewed and approved.",
         "Tests were executed in the CI/CD pipeline before merge.",
-        "Test results are visible in the pull request status checks.",
-        "Tests ran in a clean environment with no cached dependencies.",
-        "No flaky tests remained unresolved at the time of release (fixed or removed).",
-        "Pre-release checklist items are verified: all automated tests pass, coverage meets thresholds, no known critical/high-severity bugs, performance tests pass (if applicable), security tests pass, and manual smoke tests for critical features are completed.",
-        "IF an exception/waiver is claimed THEN the change falls within one of the documented exception categories (legacy integration, third-party dependencies, PoC/experimental, documentation-only, build/deploy scripts, dependency version bumps, or refactoring with no behavioral changes) and the exception is documented."
+        "Test results were visible in pull request status checks.",
+        "Unit test code coverage for new code is ≥ 80%.",
+        "Integration test coverage for critical integration points is ≥ 60%.",
+        "IF the change touches security-sensitive, payment, or authentication flows THEN test coverage for those paths is 100%.",
+        "IF the change modifies legacy code THEN coverage is maintained or improved versus the prior baseline.",
+        "Branch coverage is ≥ 70%.",
+        "Function coverage is ≥ 80%.",
+        "A coverage report was generated and reviewed as part of the code review.",
+        "No known critical or high-severity bugs are open against the change at release.",
+        "Manual smoke tests were completed for critical features (where applicable).",
+        "IF the change qualifies for an exception (legacy integration, third-party dependency, PoC/experimental, documentation-only, build/deployment scripts, dependency version bump, or behavior-preserving refactor) THEN the exception basis is documented on the change."
       ],
       "relevant_policies": [
         "testing-policy.md"

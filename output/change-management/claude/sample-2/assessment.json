@@ -1,54 +1,69 @@
 {
   "control": "Change Management",
   "sample_id": "sample-2",
-  "generated_at": "2026-07-03T02:01:20.816490Z",
+  "generated_at": "2026-07-03T03:14:09.627588Z",
   "model": "claude:claude-opus-4-7",
   "attributes": [
     {
       "control": "Change Management",
       "sample_id": "sample-2",
-      "attribute_id": "change-request-documented",
+      "attribute_id": "change-request-documents-scope-risk-rollback",
       "attribute_text": "Every production change has a corresponding change request that documents scope, risk classification, and rollback plan",
-      "verdict": "FAIL",
-      "confidence": 0.9,
-      "rationale": "The change request documents scope, risk classification (Medium), rollback plan, requester, approver, planned window, ID (CHG-2026-0912), and category (Normal). However, the attribute requires that IF the change is Normal THEN a CAB review is recorded. This change is categorised as Normal but the CAB meeting reference is explicitly \"(none — deployed under standing team autonomy waiver)\" with a retroactive CAB scheduled after deployment. No CAB review is recorded, which fails the Normal-change criterion.",
+      "verdict": "SUCCESS",
+      "confidence": 0.95,
+      "rationale": "The change request exists with identifier CHG-2026-0912 (correct format), documents scope (systems, repositories, config surfaces), risk classification (Medium), a rollback plan with steps and RTO, a named requester and named approver, a planned window (2026-06-28 15:00–17:00 UTC), and categorises the change as Normal. All documentation-completeness criteria for this attribute are met. Note: the requester and approver being the same person is a separate approval/independence attribute and is not judged here.",
       "policy_references": [
         {
           "source": "change-management-policy.md",
+          "section": "Required Documentation",
+          "quote": "Every change (regardless of category) must include: A change request identifier (e.g. CHG-YYYY-NNNN); Scope: systems affected, code repositories, config surfaces; Risk classification (Low / Medium / High); Rollback plan; Named requester and named approver; Planned start and end times"
+        },
+        {
+          "source": "change-management-policy.md",
           "section": "Change Categories",
-          "quote": "Normal | Non-routine change with a defined risk assessment | 2 (Change Coordinator + Change Approver from CAB) | Yes"
+          "quote": "Standard | Normal | Emergency"
         }
       ],
       "evidence_refs": [
         {
           "file": "change-request.md",
-          "locator": "Header + Approval record section",
-          "observation": "Category: Normal; CAB meeting reference: (none — deployed under standing team autonomy waiver); Approval decision: Self-approved; retroactive CAB scheduled 2026-07-02."
-        },
-        {
-          "file": "change-request.md",
-          "locator": "System(s) affected / Repositories touched / Scope / Risk assessment / Rollback plan / Planned window",
-          "observation": "Documents scope (reports-api, reports-worker, reports-db; repos northpeak/reports-service PR#47 and northpeak/infra-terraform PR#2438), risk Medium, rollback plan with 3 steps, planned window 2026-06-28 15:00–17:00 UTC."
-        },
-        {
-          "file": "change-request.md",
           "locator": "Title line",
-          "observation": "Change request ID 'CHG-2026-0912' matches CHG-YYYY-NNNN format."
+          "observation": "Change request identifier 'CHG-2026-0912' matches CHG-YYYY-NNNN format."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "Header block (Category, Risk, System(s) affected, Repositories touched, Planned window)",
+          "observation": "Category: Normal; Risk: Medium; systems reports-api/reports-worker/reports-db listed; repositories northpeak/reports-service PR #47 and northpeak/infra-terraform PR #2438 listed; planned window 2026-06-28 15:00 UTC → 17:00 UTC."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "Scope section",
+          "observation": "Documents scope: deploy reporting service, provision RDS, configure IAM roles and API gateway routes (config surfaces)."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "Rollback plan section",
+          "observation": "Three-step rollback plan with timings and 5-minute RTO documented."
+        },
+        {
+          "file": "change-request.md",
+          "locator": "Requester and Approver sections",
+          "observation": "Named requester Marcus Bell and named approver Marcus Bell are both documented (independence is a separate attribute)."
         }
       ],
       "exceptions_considered": [
-        "Documentation-only exception — rejected: this is a new production service deployment, not documentation.",
-        "Emergency retrospective CAB — rejected: change is categorised Normal, not Emergency, so retrospective CAB is not a valid substitute."
+        "Documentation-only change exception — rejected: this deploys a new production service and RDS instance, not documentation.",
+        "Dev/staging exception — rejected: deployment targets production per deployment-log.txt."
       ]
     },
     {
       "control": "Change Management",
       "sample_id": "sample-2",
-      "attribute_id": "authorised-approver-pre-deployment",
+      "attribute_id": "authorised-approver-prior-to-deployment",
       "attribute_text": "Production changes are approved by an authorised change approver prior to deployment",
       "verdict": "FAIL",
       "confidence": 0.99,
-      "rationale": "The change request lists Marcus Bell as both requester and approver, and the approval decision is explicitly \"Self-approved\". This violates the four-eyes principle criterion. Additionally, CHG-2026-0912 is categorised as Normal, which requires 2 approvers (Change Coordinator + Change Approver from CAB); only a single self-approval is recorded, and the CAB review was explicitly skipped. Retrospective CAB is scheduled but retrospective approval is only permitted for Emergency changes.",
+      "rationale": "The change is self-approved: requester and approver are both Marcus Bell, violating the four-eyes principle. Additionally, this is a Normal change which requires 2 approvers (Change Coordinator + CAB Approver) with CAB review evidenced — the record explicitly states CAB was skipped and only a retroactive CAB was scheduled. Retrospective approval is only valid for Emergency changes, but this change is documented as Normal.",
       "policy_references": [
         {
           "source": "change-management-policy.md",
@@ -69,38 +84,38 @@
       "evidence_refs": [
         {
           "file": "change-request.md",
-          "locator": "Category field header",
-          "observation": "Change is categorised as Normal, Risk Medium."
+          "locator": "Requester and Approver sections",
+          "observation": "Both Requester and Approver are listed as 'Marcus Bell (Platform Engineer) — marcus.bell@northpeakfinancial.com' — same human."
         },
         {
           "file": "change-request.md",
-          "locator": "Requester and Approver sections",
-          "observation": "Both requester and approver are listed as Marcus Bell (marcus.bell@northpeakfinancial.com)."
+          "locator": "Category header",
+          "observation": "Category is 'Normal' with Risk 'Medium'."
         },
         {
           "file": "change-request.md",
           "locator": "Approval record section",
-          "observation": "Approval decision recorded as 'Self-approved'; CAB meeting reference states '(none — deployed under standing team autonomy waiver)'; note states CAB was skipped to hit demo deadline with a retroactive CAB scheduled 2026-07-02."
+          "observation": "'CAB meeting reference: (none — deployed under standing team autonomy waiver)', 'Approval decision: Self-approved', note states CAB skipped and retroactive CAB scheduled for 2026-07-02."
         },
         {
           "file": "deployment-log.txt",
           "locator": "approval verification line at 15:04:20 UTC",
-          "observation": "Deployment runner logs 'approval OK — CHG-2026-0912 approved by marcus.bell at 2026-06-28T14:47:00Z (self-approved)'."
+          "observation": "Log records 'approved by marcus.bell at 2026-06-28T14:47:00Z (self-approved)' confirming self-approval was accepted by the deployment runner."
         }
       ],
       "exceptions_considered": [
-        "Retrospective/emergency exception: rejected because the change is documented as Normal, not Emergency, so retrospective CAB approval is not permitted.",
-        "Documentation-only exception: rejected — this is a new production service and RDS provisioning, clearly in scope."
+        "Considered whether a 'standing team autonomy waiver' could substitute for CAB approval — rejected, no such exception exists in the Change Management Policy.",
+        "Considered whether retrospective CAB could cure the deficiency — rejected because retrospective approvals per policy are only valid for Emergency changes, and this is documented as Normal."
       ]
     },
     {
       "control": "Change Management",
       "sample_id": "sample-2",
-      "attribute_id": "pre-deployment-testing-evidence",
+      "attribute_id": "pre-deployment-testing-evidence-retained",
       "attribute_text": "Pre-deployment testing is completed and evidence retained before release",
       "verdict": "FAIL",
-      "confidence": 0.97,
-      "rationale": "Change is Normal, so failed tests must block deployment. The test workbook shows TC-002 (Functional) and TC-004 (Regression) FAILED on 2026-06-28, yet the deployment log shows the change was deployed at 15:04–15:31 UTC with an explicit \"override applied — accepting canary failure for demo\". The change request itself admits \"3 test cases failed on staging... Deployment proceeded pending post-deployment fix.\" This directly violates the criterion that failed tests block deployment for Standard/Normal changes.",
+      "confidence": 0.98,
+      "rationale": "This is a Normal change with failed pre-deployment tests, yet deployment proceeded. Test Cases sheet shows TC-002 (Functional) and TC-004 (Regression) with Result=FAIL on 2026-06-28 09:02–09:06, and the change request itself acknowledges \"3 test cases failed on staging... Deployment proceeded pending post-deployment fix\". The deployment log confirms deployment completed at 15:31:02 UTC with status DEPLOYED. Per policy, \"Failed tests block deployment for Standard/Normal changes\" — this criterion is directly violated.",
       "policy_references": [
         {
           "source": "change-management-policy.md",
@@ -115,31 +130,110 @@
       ],
       "evidence_refs": [
         {
+          "file": "change-request.md",
+          "locator": "Header — Category",
+          "observation": "Change is classified Category: Normal, Risk: Medium."
+        },
+        {
           "file": "pre-deployment-test-results.xlsx",
           "locator": "Test Cases!D3 (TC-002 Result)",
-          "observation": "Functional test TC-002 'reports service returns Q2 aggregate correctly' Result = FAIL, executed 2026-06-28 09:03."
+          "observation": "TC-002 functional test 'reports service returns Q2 aggregate correctly' Result = FAIL, executed 2026-06-28 09:03."
         },
         {
           "file": "pre-deployment-test-results.xlsx",
           "locator": "Test Cases!D5 (TC-004 Result)",
-          "observation": "Regression test TC-004 'legacy report export CSV columns unchanged' Result = FAIL, executed 2026-06-28 09:05."
+          "observation": "TC-004 regression test 'legacy report export CSV columns unchanged' Result = FAIL, executed 2026-06-28 09:05."
         },
         {
           "file": "change-request.md",
-          "locator": "Category / Testing evidence sections",
-          "observation": "Change is classified Normal; testing section states '3 test cases failed on staging (2 functional, 1 performance). Deployment proceeded pending post-deployment fix.'"
+          "locator": "Testing evidence section",
+          "observation": "Requester notes: '3 test cases failed on staging (2 functional, 1 performance). Deployment proceeded pending post-deployment fix.'"
         },
         {
           "file": "deployment-log.txt",
-          "locator": "Lines at 15:19:41–15:31:02 UTC",
-          "observation": "Canary transactions failed; override applied to accept failure; deployment completed with status DEPLOYED despite known defects."
+          "locator": "Final line — status",
+          "observation": "Deployment completed 2026-06-28 15:31:02 UTC — 'status: DEPLOYED (with known post-deploy defects to be fixed 2026-06-29)', confirming release proceeded despite failed tests."
         }
       ],
       "exceptions_considered": [
-        "Emergency accepted-risk exception: rejected because the change is explicitly classified Normal, not Emergency.",
-        "Documentation-only exception: rejected because the change deploys new production services and infrastructure."
+        "Emergency post-deployment testing allowance — rejected because the change request explicitly classifies this as Normal, not Emergency.",
+        "Documentation-only exception — rejected; this deploys new services and infrastructure."
       ]
     }
   ],
+  "control_conclusion": "CONTROL_FAIL",
+  "executive_summary": "The control failed. 2 of 3 attribute(s) were positively contradicted by the evidence. The auditee has open remediation to complete before this control can be signed off.",
+  "key_findings": [
+    {
+      "severity": "fail",
+      "text": "Production changes are approved by an authorised change approver prior to deployment"
+    },
+    {
+      "severity": "fail",
+      "text": "Pre-deployment testing is completed and evidence retained before release"
+    },
+    {
+      "severity": "pass",
+      "text": "Every production change has a corresponding change request that documents scope, risk classification, and rollback plan"
+    }
+  ],
+  "recommended_actions": [
+    "Remediate the root cause of the FAIL on “Production changes are approved by an authorised change approver prior to deployment”, then re-submit for testing. Rationale: The change is self-approved: requester and approver are both Marcus Bell, violating the four-eyes principle.",
+    "Remediate the root cause of the FAIL on “Pre-deployment testing is completed and evidence retained before release”, then re-submit for testing. Rationale: This is a Normal change with failed pre-deployment tests, yet deployment proceeded."
+  ],
+  "evidence_coverage": {
+    "all_files": [
+      "change-request.md",
+      "deployment-log.txt",
+      "pre-deployment-test-results.xlsx"
+    ],
+    "cited_files": [
+      "change-request.md",
+      "deployment-log.txt",
+      "pre-deployment-test-results.xlsx"
+    ],
+    "uncited_files": []
+  },
+  "evidence_inventory": [
+    {
+      "file": "change-request.md",
+      "kind": "markdown",
+      "bytes_size": 1529,
+      "extraction_summary": "Text · 202 words, inlined verbatim into the judge prompt",
+      "cited_by_attributes": [
+        "change-request-documents-scope-risk-rollback",
+        "change-request-documents-scope-risk-rollback",
+        "change-request-documents-scope-risk-rollback",
+        "change-request-documents-scope-risk-rollback",
+        "change-request-documents-scope-risk-rollback",
+        "authorised-approver-prior-to-deployment",
+        "authorised-approver-prior-to-deployment",
+        "authorised-approver-prior-to-deployment",
+        "pre-deployment-testing-evidence-retained",
+        "pre-deployment-testing-evidence-retained"
+      ]
+    },
+    {
+      "file": "deployment-log.txt",
+      "kind": "text",
+      "bytes_size": 1450,
+      "extraction_summary": "Text · 162 words, inlined verbatim into the judge prompt",
+      "cited_by_attributes": [
+        "authorised-approver-prior-to-deployment",
+        "pre-deployment-testing-evidence-retained"
+      ]
+    },
+    {
+      "file": "pre-deployment-test-results.xlsx",
+      "kind": "xlsx",
+      "bytes_size": 5996,
+      "extraction_summary": "Workbook · 2 sheet(s), 7 rows total. Sheets: Test Cases, Summary",
+      "cited_by_attributes": [
+        "pre-deployment-testing-evidence-retained",
+        "pre-deployment-testing-evidence-retained"
+      ]
+    }
+  ],
+  "consistency_disagreement_rate": null,
   "reperformance_notes": null
 }

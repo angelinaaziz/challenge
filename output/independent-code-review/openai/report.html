@@ -50,8 +50,8 @@ body {
 
 /* --- Header --- */
 header.hero {
-  padding-bottom: 40px;
-  margin-bottom: 56px;
+  padding-bottom: 32px;
+  margin-bottom: 40px;
   border-bottom: 1px solid var(--border);
 }
 header.hero .eyebrow {
@@ -60,7 +60,7 @@ header.hero .eyebrow {
   letter-spacing: 0.20em;
   text-transform: uppercase;
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -74,18 +74,60 @@ header.hero .eyebrow::before {
 }
 header.hero h1 {
   margin: 0;
-  font-size: 44px;
+  font-size: 32px;
   font-weight: 500;
-  letter-spacing: -0.028em;
+  letter-spacing: -0.02em;
   color: var(--ink);
-  line-height: 1.15;
+  line-height: 1.2;
 }
 header.hero .meta {
   color: var(--muted);
   font-size: 13px;
-  margin-top: 12px;
+  margin-top: 8px;
 }
 header.hero .meta strong { color: var(--ink); font-weight: 500; }
+
+/* --- BLUF (bottom-line-up-front) verdict banner --- */
+.bluf {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 32px;
+  align-items: center;
+  padding: 40px;
+  border-radius: 12px;
+  margin-bottom: 48px;
+  border: 1px solid;
+}
+.bluf.pass { background: var(--pass-soft); border-color: var(--pass-border); }
+.bluf.fail { background: var(--fail-soft); border-color: var(--fail-border); }
+.bluf.warn { background: var(--warn-soft); border-color: var(--warn-border); }
+.bluf .verdict-icon-lg {
+  width: 84px; height: 84px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; font-weight: 700;
+  border: 3px solid;
+}
+.bluf.pass .verdict-icon-lg { color: var(--pass); border-color: var(--pass); background: white; }
+.bluf.fail .verdict-icon-lg { color: var(--fail); border-color: var(--fail); background: white; }
+.bluf.warn .verdict-icon-lg { color: var(--warn); border-color: var(--warn); background: white; }
+.bluf .verdict-body {}
+.bluf .verdict-label {
+  font-size: 12px; letter-spacing: 0.20em;
+  text-transform: uppercase; font-weight: 700;
+  margin-bottom: 8px;
+}
+.bluf.pass .verdict-label { color: var(--pass); }
+.bluf.fail .verdict-label { color: var(--fail); }
+.bluf.warn .verdict-label { color: var(--warn); }
+.bluf .verdict-headline {
+  font-size: 28px; font-weight: 500;
+  color: var(--ink); letter-spacing: -0.02em;
+  line-height: 1.25; margin: 0;
+}
+.bluf .verdict-context {
+  color: var(--muted); font-size: 13px; margin-top: 12px;
+}
 
 /* --- Badges --- */
 .badge {
@@ -152,6 +194,56 @@ header.hero .meta strong { color: var(--ink); font-weight: 500; }
   font-weight: 600;
   margin: 40px 0 16px;
 }
+
+/* --- Executive summary --- */
+.exec-summary {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--ink);
+  padding: 20px 0 4px;
+  border-left: 3px solid var(--accent);
+  padding-left: 20px;
+  margin-bottom: 4px;
+}
+
+/* --- Findings --- */
+ul.findings { list-style: none; padding: 0; margin: 0 0 8px; }
+ul.findings li.finding {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+ul.findings li.finding:last-child { border-bottom: none; }
+ul.findings .finding-icon {
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+}
+ul.findings li.pass .finding-icon { color: var(--pass); }
+ul.findings li.warn .finding-icon { color: var(--warn); }
+ul.findings li.fail .finding-icon { color: var(--fail); }
+ul.findings .finding-text {
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+ul.findings li.fail .finding-text { color: var(--ink); font-weight: 500; }
+
+/* --- Recommended actions --- */
+ol.actions {
+  padding-left: 20px;
+  margin: 0 0 24px;
+  color: var(--ink-2);
+}
+ol.actions li {
+  padding: 8px 0;
+  font-size: 14px;
+  line-height: 1.55;
+}
+ol.actions li::marker { color: var(--accent); font-weight: 600; }
 
 /* --- Reperformance callout --- */
 .reperformance {
@@ -330,9 +422,127 @@ details.attribute .body .quote {
 .trace-table td.num  { text-align: right; color: var(--ink-2); }
 .trace-table td.cost { color: var(--accent); text-align: right; font-weight: 500; }
 
+/* --- Evidence inventory --- */
+.inventory {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--card);
+  margin-bottom: 20px;
+}
+.inventory-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 20px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+.inventory-row:last-child { border-bottom: none; }
+.inventory-row .kind-pill {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-family: ui-monospace, Menlo, monospace;
+}
+.inventory-row .file-body { min-width: 0; }
+.inventory-row .file-name {
+  color: var(--ink); font-weight: 500; font-size: 14px;
+  font-family: ui-monospace, Menlo, monospace;
+  margin-bottom: 4px;
+  word-break: break-all;
+}
+.inventory-row .file-summary { color: var(--muted); font-size: 12px; line-height: 1.5; }
+.inventory-row .cited-pill {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.inventory-row .cited-pill.cited {
+  color: var(--pass); background: var(--pass-soft); border: 1px solid var(--pass-border);
+}
+.inventory-row .cited-pill.uncited {
+  color: var(--warn); background: var(--warn-soft); border: 1px solid var(--warn-border);
+}
+
+/* --- Sign-off --- */
+.signoff {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 32px;
+  margin-top: 48px;
+}
+.signoff h3 {
+  margin: 0 0 8px 0;
+  font-size: 20px; font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.signoff .signoff-note {
+  color: var(--muted); font-size: 13px; margin-bottom: 24px;
+  line-height: 1.55;
+}
+.signoff .decision-row {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.signoff .decision-btn {
+  padding: 12px 20px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font-size: 13px; font-weight: 500;
+  color: var(--muted); background: var(--paper);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  display: flex; align-items: center; gap: 8px;
+}
+.signoff .decision-btn:hover { border-color: var(--border-strong); color: var(--ink); }
+.signoff .decision-btn.accept:hover { border-color: var(--pass); color: var(--pass); background: var(--pass-soft); }
+.signoff .decision-btn.reject:hover { border-color: var(--fail); color: var(--fail); background: var(--fail-soft); }
+.signoff .decision-btn.rework:hover { border-color: var(--warn); color: var(--warn); background: var(--warn-soft); }
+.signoff .fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+.signoff .field label {
+  display: block;
+  font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; font-weight: 600;
+  color: var(--muted); margin-bottom: 8px;
+}
+.signoff .field input,
+.signoff .field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: inherit;
+}
+.signoff .field input:focus,
+.signoff .field textarea:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.signoff .field.wide { grid-column: 1 / -1; }
+.signoff .field textarea { min-height: 80px; resize: vertical; }
+
 /* --- Footer --- */
 .footer {
-  margin-top: 72px;
+  margin-top: 60px;
   padding-top: 28px;
   border-top: 1px solid var(--border);
   color: var(--muted-2);
@@ -353,7 +563,7 @@ details.attribute .body .quote {
   details.attribute[open] > summary { background: none; }
   details.attribute .body { display: block !important; }
 }
-</style></head><body><div class="container"><header class="hero"><div class="eyebrow">Bead audit workpaper</div><h1 class="display">Independent Code Review</h1><div class="meta">Model openai:gpt-5.4 &nbsp;·&nbsp; 2 samples</div><div style="margin-top:16px;"><span class="badge fail"><span class="dot"></span>CONTROL FAIL</span></div></header><section class="sample-card"><div class="sample-header"><div><div class="sample-label">Sample</div><h2>sample-1</h2></div><div class="badge fail" style="margin-top:0;"><span class="dot"></span>CONTROL FAIL</div></div><div class="sample-meta"><span><strong>openai:gpt-5.4</strong></span><span>generated 03 Jul 2026, 01:25 UTC</span></div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Code Reviews are performed prior to committing a change to the main branch</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>0.95</strong><br>5 citations</div></summary><div class="body"><h4>Rationale</h4><p>The pull request evidence is tied to the specific merged change: PR #62754 titled &quot;Shrink relationComplexityError test size&quot; shows it was merged into microsoft:main from branch relationComplexityErrorSmaller, with 1 commit and 4 files changed. The same PR timeline shows RyanCavanaugh approved the changes 17 hours ago, while the merge occurred 16 hours ago, demonstrating review happened before merge. I treated Copilot as non-independent AI review, but the human approval from RyanCavanaugh separately satisfies the review criterion.</p><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Pull request header</span></div><div class="obs">The page is for microsoft/TypeScript PR #62754 titled &quot;Shrink relationComplexityError test size,&quot; marked Merged, and states jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Tabs and diff summary below PR title</span></div><div class="obs">The PR shows Commits 1 and Files changed 4, linking the review record to the specific change set being merged.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Timeline entries in conversation</span></div><div class="obs">The timeline shows RyanCavanaugh approved these changes 17 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Merge timeline entry</span></div><div class="obs">The timeline shows jakebailey merged commit ea48ded into microsoft:main 16 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Reviewers section in right sidebar</span></div><div class="obs">The Reviewers section lists RyanCavanaugh with a green check mark and also lists Copilot as a reviewer.</div></li></ul><h4>Exceptions considered</h4><ul><li>AI review exception considered: Copilot appears as an AI reviewer and was not treated as an independent human reviewer. This did not affect the conclusion because RyanCavanaugh, a different named human from author jakebailey, approved before merge.</li><li>No documentation-only or similar testing-policy exception was needed because the evidence directly shows a human review before merge.</li></ul></div></details><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Code Review approvals are performed by independent code reviewers</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>0.95</strong><br>4 citations</div></summary><div class="body"><h4>Rationale</h4><p>The PR evidence shows the author/merger was jakebailey, while RyanCavanaugh approved the changes, so the approver is a different named human from the author. The timeline shows RyanCavanaugh approved 17 hours ago and jakebailey merged 16 hours ago, demonstrating at least one independent approval existed before merge to main. I did not rely on the Copilot review for independence because it is an AI reviewer, but the human approval from RyanCavanaugh is sufficient.</p><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">PR header / merge status header</span></div><div class="obs">The pull request is marked Merged, and the header states jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Conversation timeline entry for review request and approval</span></div><div class="obs">The timeline shows jakebailey requested review from RyanCavanaugh and Copilot 17 hours ago, and RyanCavanaugh approved these changes 17 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Conversation timeline entry for merge</span></div><div class="obs">The timeline shows jakebailey merged commit ea48ded into microsoft:main 16 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Right sidebar - Reviewers section</span></div><div class="obs">The Reviewers section lists RyanCavanaugh with a green check mark and also lists Copilot as a reviewer.</div></li></ul><h4>Exceptions considered</h4><ul><li>AI/bot reviewer exception considered: Copilot appears as an AI reviewer and was not treated as an independent human reviewer. This was rejected as the basis for compliance, but a separate human approval from RyanCavanaugh satisfies the attribute.</li><li>No documentation-only or similar change exception was applied; the attribute requires independent review evidence, and such evidence is present.</li></ul></div></details><details class="attribute" data-verdict="FAIL"><summary><div class="verdict-icon">✕</div><div class="attr-title"><div>Testing is performed in accordance with the testing policy</div><div class="verdict-text">FAIL</div></div><div class="attr-meta">Confidence <strong>0.94</strong><br>5 citations</div></summary><div class="body"><h4>Rationale</h4><p>The evidence contradicts the requirement that all automated tests pass before release: the merged PR shows &quot;36 of 37 checks passed,&quot; so at least one check did not pass at merge time. While a CI run tied to PR #62754 shows a successful workflow with visible jobs including coverage, browser-integration, and smoke, the PR status at merge still indicates not all checks passed. Coverage thresholds shown in the coverage report exceed the policy minimums at the summary level (Branches 89.48%, Functions 94.79%), but that does not cure the failed criterion that all tests/checks must pass before merge.</p><h4>Policy references</h4><ul><li><div><span class="file">testing-policy.md</span> § Pre-Release Checklist</div><div class="quote">Before any release, the following must be verified:
+</style></head><body><div class="container"><header class="hero"><div class="eyebrow">Bead audit workpaper</div><h1 class="display">Independent Code Review</h1><div class="meta">Tested by <strong>openai:gpt-5.4</strong> across <strong>2</strong> samples</div></header><div class="bluf fail"><div class="verdict-icon-lg">✕</div><div class="verdict-body"><div class="verdict-label">Control failed</div><h2 class="verdict-headline">2 attributes positively contradicted by the evidence.</h2><div class="verdict-context">See recommended actions per sample below.</div></div></div><section class="sample-card"><div class="sample-header"><div><div class="sample-label">Sample</div><h2>sample-1</h2></div><div class="badge fail" style="margin-top:0;"><span class="dot"></span>CONTROL FAIL</div></div><div class="sample-meta"><span><strong>openai:gpt-5.4</strong></span><span>generated 03 Jul 2026, 01:25 UTC</span></div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Code Reviews are performed prior to committing a change to the main branch</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>0.95</strong><br>5 citations</div></summary><div class="body"><h4>Rationale</h4><p>The pull request evidence is tied to the specific merged change: PR #62754 titled &quot;Shrink relationComplexityError test size&quot; shows it was merged into microsoft:main from branch relationComplexityErrorSmaller, with 1 commit and 4 files changed. The same PR timeline shows RyanCavanaugh approved the changes 17 hours ago, while the merge occurred 16 hours ago, demonstrating review happened before merge. I treated Copilot as non-independent AI review, but the human approval from RyanCavanaugh separately satisfies the review criterion.</p><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Pull request header</span></div><div class="obs">The page is for microsoft/TypeScript PR #62754 titled &quot;Shrink relationComplexityError test size,&quot; marked Merged, and states jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Tabs and diff summary below PR title</span></div><div class="obs">The PR shows Commits 1 and Files changed 4, linking the review record to the specific change set being merged.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Timeline entries in conversation</span></div><div class="obs">The timeline shows RyanCavanaugh approved these changes 17 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Merge timeline entry</span></div><div class="obs">The timeline shows jakebailey merged commit ea48ded into microsoft:main 16 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Reviewers section in right sidebar</span></div><div class="obs">The Reviewers section lists RyanCavanaugh with a green check mark and also lists Copilot as a reviewer.</div></li></ul><h4>Exceptions considered</h4><ul><li>AI review exception considered: Copilot appears as an AI reviewer and was not treated as an independent human reviewer. This did not affect the conclusion because RyanCavanaugh, a different named human from author jakebailey, approved before merge.</li><li>No documentation-only or similar testing-policy exception was needed because the evidence directly shows a human review before merge.</li></ul></div></details><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Code Review approvals are performed by independent code reviewers</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>0.95</strong><br>4 citations</div></summary><div class="body"><h4>Rationale</h4><p>The PR evidence shows the author/merger was jakebailey, while RyanCavanaugh approved the changes, so the approver is a different named human from the author. The timeline shows RyanCavanaugh approved 17 hours ago and jakebailey merged 16 hours ago, demonstrating at least one independent approval existed before merge to main. I did not rely on the Copilot review for independence because it is an AI reviewer, but the human approval from RyanCavanaugh is sufficient.</p><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">PR header / merge status header</span></div><div class="obs">The pull request is marked Merged, and the header states jakebailey merged 1 commit into microsoft:main from jakebailey:relationComplexityErrorSmaller.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Conversation timeline entry for review request and approval</span></div><div class="obs">The timeline shows jakebailey requested review from RyanCavanaugh and Copilot 17 hours ago, and RyanCavanaugh approved these changes 17 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Conversation timeline entry for merge</span></div><div class="obs">The timeline shows jakebailey merged commit ea48ded into microsoft:main 16 hours ago.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</span> @ <span class="loc">Right sidebar - Reviewers section</span></div><div class="obs">The Reviewers section lists RyanCavanaugh with a green check mark and also lists Copilot as a reviewer.</div></li></ul><h4>Exceptions considered</h4><ul><li>AI/bot reviewer exception considered: Copilot appears as an AI reviewer and was not treated as an independent human reviewer. This was rejected as the basis for compliance, but a separate human approval from RyanCavanaugh satisfies the attribute.</li><li>No documentation-only or similar change exception was applied; the attribute requires independent review evidence, and such evidence is present.</li></ul></div></details><details class="attribute" data-verdict="FAIL"><summary><div class="verdict-icon">✕</div><div class="attr-title"><div>Testing is performed in accordance with the testing policy</div><div class="verdict-text">FAIL</div></div><div class="attr-meta">Confidence <strong>0.94</strong><br>5 citations</div></summary><div class="body"><h4>Rationale</h4><p>The evidence contradicts the requirement that all automated tests pass before release: the merged PR shows &quot;36 of 37 checks passed,&quot; so at least one check did not pass at merge time. While a CI run tied to PR #62754 shows a successful workflow with visible jobs including coverage, browser-integration, and smoke, the PR status at merge still indicates not all checks passed. Coverage thresholds shown in the coverage report exceed the policy minimums at the summary level (Branches 89.48%, Functions 94.79%), but that does not cure the failed criterion that all tests/checks must pass before merge.</p><h4>Policy references</h4><ul><li><div><span class="file">testing-policy.md</span> § Pre-Release Checklist</div><div class="quote">Before any release, the following must be verified:
 
 - [ ] All automated tests pass</div></li><li><div><span class="file">testing-policy.md</span> § Pre-Release Test Requirements &gt; Mandatory Test Execution</div><div class="quote">All code must pass the following test suites before release:
 
@@ -380,4 +590,4 @@ Coverage reports must be generated and reviewed as part of the code review proce
 5. **Security Tests**: Security scan results must be reviewed and approved</div></li><li><div><span class="file">testing-policy.md</span> § Test Execution Environment</div><div class="quote">- Tests must run in CI/CD pipeline before merge
 - All tests must pass in a clean environment (no cached dependencies)
 - Test results must be visible in pull request status checks
-- Flaky tests must be fixed or removed before release</div></li><li><div><span class="file">testing-policy.md</span> § Test Maintenance</div><div class="quote">- Tests that fail must be fixed before code merge</div></li></ul><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">PR merge box near bottom of timeline</span></div><div class="obs">The merge box states &quot;33 of 36 checks passed&quot; while the PR is shown as successfully merged.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">PR header beside title</span></div><div class="obs">The PR status badge reads &quot;Merged,&quot; confirming the change was merged despite only 33 of 36 checks passing.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png</span> @ <span class="loc">Actions run summary header</span></div><div class="obs">The workflow run for &quot;ci.yml&quot; shows status &quot;Success&quot; and trigger &quot;on: pull_request,&quot; indicating tests ran in CI/CD before merge.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png</span> @ <span class="loc">Jobs list and workflow graph</span></div><div class="obs">The run includes multiple test jobs and a benchmark job, including test debug/release jobs across macOS, Windows, and Linux, plus &quot;bench release linux-x86_64&quot;.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">Top PR tabs under title</span></div><div class="obs">The PR page shows a &quot;Checks 18&quot; tab, evidencing that test/check results are visible on the pull request.</div></li></ul><h4>Exceptions considered</h4><ul><li>Testing-policy exceptions were considered and rejected because the evidence shows a feature change to timer behavior in application code (not documentation-only, dependency update, build/deployment-script-only, or clearly pure refactor), and no approved waiver or exception record is visible.</li><li>Proof-of-concept/experimental exception was considered and rejected because the PR was merged to main and the evidence does not show it was explicitly marked temporary or not intended for production use.</li><li>Legacy code integration / third-party dependency exceptions were considered, but the screenshots do not show any documented exception approval or statement that testing requirements were waived for those reasons.</li></ul></div></details></section><section class="trace-section"><h2>LLM call trace <span style='color:var(--muted); font-size: 13px; font-weight: 400;'>· 11 calls · $0.0000</span></h2><table class="trace-table"><thead><tr><th>#</th><th>Purpose</th><th>In</th><th>Cache</th><th>Out</th><th>$</th><th>Latency</th></tr></thead><tbody><tr><td>1</td><td>screenshot:Screenshot 2025-11-14 at 14-27-50 Coverage Report.png</td><td class="num">3,233</td><td class="num">0</td><td class="num">1,131</td><td class="cost">$0.0000</td><td class="num">7831ms</td></tr><tr><td>2</td><td>screenshot:Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</td><td class="num">3,749</td><td class="num">0</td><td class="num">1,001</td><td class="cost">$0.0000</td><td class="num">9237ms</td></tr><tr><td>3</td><td>screenshot:Screenshot 2025-11-14 at 14-29-21 Shrink relationComplexityError test size · microsoft_TypeScript@9e76dd2.png</td><td class="num">3,670</td><td class="num">0</td><td class="num">964</td><td class="cost">$0.0000</td><td class="num">8241ms</td></tr><tr><td>4</td><td>judge:code-reviews-are-performed-prior-to-committing-a-change-to-the-main-branch:sample-1</td><td class="num">4,801</td><td class="num">0</td><td class="num">659</td><td class="cost">$0.0000</td><td class="num">5048ms</td></tr><tr><td>5</td><td>judge:code-review-approvals-are-performed-by-independent-code-reviewers:sample-1</td><td class="num">4,796</td><td class="num">0</td><td class="num">576</td><td class="cost">$0.0000</td><td class="num">5197ms</td></tr><tr><td>6</td><td>judge:testing-is-performed-in-accordance-with-the-testing-policy:sample-1</td><td class="num">5,925</td><td class="num">0</td><td class="num">1,070</td><td class="cost">$0.0000</td><td class="num">8138ms</td></tr><tr><td>7</td><td>screenshot:Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png</td><td class="num">3,738</td><td class="num">0</td><td class="num">934</td><td class="cost">$0.0000</td><td class="num">8326ms</td></tr><tr><td>8</td><td>screenshot:Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</td><td class="num">3,728</td><td class="num">0</td><td class="num">1,108</td><td class="cost">$0.0000</td><td class="num">10349ms</td></tr><tr><td>9</td><td>judge:code-reviews-are-performed-prior-to-committing-a-change-to-the-main-branch:sample-2</td><td class="num">3,606</td><td class="num">0</td><td class="num">664</td><td class="cost">$0.0000</td><td class="num">5321ms</td></tr><tr><td>10</td><td>judge:code-review-approvals-are-performed-by-independent-code-reviewers:sample-2</td><td class="num">3,601</td><td class="num">0</td><td class="num">633</td><td class="cost">$0.0000</td><td class="num">7800ms</td></tr><tr><td>11</td><td>judge:testing-is-performed-in-accordance-with-the-testing-policy:sample-2</td><td class="num">4,730</td><td class="num">0</td><td class="num">934</td><td class="cost">$0.0000</td><td class="num">7012ms</td></tr></tbody></table></section><div class="footer">Generated by <code>bead-agent report</code> · self-contained, no external assets.</div></div></body></html>
+- Flaky tests must be fixed or removed before release</div></li><li><div><span class="file">testing-policy.md</span> § Test Maintenance</div><div class="quote">- Tests that fail must be fixed before code merge</div></li></ul><h4>Evidence</h4><ul><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">PR merge box near bottom of timeline</span></div><div class="obs">The merge box states &quot;33 of 36 checks passed&quot; while the PR is shown as successfully merged.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">PR header beside title</span></div><div class="obs">The PR status badge reads &quot;Merged,&quot; confirming the change was merged despite only 33 of 36 checks passing.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png</span> @ <span class="loc">Actions run summary header</span></div><div class="obs">The workflow run for &quot;ci.yml&quot; shows status &quot;Success&quot; and trigger &quot;on: pull_request,&quot; indicating tests ran in CI/CD before merge.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png</span> @ <span class="loc">Jobs list and workflow graph</span></div><div class="obs">The run includes multiple test jobs and a benchmark job, including test debug/release jobs across macOS, Windows, and Linux, plus &quot;bench release linux-x86_64&quot;.</div></li><li><div><span class="file">Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</span> @ <span class="loc">Top PR tabs under title</span></div><div class="obs">The PR page shows a &quot;Checks 18&quot; tab, evidencing that test/check results are visible on the pull request.</div></li></ul><h4>Exceptions considered</h4><ul><li>Testing-policy exceptions were considered and rejected because the evidence shows a feature change to timer behavior in application code (not documentation-only, dependency update, build/deployment-script-only, or clearly pure refactor), and no approved waiver or exception record is visible.</li><li>Proof-of-concept/experimental exception was considered and rejected because the PR was merged to main and the evidence does not show it was explicitly marked temporary or not intended for production use.</li><li>Legacy code integration / third-party dependency exceptions were considered, but the screenshots do not show any documented exception approval or statement that testing requirements were waived for those reasons.</li></ul></div></details></section><section class="trace-section"><h2>Decision log <span style='color:var(--muted); font-size: 13px; font-weight: 400;'>· 11 LLM calls · $0.0000</span></h2><div class="trace-meta">Every judgment the agent made. Each row is one LLM call &mdash; the audit-trail record of how the verdict was reached.</div><table class="trace-table"><thead><tr><th>#</th><th>Purpose</th><th>In</th><th>Cache</th><th>Out</th><th>$</th><th>Latency</th></tr></thead><tbody><tr><td>1</td><td>screenshot:Screenshot 2025-11-14 at 14-27-50 Coverage Report.png</td><td class="num">3,233</td><td class="num">0</td><td class="num">1,131</td><td class="cost">$0.0000</td><td class="num">7831ms</td></tr><tr><td>2</td><td>screenshot:Screenshot 2025-11-14 at 14-28-31 Shrink relationComplexityError test size by jakebailey · Pull Request #62754 · microsoft_TypeScript.png</td><td class="num">3,749</td><td class="num">0</td><td class="num">1,001</td><td class="cost">$0.0000</td><td class="num">9237ms</td></tr><tr><td>3</td><td>screenshot:Screenshot 2025-11-14 at 14-29-21 Shrink relationComplexityError test size · microsoft_TypeScript@9e76dd2.png</td><td class="num">3,670</td><td class="num">0</td><td class="num">964</td><td class="cost">$0.0000</td><td class="num">8241ms</td></tr><tr><td>4</td><td>judge:code-reviews-are-performed-prior-to-committing-a-change-to-the-main-branch:sample-1</td><td class="num">4,801</td><td class="num">0</td><td class="num">659</td><td class="cost">$0.0000</td><td class="num">5048ms</td></tr><tr><td>5</td><td>judge:code-review-approvals-are-performed-by-independent-code-reviewers:sample-1</td><td class="num">4,796</td><td class="num">0</td><td class="num">576</td><td class="cost">$0.0000</td><td class="num">5197ms</td></tr><tr><td>6</td><td>judge:testing-is-performed-in-accordance-with-the-testing-policy:sample-1</td><td class="num">5,925</td><td class="num">0</td><td class="num">1,070</td><td class="cost">$0.0000</td><td class="num">8138ms</td></tr><tr><td>7</td><td>screenshot:Screenshot 2025-11-14 at 14-31-38 feat use Node.js timers by default · denoland_deno@12cde71.png</td><td class="num">3,738</td><td class="num">0</td><td class="num">934</td><td class="cost">$0.0000</td><td class="num">8326ms</td></tr><tr><td>8</td><td>screenshot:Screenshot 2025-11-14 at 14-32-05 feat use Node.js timers by default by bartlomieju · Pull Request #31272 · denoland_deno.png</td><td class="num">3,728</td><td class="num">0</td><td class="num">1,108</td><td class="cost">$0.0000</td><td class="num">10349ms</td></tr><tr><td>9</td><td>judge:code-reviews-are-performed-prior-to-committing-a-change-to-the-main-branch:sample-2</td><td class="num">3,606</td><td class="num">0</td><td class="num">664</td><td class="cost">$0.0000</td><td class="num">5321ms</td></tr><tr><td>10</td><td>judge:code-review-approvals-are-performed-by-independent-code-reviewers:sample-2</td><td class="num">3,601</td><td class="num">0</td><td class="num">633</td><td class="cost">$0.0000</td><td class="num">7800ms</td></tr><tr><td>11</td><td>judge:testing-is-performed-in-accordance-with-the-testing-policy:sample-2</td><td class="num">4,730</td><td class="num">0</td><td class="num">934</td><td class="cost">$0.0000</td><td class="num">7012ms</td></tr></tbody></table></section><script>function signoffManifest(decision){const now = new Date().toISOString();const manifest = {  workpaper: "Independent Code Review",  model: "openai:gpt-5.4",  ai_conclusion: "CONTROL_FAIL",  reviewer_decision: decision,  reviewer_name: document.getElementById('rev-name').value || null,  reviewer_date: document.getElementById('rev-date').value || null,  reviewer_notes: document.getElementById('rev-notes').value || null,  signed_at: now,  report_url: window.location.href,};if (!manifest.reviewer_name) {  alert('Please enter your name before signing off.');  document.getElementById('rev-name').focus();  return;}if (!manifest.reviewer_date) {  manifest.reviewer_date = now.slice(0,10);}const blob = new Blob([JSON.stringify(manifest, null, 2)],   {type:'application/json'});const a = document.createElement('a');a.href = URL.createObjectURL(blob);a.download = 'signoff-' + decision.toLowerCase() + '-' + now.slice(0,10) + '.json';a.click();URL.revokeObjectURL(a.href);document.getElementById('signoff-status').innerHTML =   '<strong>' + decision + '</strong> recorded &middot; ' +   'manifest downloaded &middot; attach to workpaper file.';document.getElementById('signoff-status').style.color =   decision === 'ACCEPT' ? 'var(--pass)' :   decision === 'REJECT' ? 'var(--fail)' : 'var(--warn)';}</script><div class="signoff"><h3>Reviewer sign-off</h3><div class="signoff-note">The AI agent proposed the verdicts above. As the responsible auditor, accept, reject, or send back for rework. Your decision downloads a signed JSON manifest — attach that to your workpaper file as the human-in-the-loop record.</div><div class="fields" style="margin-bottom: 24px;"><div class="field"><label for="rev-name">Reviewer name (required)</label><input id="rev-name" type="text" placeholder="e.g. Priya Nadkarni, Director of Finance Systems"></div><div class="field"><label for="rev-date">Sign-off date</label><input id="rev-date" type="date"></div><div class="field wide"><label for="rev-notes">Rationale / conditions / follow-up</label><textarea id="rev-notes" placeholder="Optional: reasons for the decision, any conditions on acceptance, follow-up required..."></textarea></div></div><div class="decision-row"><button type="button" class="decision-btn accept" onclick="signoffManifest('ACCEPT')">&check; Accept AI conclusion</button><button type="button" class="decision-btn rework" onclick="signoffManifest('REWORK')">&#9998; Send back for rework</button><button type="button" class="decision-btn reject" onclick="signoffManifest('REJECT')">&times; Reject conclusion</button></div><div id="signoff-status" style="margin-top: 16px; font-size: 13px; color: var(--muted);"></div></div><div class="footer">Generated by <code>bead-agent report</code> &middot; self-contained, no external assets &middot; themed after <a href="https://usebead.ai">usebead.ai</a></div></div></body></html>

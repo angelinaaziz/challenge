@@ -148,5 +148,6 @@ def _print_scoreboard(scores: dict[str, dict], control_dir: Path) -> None:
             CONSOLE.print(f"\n[bold]{k} mismatches:[/]")
             for lab, got in v["mismatches"]:
                 CONSOLE.print(
-                    f"  • {lab.sample_id} / {lab.attribute_id}: expected [green]{lab.verdict.value}[/], got [red]{got}[/]"
+                    f"  • {lab.sample_id} / {lab.attribute_text[:60]}: "
+                    f"expected [green]{lab.verdict.value}[/], got [red]{got}[/]"
                 )

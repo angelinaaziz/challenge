@@ -50,8 +50,8 @@ body {
 
 /* --- Header --- */
 header.hero {
-  padding-bottom: 40px;
-  margin-bottom: 56px;
+  padding-bottom: 32px;
+  margin-bottom: 40px;
   border-bottom: 1px solid var(--border);
 }
 header.hero .eyebrow {
@@ -60,7 +60,7 @@ header.hero .eyebrow {
   letter-spacing: 0.20em;
   text-transform: uppercase;
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -74,18 +74,60 @@ header.hero .eyebrow::before {
 }
 header.hero h1 {
   margin: 0;
-  font-size: 44px;
+  font-size: 32px;
   font-weight: 500;
-  letter-spacing: -0.028em;
+  letter-spacing: -0.02em;
   color: var(--ink);
-  line-height: 1.15;
+  line-height: 1.2;
 }
 header.hero .meta {
   color: var(--muted);
   font-size: 13px;
-  margin-top: 12px;
+  margin-top: 8px;
 }
 header.hero .meta strong { color: var(--ink); font-weight: 500; }
+
+/* --- BLUF (bottom-line-up-front) verdict banner --- */
+.bluf {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 32px;
+  align-items: center;
+  padding: 40px;
+  border-radius: 12px;
+  margin-bottom: 48px;
+  border: 1px solid;
+}
+.bluf.pass { background: var(--pass-soft); border-color: var(--pass-border); }
+.bluf.fail { background: var(--fail-soft); border-color: var(--fail-border); }
+.bluf.warn { background: var(--warn-soft); border-color: var(--warn-border); }
+.bluf .verdict-icon-lg {
+  width: 84px; height: 84px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; font-weight: 700;
+  border: 3px solid;
+}
+.bluf.pass .verdict-icon-lg { color: var(--pass); border-color: var(--pass); background: white; }
+.bluf.fail .verdict-icon-lg { color: var(--fail); border-color: var(--fail); background: white; }
+.bluf.warn .verdict-icon-lg { color: var(--warn); border-color: var(--warn); background: white; }
+.bluf .verdict-body {}
+.bluf .verdict-label {
+  font-size: 12px; letter-spacing: 0.20em;
+  text-transform: uppercase; font-weight: 700;
+  margin-bottom: 8px;
+}
+.bluf.pass .verdict-label { color: var(--pass); }
+.bluf.fail .verdict-label { color: var(--fail); }
+.bluf.warn .verdict-label { color: var(--warn); }
+.bluf .verdict-headline {
+  font-size: 28px; font-weight: 500;
+  color: var(--ink); letter-spacing: -0.02em;
+  line-height: 1.25; margin: 0;
+}
+.bluf .verdict-context {
+  color: var(--muted); font-size: 13px; margin-top: 12px;
+}
 
 /* --- Badges --- */
 .badge {
@@ -152,6 +194,56 @@ header.hero .meta strong { color: var(--ink); font-weight: 500; }
   font-weight: 600;
   margin: 40px 0 16px;
 }
+
+/* --- Executive summary --- */
+.exec-summary {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--ink);
+  padding: 20px 0 4px;
+  border-left: 3px solid var(--accent);
+  padding-left: 20px;
+  margin-bottom: 4px;
+}
+
+/* --- Findings --- */
+ul.findings { list-style: none; padding: 0; margin: 0 0 8px; }
+ul.findings li.finding {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: start;
+}
+ul.findings li.finding:last-child { border-bottom: none; }
+ul.findings .finding-icon {
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+}
+ul.findings li.pass .finding-icon { color: var(--pass); }
+ul.findings li.warn .finding-icon { color: var(--warn); }
+ul.findings li.fail .finding-icon { color: var(--fail); }
+ul.findings .finding-text {
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+ul.findings li.fail .finding-text { color: var(--ink); font-weight: 500; }
+
+/* --- Recommended actions --- */
+ol.actions {
+  padding-left: 20px;
+  margin: 0 0 24px;
+  color: var(--ink-2);
+}
+ol.actions li {
+  padding: 8px 0;
+  font-size: 14px;
+  line-height: 1.55;
+}
+ol.actions li::marker { color: var(--accent); font-weight: 600; }
 
 /* --- Reperformance callout --- */
 .reperformance {
@@ -330,9 +422,127 @@ details.attribute .body .quote {
 .trace-table td.num  { text-align: right; color: var(--ink-2); }
 .trace-table td.cost { color: var(--accent); text-align: right; font-weight: 500; }
 
+/* --- Evidence inventory --- */
+.inventory {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--card);
+  margin-bottom: 20px;
+}
+.inventory-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 20px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+.inventory-row:last-child { border-bottom: none; }
+.inventory-row .kind-pill {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-family: ui-monospace, Menlo, monospace;
+}
+.inventory-row .file-body { min-width: 0; }
+.inventory-row .file-name {
+  color: var(--ink); font-weight: 500; font-size: 14px;
+  font-family: ui-monospace, Menlo, monospace;
+  margin-bottom: 4px;
+  word-break: break-all;
+}
+.inventory-row .file-summary { color: var(--muted); font-size: 12px; line-height: 1.5; }
+.inventory-row .cited-pill {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.inventory-row .cited-pill.cited {
+  color: var(--pass); background: var(--pass-soft); border: 1px solid var(--pass-border);
+}
+.inventory-row .cited-pill.uncited {
+  color: var(--warn); background: var(--warn-soft); border: 1px solid var(--warn-border);
+}
+
+/* --- Sign-off --- */
+.signoff {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 32px;
+  margin-top: 48px;
+}
+.signoff h3 {
+  margin: 0 0 8px 0;
+  font-size: 20px; font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+.signoff .signoff-note {
+  color: var(--muted); font-size: 13px; margin-bottom: 24px;
+  line-height: 1.55;
+}
+.signoff .decision-row {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.signoff .decision-btn {
+  padding: 12px 20px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font-size: 13px; font-weight: 500;
+  color: var(--muted); background: var(--paper);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  display: flex; align-items: center; gap: 8px;
+}
+.signoff .decision-btn:hover { border-color: var(--border-strong); color: var(--ink); }
+.signoff .decision-btn.accept:hover { border-color: var(--pass); color: var(--pass); background: var(--pass-soft); }
+.signoff .decision-btn.reject:hover { border-color: var(--fail); color: var(--fail); background: var(--fail-soft); }
+.signoff .decision-btn.rework:hover { border-color: var(--warn); color: var(--warn); background: var(--warn-soft); }
+.signoff .fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+}
+.signoff .field label {
+  display: block;
+  font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; font-weight: 600;
+  color: var(--muted); margin-bottom: 8px;
+}
+.signoff .field input,
+.signoff .field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: inherit;
+}
+.signoff .field input:focus,
+.signoff .field textarea:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.signoff .field.wide { grid-column: 1 / -1; }
+.signoff .field textarea { min-height: 80px; resize: vertical; }
+
 /* --- Footer --- */
 .footer {
-  margin-top: 72px;
+  margin-top: 60px;
   padding-top: 28px;
   border-top: 1px solid var(--border);
   color: var(--muted-2);
@@ -353,4 +563,4 @@ details.attribute .body .quote {
   details.attribute[open] > summary { background: none; }
   details.attribute .body { display: block !important; }
 }
-</style></head><body><div class="container"><header class="hero"><div class="eyebrow">Bead audit workpaper</div><h1 class="display">User Access Review</h1><div class="meta">Model claude:claude-opus-4-7 &nbsp;·&nbsp; 1 sample</div><div style="margin-top:16px;"><span class="badge warn"><span class="dot"></span>CONTROL INCONCLUSIVE</span></div></header><section class="sample-card"><div class="sample-header"><div><div class="sample-label">Sample</div><h2>sample-1</h2></div><div class="badge warn" style="margin-top:0;"><span class="dot"></span>CONTROL INCONCLUSIVE</div></div><div class="sample-meta"><span><strong>claude:claude-opus-4-7</strong></span><span>generated 03 Jul 2026, 02:55 UTC</span></div><div class="section-title">Reperformance</div><div class="reperformance"><div class="reperformance-label">Deterministic re-check · ground truth</div>System export: 334 rows | HRIS roster: 720 rows | Reviewer sheet: 334 rows | Matched to HRIS: 332 | Orphans (no HRIS record): 2 | Terminated but active in system: 2 | On leave but active in system: 8 | Reviewer missed (terminated + retained): 1</div><div class="coverage"><div><div class="label">Evidence coverage</div><div class="value">50%</div></div><div><div class="label">Files cited</div><div class="value">1 of 2</div></div><div class="uncited"><div class="label">Uncited</div><div class="value">hris-employee-export.xlsx</div></div></div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Access reviews are performed on a periodic basis (e.g. quarterly)</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>0.90</strong><br>4 citations</div></summary><div class="body"><h4>Rationale</h4><p>The evidence shows a Q2 2026 quarterly UAR was performed for NetSuite (Production), completed 2026-06-30, covering the complete population of 334 accounts from the system export (332 in-scope human users + 2 service accounts flagged out of scope). The Cover sheet explicitly identifies the review as &quot;Periodic (Quarterly) User Access Review&quot; for Q2 2026 with review completion date documented. The reviewer sheet contains 334 rows matching the system export 1:1, and all Review Dates are 2026-06-30, evidencing completeness of population coverage at the time of review. Note: this attribute assesses cadence/timeliness/completeness only; separate attributes cover reviewer independence, accuracy, and remediation of findings.</p><h4>Evidence</h4><ul><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover sheet (Review Period / Review Type / Review Completed)</span></div><div class="obs">Review Period: Q2 2026; Review Type: Periodic (Quarterly) User Access Review; Review Completed: 2026-06-30; Scope: All human user accounts with access to NetSuite Production.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">System Access Export sheet (row count)</span></div><div class="obs">334 rows in the NetSuite user/roles export (dated 26 Jun 2026 per Cover).</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Access Review sheet (row count, Review Date column)</span></div><div class="obs">334 review rows, each with Review Date 2026-06-30 — full population covered at review time.</div></li><li><div><span class="file">reperformance</span> @ <span class="loc">unique_review_dates and reviewer_sheet_rows</span></div><div class="obs">Deterministic reperformance confirms reviewer_sheet_rows=334 matches system_export_rows=334; unique_review_dates = [&#x27;2026-06-30&#x27;].</div></li></ul><h4>Exceptions considered</h4><ul><li>Only one review period is in evidence, so gap-between-consecutive-reviews cannot be directly verified; however the Q2 2026 review being labelled &#x27;Periodic (Quarterly)&#x27; and completed within Q2 2026 is consistent with a quarterly cadence for this sample.</li></ul></div></details><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Access is reviewed and approved by an appropriate system or data owner</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>0.90</strong><br>5 citations</div></summary><div class="body"><h4>Rationale</h4><p>The Cover sheet identifies the reviewer/approver by name and role as &quot;Priya Nadkarni, Director, Finance Systems (System Owner)&quot;, and the Access Review sheet consistently shows Priya Nadkarni as the &quot;Reviewed By&quot; party across the sampled rows. The Cover records explicit sign-off (&quot;Approved electronically by Priya Nadkarni on 2026-06-30&quot;). Priya is not present in the list of reviewed users, so there is no self-review. All four criteria are satisfied.</p><h4>Evidence</h4><ul><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover!Reviewer / Approver</span></div><div class="obs">Reviewer/Approver identified as &#x27;Priya Nadkarni, Director, Finance Systems (System Owner)&#x27;.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover!Reviewer Sign-off</span></div><div class="obs">&#x27;Approved electronically by Priya Nadkarni on 2026-06-30.&#x27; — explicit sign-off retained.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Access Review!G2:G6 (Reviewed By)</span></div><div class="obs">Every sampled row shows &#x27;Priya Nadkarni&#x27; as the Reviewed By party with Review Date 2026-06-30.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Access Review sheet — user list</span></div><div class="obs">Priya Nadkarni does not appear in the reviewed user population, so there is no self-approval.</div></li><li><div><span class="file">reperformance</span> @ <span class="loc">reviewer_names</span></div><div class="obs">Deterministic reperformance confirms single reviewer: [&#x27;Priya Nadkarni&#x27;].</div></li></ul><h4>Exceptions considered</h4><ul><li>Considered whether the reviewer might also be a user in the reviewed population (self-approval risk) — Priya Nadkarni does not appear among the 334 accounts reviewed, so this exception does not apply.</li></ul></div></details><details class="attribute" data-verdict="FURTHER_EVIDENCE_REQUIRED"><summary><div class="verdict-icon">?</div><div class="attr-title"><div>Inappropriate or excessive access identified during the review is remediated in a timely manner</div><div class="verdict-text">FURTHER EVIDENCE REQUIRED</div></div><div class="attr-meta">Confidence <strong>0.80</strong><br>4 citations</div></summary><div class="body"><h4>Rationale</h4><p>The reviewer flagged one account for revocation (Danielle Goodwin) and the summary states remediation was tracked via ITSM ticket ITSM-48217 with a 5 business day SLA, which addresses tracking. However, no evidence has been provided showing the ticket was actually closed and access revoked in NetSuite (e.g., ticket closure record, updated system export, or deprovisioning screenshot), so criteria 2 (evidence access was actually revoked) and 3 (remediation within SLA) cannot be confirmed. Additionally, the reperformance identified a second terminated-but-active account (Kevin Lewis) that the reviewer decided to &quot;retain&quot; with no documented justification — this is a reviewer-missed finding rather than a remediation-attribute failure, but it does mean at least one flagged/should-have-been-flagged item lacks either a remediation trail or a documented risk acceptance. Evidence that would flip to SUCCESS: closure record of ITSM-48217 and an updated NetSuite export showing danielle.goodwin&#x27;s account inactive/removed within the 5-business-day SLA.</p><h4>Evidence</h4><ul><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover!Observation 1 / Conclusion</span></div><div class="obs">States Danielle Goodwin&#x27;s access flagged for immediate revocation; deprovisioning ticket ITSM-48217 raised and assigned to IT with 5 business day SLA. Conclusion says &#x27;1 observation raised and remediated via ITSM-48217&#x27; but no ticket closure evidence attached.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">System Access Export!C90 (danielle.goodwin row)</span></div><div class="obs">System export dated 26 Jun 2026 shows danielle.goodwin account status = Active. No later export provided to confirm the account was subsequently deactivated.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Access Review!E187 (kevin.lewis row)</span></div><div class="obs">Kevin Lewis (HRIS terminated) marked Reviewer Decision = Retain with no documented risk acceptance or justification — reperformer flagged as a missed finding; no remediation tracked because reviewer did not flag it.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover!&#x27;Accounts Flagged for Revocation&#x27; and &#x27;Observations raised&#x27;</span></div><div class="obs">Both = 1, confirming only one flagged item was tracked for remediation.</div></li></ul><h4>Exceptions considered</h4><ul><li>Inactive-but-retained accounts (12 rows): these accounts were already inactive in the system, so no remediation action is required — reviewer&#x27;s &#x27;retain&#x27; decision is acceptable and does not affect this attribute.</li><li>On-leave-but-active accounts (8 rows): reviewer explicitly retained; policy-dependent and not treated as flagged access requiring remediation.</li><li>Service accounts (2 orphans): marked out of scope on the Cover sheet, not requiring remediation under this review.</li></ul></div></details></section><section class="trace-section"><h2>LLM call trace <span style='color:var(--muted); font-size: 13px; font-weight: 400;'>· 3 calls · $1.3715</span></h2><table class="trace-table"><thead><tr><th>#</th><th>Purpose</th><th>In</th><th>Cache</th><th>Out</th><th>$</th><th>Latency</th></tr></thead><tbody><tr><td>1</td><td>judge:periodic-access-reviews:sample-1</td><td class="num">26,349</td><td class="num">0</td><td class="num">1,036</td><td class="cost">$0.4828</td><td class="num">14381ms</td></tr><tr><td>2</td><td>judge:reviewed-and-approved-by-appropriate-owner:sample-1</td><td class="num">26,364</td><td class="num">2,638</td><td class="num">930</td><td class="cost">$0.4296</td><td class="num">13020ms</td></tr><tr><td>3</td><td>judge:timely-remediation-of-inappropriate-access:sample-1</td><td class="num">26,372</td><td class="num">2,638</td><td class="num">1,321</td><td class="cost">$0.4590</td><td class="num">20467ms</td></tr></tbody></table></section><div class="footer">Generated by <code>bead-agent report</code> · self-contained, no external assets.</div></div></body></html>
+</style></head><body><div class="container"><header class="hero"><div class="eyebrow">Bead audit workpaper</div><h1 class="display">User Access Review</h1><div class="meta">Tested by <strong>claude:claude-opus-4-7</strong> across <strong>1</strong> sample</div></header><div class="bluf warn"><div class="verdict-icon-lg">?</div><div class="verdict-body"><div class="verdict-label">Cannot sign off yet</div><h2 class="verdict-headline">1 attribute need supplementary evidence before this control can be concluded.</h2><div class="verdict-context">See action list per sample below.</div></div></div><section class="sample-card"><div class="sample-header"><div><div class="sample-label">Sample</div><h2>sample-1</h2></div><div class="badge warn" style="margin-top:0;"><span class="dot"></span>CONTROL INCONCLUSIVE</div></div><div class="sample-meta"><span><strong>claude:claude-opus-4-7</strong></span><span>generated 03 Jul 2026, 03:08 UTC</span></div><div class="section-title">Executive summary</div><div class="exec-summary">The control cannot be signed off from this evidence bundle. 1 attribute(s) need further evidence, 2 passed, and none positively failed. Request the missing evidence and re-audit. Deterministic reperformance surfaced 1 finding(s) the reviewer missed — see the reperformance summary.</div><div class="section-title">Key findings</div><ul class="findings"><li class="finding warn"><span class="finding-icon">▲</span><span class="finding-text">Insufficient evidence: Inappropriate or excessive access identified during the review is remediated in a timely manner</span></li><li class="finding pass"><span class="finding-icon">●</span><span class="finding-text">Access reviews are performed on a periodic basis (e.g. quarterly)</span></li><li class="finding pass"><span class="finding-icon">●</span><span class="finding-text">Access is reviewed and approved by an appropriate system or data owner</span></li><li class="finding fail"><span class="finding-icon">■</span><span class="finding-text">Reviewer missed: Kevin Lewis (kevin.lewis@northpeakfinancial.com) — HRIS shows this employee is terminated, but their system account is still Active. Access should have been revoked.</span></li><li class="finding warn"><span class="finding-icon">▲</span><span class="finding-text">No HRIS record: Service Account - Bank Reconciliation (svc-bank-recon@northpeakfinancial.com) — User exists in system access export but has no matching record in the HRIS roster — service account or leaver missed by HR export.</span></li><li class="finding warn"><span class="finding-icon">▲</span><span class="finding-text">No HRIS record: Service Account - Boomi Integration (svc-netsuite-integration@northpeakfinancial.com) — User exists in system access export but has no matching record in the HRIS roster — service account or leaver missed by HR export.</span></li><li class="finding warn"><span class="finding-icon">▲</span><span class="finding-text">Evidence file(s) were provided but not cited by any verdict: hris-employee-export.xlsx. Confirm relevance or extraction gap.</span></li></ul><div class="section-title">What to do next</div><ol class="actions"><li>Provide additional evidence to close “Inappropriate or excessive access identified during the review is remediated in a timely manner”. Specifically: The reviewer flagged one account (Danielle Goodwin) for revocation and the summary records remediation via ITSM ticket ITSM-48217 assigned to IT with a 5-business-day SLA.</li><li>Revoke Kevin Lewis&#x27;s access (kevin.lewis@northpeakfinancial.com) and update the review process to catch terminated employees still marked Retain.</li></ol><div class="section-title">Reperformance</div><div class="reperformance"><div class="reperformance-label">Deterministic re-check · ground truth</div>System export: 334 rows | HRIS roster: 720 rows | Reviewer sheet: 334 rows | Matched to HRIS: 332 | Orphans (no HRIS record): 2 | Terminated but active in system: 2 | On leave but active in system: 8 | Reviewer missed (terminated + retained): 1</div><div class="coverage"><div><div class="label">Evidence coverage</div><div class="value">50%</div></div><div><div class="label">Files cited</div><div class="value">1 of 2</div></div><div class="uncited"><div class="label">Uncited</div><div class="value">hris-employee-export.xlsx</div></div></div><div class="section-title">Attribute verdicts</div><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Access reviews are performed on a periodic basis (e.g. quarterly)</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>0.90</strong><br>3 citations</div></summary><div class="body"><h4>Rationale</h4><p>The evidence file uar-netsuite-q2-2026.xlsx documents a Q2 2026 Periodic (Quarterly) User Access Review for NetSuite (Production), completed on 2026-06-30 (within Q2 2026). All 334 rows on the Access Review sheet share a single review date of 2026-06-30, and the Cover sheet explicitly identifies the cadence (&quot;Periodic (Quarterly) User Access Review&quot;) and completion date. This attribute concerns cadence and completion timing only; substantive issues (e.g., missed terminated user) are scoped to other attributes. Only limitation is that a single quarter&#x27;s evidence is provided, so full-period cadence adherence across all quarters cannot be independently confirmed from this sample alone.</p><h4>Evidence</h4><ul><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover!Review Period / Review Type / Review Completed</span></div><div class="obs">Cover metadata states Review Period = &#x27;Q2 2026&#x27;, Review Type = &#x27;Periodic (Quarterly) User Access Review&#x27;, Review Completed = &#x27;2026-06-30&#x27;, with Reviewer Sign-off &#x27;Approved electronically by Priya Nadkarni on 2026-06-30.&#x27;</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Access Review!H2:H335 (Review Date column)</span></div><div class="obs">All 334 reviewer rows carry Review Date = 2026-06-30, evidencing a completed review within Q2 2026.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Deterministic reperformance: unique_review_dates</span></div><div class="obs">Reperformance confirms exactly one unique review date (2026-06-30) across the population, consistent with a single quarterly cycle.</div></li></ul><h4>Exceptions considered</h4><ul><li>Only one quarter (Q2 2026) of evidence was provided in this sample; verdict is on the observed cycle. If the audit period spans multiple quarters, additional quarters&#x27; UAR packs would be needed to fully confirm no skipped cycles.</li></ul></div></details><details class="attribute" data-verdict="SUCCESS"><summary><div class="verdict-icon">✓</div><div class="attr-title"><div>Access is reviewed and approved by an appropriate system or data owner</div><div class="verdict-text">SUCCESS</div></div><div class="attr-meta">Confidence <strong>0.90</strong><br>5 citations</div></summary><div class="body"><h4>Rationale</h4><p>The Cover sheet identifies Priya Nadkarni, Director, Finance Systems as the System Owner and Reviewer/Approver for NetSuite (Production), and the Access Review sheet consistently lists her as &quot;Reviewed By&quot; for all sampled rows on 2026-06-30. An electronic sign-off attestation is documented (&quot;Approved electronically by Priya Nadkarni on 2026-06-30&quot;). Priya is not present in the reviewed user population (she does not appear as a user in the NetSuite export), so she did not review her own access. The population reviewed (334 rows) reconciles to the system export (334 rows). Note: this attribute concerns reviewer appropriateness/independence/sign-off — the separate reconciliation finding (Kevin Lewis missed) belongs to a different attribute and is not held against this one.</p><h4>Evidence</h4><ul><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover!Reviewer / Approver</span></div><div class="obs">Reviewer / Approver identified as &#x27;Priya Nadkarni, Director, Finance Systems (System Owner)&#x27; for NetSuite (Production).</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover!Reviewer Sign-off</span></div><div class="obs">&#x27;Approved electronically by Priya Nadkarni on 2026-06-30.&#x27; — documented sign-off.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Access Review!G2:G6 (Reviewed By column, sampled rows)</span></div><div class="obs">All sampled rows show &#x27;Priya Nadkarni&#x27; as Reviewed By with Review Date 2026-06-30.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">System Access Export (full user list)</span></div><div class="obs">Priya Nadkarni does not appear as a user in the NetSuite access export — she did not review her own access.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Deterministic reperformance: reviewer_names, unique_review_dates</span></div><div class="obs">Single reviewer &#x27;Priya Nadkarni&#x27; and single review date &#x27;2026-06-30&#x27; across all 334 rows; reviewer_sheet_rows (334) equals system_export_rows (334).</div></li></ul><h4>Exceptions considered</h4><ul><li>Considered whether the reviewer might also be a user of the system (self-review) — she is not present in the system access export.</li><li>Considered whether reconciliation gaps (Kevin Lewis missed, service account orphans) undermine this attribute — they pertain to review completeness/effectiveness, a separate attribute, and do not affect reviewer appropriateness/independence/sign-off.</li></ul></div></details><details class="attribute" data-verdict="FURTHER_EVIDENCE_REQUIRED"><summary><div class="verdict-icon">?</div><div class="attr-title"><div>Inappropriate or excessive access identified during the review is remediated in a timely manner</div><div class="verdict-text">FURTHER EVIDENCE REQUIRED</div></div><div class="attr-meta">Confidence <strong>0.80</strong><br>5 citations</div></summary><div class="body"><h4>Rationale</h4><p>The reviewer flagged one account (Danielle Goodwin) for revocation and the summary records remediation via ITSM ticket ITSM-48217 assigned to IT with a 5-business-day SLA. However, no evidence has been provided showing (a) the ticket itself, (b) that the access was actually revoked, or (c) post-remediation confirmation that the account is now inactive in NetSuite. Additionally, the reperformance identified a second terminated-but-active account (Kevin Lewis) that the reviewer incorrectly retained — this is a reviewer-completeness issue, not strictly a remediation-timeliness issue, but it means only 1 of 2 real findings entered the remediation workflow. To reach SUCCESS, provide the ITSM-48217 ticket record with closure date and a post-remediation NetSuite screenshot showing Danielle Goodwin&#x27;s account is inactive/deleted.</p><h4>Evidence</h4><ul><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover!Observation 1</span></div><div class="obs">States Danielle Goodwin retains ACTIVE access despite HRIS termination effective 2021-12-03; access flagged for immediate revocation and deprovisioning ticket ITSM-48217 raised, assigned to IT Identity &amp; Access, due within 5 business days.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Cover!Conclusion</span></div><div class="obs">&#x27;Review complete. 1 observation raised and remediated via ITSM-48217.&#x27; — narrative claims remediation but no supporting ticket artefact provided.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Access Review!E90 (Danielle Goodwin row)</span></div><div class="obs">Reviewer Decision = &#x27;revoke&#x27; for danielle.goodwin@northpeakfinancial.com — the flagged item is documented with a remediation action in the review workbook.</div></li><li><div><span class="file">uar-netsuite-q2-2026.xlsx</span> @ <span class="loc">Access Review!E187 (Kevin Lewis row)</span></div><div class="obs">Reviewer Decision = &#x27;retain&#x27; for kevin.lewis@northpeakfinancial.com despite HRIS showing terminated — this account was not flagged for remediation, so no remediation was triggered.</div></li><li><div><span class="file">deterministic reperformance</span> @ <span class="loc">reviewer_missed_findings / terminated_but_active_in_system</span></div><div class="obs">Reperformance identifies 2 terminated-but-active accounts (Danielle Goodwin, Kevin Lewis); only Danielle Goodwin entered the remediation workflow.</div></li></ul><h4>Exceptions considered</h4><ul><li>Considered whether Kevin Lewis being missed by the reviewer belongs to a separate &#x27;reviewer completeness&#x27; attribute rather than this timeliness attribute — it primarily does, but it is noted because remediation cannot be timely for a finding that was never raised.</li><li>Considered whether the narrative statement &#x27;remediated via ITSM-48217&#x27; on the Cover sheet is sufficient evidence — rejected because there is no independent artefact (ticket export or post-remediation system screenshot) confirming the revocation actually occurred.</li></ul></div></details><div class="section-title">Evidence inventory · what was tested</div><div class="inventory"><div class="inventory-row"><div class="kind-pill">xlsx</div><div class="file-body"><div class="file-name">hris-employee-export.xlsx <span style="color:var(--muted-2); font-weight:400;">· 59.3 KB</span></div><div class="file-summary">Workbook · 2 sheet(s), 720 rows total. Sheets: Employees, Notes</div></div><div class="cited-pill uncited">Uncited</div></div><div class="inventory-row"><div class="kind-pill">xlsx</div><div class="file-body"><div class="file-name">uar-netsuite-q2-2026.xlsx <span style="color:var(--muted-2); font-weight:400;">· 41.4 KB</span></div><div class="file-summary">Workbook · 4 sheet(s), 668 rows total. Sheets: Cover, System Access Export, Access Review, Summary &amp; Observations</div></div><div class="cited-pill cited">Cited by 12 verdicts</div></div></div></section><section class="trace-section"><h2>Decision log <span style='color:var(--muted); font-size: 13px; font-weight: 400;'>· 3 LLM calls · $1.3384</span></h2><div class="trace-meta">Every judgment the agent made. Each row is one LLM call &mdash; the audit-trail record of how the verdict was reached.</div><table class="trace-table"><thead><tr><th>#</th><th>Purpose</th><th>In</th><th>Cache</th><th>Out</th><th>$</th><th>Latency</th></tr></thead><tbody><tr><td>1</td><td>judge:periodic-review-cadence:sample-1</td><td class="num">26,340</td><td class="num">2,638</td><td class="num">954</td><td class="cost">$0.4310</td><td class="num">14399ms</td></tr><tr><td>2</td><td>judge:reviewer-is-appropriate-owner:sample-1</td><td class="num">26,363</td><td class="num">2,638</td><td class="num">1,177</td><td class="cost">$0.4481</td><td class="num">15910ms</td></tr><tr><td>3</td><td>judge:timely-remediation-of-exceptions:sample-1</td><td class="num">26,361</td><td class="num">2,638</td><td class="num">1,326</td><td class="cost">$0.4593</td><td class="num">17344ms</td></tr></tbody></table></section><script>function signoffManifest(decision){const now = new Date().toISOString();const manifest = {  workpaper: "User Access Review",  model: "claude:claude-opus-4-7",  ai_conclusion: "CONTROL_INCONCLUSIVE",  reviewer_decision: decision,  reviewer_name: document.getElementById('rev-name').value || null,  reviewer_date: document.getElementById('rev-date').value || null,  reviewer_notes: document.getElementById('rev-notes').value || null,  signed_at: now,  report_url: window.location.href,};if (!manifest.reviewer_name) {  alert('Please enter your name before signing off.');  document.getElementById('rev-name').focus();  return;}if (!manifest.reviewer_date) {  manifest.reviewer_date = now.slice(0,10);}const blob = new Blob([JSON.stringify(manifest, null, 2)],   {type:'application/json'});const a = document.createElement('a');a.href = URL.createObjectURL(blob);a.download = 'signoff-' + decision.toLowerCase() + '-' + now.slice(0,10) + '.json';a.click();URL.revokeObjectURL(a.href);document.getElementById('signoff-status').innerHTML =   '<strong>' + decision + '</strong> recorded &middot; ' +   'manifest downloaded &middot; attach to workpaper file.';document.getElementById('signoff-status').style.color =   decision === 'ACCEPT' ? 'var(--pass)' :   decision === 'REJECT' ? 'var(--fail)' : 'var(--warn)';}</script><div class="signoff"><h3>Reviewer sign-off</h3><div class="signoff-note">The AI agent proposed the verdicts above. As the responsible auditor, accept, reject, or send back for rework. Your decision downloads a signed JSON manifest — attach that to your workpaper file as the human-in-the-loop record.</div><div class="fields" style="margin-bottom: 24px;"><div class="field"><label for="rev-name">Reviewer name (required)</label><input id="rev-name" type="text" placeholder="e.g. Priya Nadkarni, Director of Finance Systems"></div><div class="field"><label for="rev-date">Sign-off date</label><input id="rev-date" type="date"></div><div class="field wide"><label for="rev-notes">Rationale / conditions / follow-up</label><textarea id="rev-notes" placeholder="Optional: reasons for the decision, any conditions on acceptance, follow-up required..."></textarea></div></div><div class="decision-row"><button type="button" class="decision-btn accept" onclick="signoffManifest('ACCEPT')">&check; Accept AI conclusion</button><button type="button" class="decision-btn rework" onclick="signoffManifest('REWORK')">&#9998; Send back for rework</button><button type="button" class="decision-btn reject" onclick="signoffManifest('REJECT')">&times; Reject conclusion</button></div><div id="signoff-status" style="margin-top: 16px; font-size: 13px; color: var(--muted);"></div></div><div class="footer">Generated by <code>bead-agent report</code> &middot; self-contained, no external assets &middot; themed after <a href="https://usebead.ai">usebead.ai</a></div></div></body></html>

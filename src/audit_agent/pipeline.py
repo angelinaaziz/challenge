@@ -24,9 +24,11 @@ from audit_agent.judge import judge_attribute, verify_attribute
 from audit_agent.llm import LLMProvider
 from audit_agent.schemas import (
     AttributeAssessment,
+    AuditFinding,
     Control,
     ControlConclusion,
     EvidenceCoverage,
+    EvidenceItem,
     SampleAssessment,
     ScreenshotFacts,
     TextEvidence,
@@ -177,7 +179,13 @@ def _process_sample(
 
     conclusion = rollup_verdicts([a.verdict for a in attributes])
     coverage = _compute_evidence_coverage(bundle, attributes)
+    inventory = _build_evidence_inventory(
+        bundle, attributes, screenshots, xlsx_facts, text_evidence
+    )
     disagreement = (sum(disagreements) / len(disagreements)) if disagreements else None
+    execsum, findings, actions = _build_audit_narrative(
+        conclusion, attributes, coverage, reconciliation
+    )
 
     return SampleAssessment(
         control=control.name,
@@ -186,7 +194,11 @@ def _process_sample(
         model=f"{cfg.provider.name}:{cfg.provider.model}",
         attributes=attributes,
         control_conclusion=conclusion,
+        executive_summary=execsum,
+        key_findings=findings,
+        recommended_actions=actions,
         evidence_coverage=coverage,
+        evidence_inventory=inventory,
         consistency_disagreement_rate=disagreement,
         reperformance_notes=(
             None
@@ -194,6 +206,205 @@ def _process_sample(
             else _summary_from_reconciliation(reconciliation)
         ),
     )
+
+
+def _build_audit_narrative(
+    conclusion: ControlConclusion,
+    attributes: list[AttributeAssessment],
+    coverage: EvidenceCoverage,
+    reconciliation: Optional[dict],
+) -> tuple[str, list[AuditFinding], list[str]]:
+    """Turn structured verdicts into an auditor-friendly narrative.
+
+    Answers the four questions Angelina flagged as must-haves:
+    - Why did it succeed or fail? → executive_summary
+    - What did we find? → key_findings
+    - What can I do now? → recommended_actions
+    - What was actually tested? → coverage (elsewhere) + inventory (elsewhere)
+
+    Everything here is DETERMINISTIC — derived from the schema, not another LLM
+    call. That means it's cheap, reproducible, and the auditor can trust the
+    story matches the verdicts exactly.
+    """
+    fails = [a for a in attributes if a.verdict == Verdict.FAIL]
+    hedged = [a for a in attributes if a.verdict == Verdict.FURTHER_EVIDENCE_REQUIRED]
+    passes = [a for a in attributes if a.verdict == Verdict.SUCCESS]
+
+    # -- Executive summary --------------------------------------------------
+    if conclusion == ControlConclusion.CONTROL_PASS:
+        summary = (
+            f"The control passed. All {len(passes)} attribute(s) tested cleanly with "
+            f"citation-backed evidence. No follow-up findings raised."
+        )
+    elif conclusion == ControlConclusion.CONTROL_FAIL:
+        summary = (
+            f"The control failed. {len(fails)} of {len(attributes)} attribute(s) were "
+            f"positively contradicted by the evidence. "
+            f"{f'{len(hedged)} attribute(s) also require additional evidence to close. ' if hedged else ''}"
+            f"The auditee has open remediation to complete before this control can be signed off."
+        )
+    else:  # INCONCLUSIVE
+        summary = (
+            f"The control cannot be signed off from this evidence bundle. "
+            f"{len(hedged)} attribute(s) need further evidence, "
+            f"{len(passes)} passed, and none positively failed. "
+            f"Request the missing evidence and re-audit."
+        )
+
+    if reconciliation:
+        missed = reconciliation.get("reviewer_missed_findings_count", 0) or 0
+        terminated = reconciliation.get("terminated_but_active_in_system_count", 0) or 0
+        if missed:
+            summary += (
+                f" Deterministic reperformance surfaced {missed} finding(s) the reviewer "
+                f"missed — see the reperformance summary."
+            )
+        elif terminated:
+            summary += (
+                f" Deterministic reperformance flagged {terminated} account(s) requiring "
+                f"consideration — reviewer decisions checked."
+            )
+
+    # -- Key findings --------------------------------------------------------
+    findings: list[AuditFinding] = []
+    for a in fails:
+        findings.append(AuditFinding(severity="fail", text=f"{a.attribute_text}"))
+    for a in hedged:
+        findings.append(
+            AuditFinding(severity="warn", text=f"Insufficient evidence: {a.attribute_text}")
+        )
+    for a in passes:
+        findings.append(AuditFinding(severity="pass", text=a.attribute_text))
+
+    if reconciliation:
+        missed = reconciliation.get("reviewer_missed_findings", [])
+        for m in missed[:3]:  # cap for signal density
+            findings.append(
+                AuditFinding(
+                    severity="fail",
+                    text=f"Reviewer missed: {m['name']} ({m['email']}) — {m['detail']}",
+                )
+            )
+        orphans = reconciliation.get("orphans_no_hris_record", [])
+        for o in orphans[:3]:
+            findings.append(
+                AuditFinding(
+                    severity="warn",
+                    text=f"No HRIS record: {o['name']} ({o['email']}) — {o['detail']}",
+                )
+            )
+
+    # -- Uncited-evidence signal ---------------------------------------------
+    if coverage and coverage.uncited_files:
+        findings.append(
+            AuditFinding(
+                severity="warn",
+                text=(
+                    f"Evidence file(s) were provided but not cited by any verdict: "
+                    f"{', '.join(coverage.uncited_files)}. Confirm relevance or extraction gap."
+                ),
+            )
+        )
+
+    # -- Recommended actions -------------------------------------------------
+    actions: list[str] = []
+    for a in fails:
+        actions.append(
+            f"Remediate the root cause of the FAIL on “{a.attribute_text}”, "
+            f"then re-submit for testing. Rationale: {a.rationale.split('.')[0]}."
+        )
+    for a in hedged:
+        actions.append(
+            f"Provide additional evidence to close “{a.attribute_text}”. "
+            f"Specifically: {a.rationale.split('.')[0]}."
+        )
+    if reconciliation:
+        missed = reconciliation.get("reviewer_missed_findings", [])
+        for m in missed[:3]:
+            actions.append(
+                f"Revoke {m['name']}'s access ({m['email']}) and update the review "
+                f"process to catch terminated employees still marked Retain."
+            )
+    if not actions:
+        actions.append(
+            "No open actions from this run — retain evidence + workpaper for the audit file."
+        )
+
+    return summary, findings, actions
+
+
+def _build_evidence_inventory(
+    bundle: EvidenceBundle,
+    attributes: list[AttributeAssessment],
+    screenshots: list[ScreenshotFacts],
+    xlsx_facts: list[XlsxFacts],
+    text_evidence: list[TextEvidence],
+) -> list[EvidenceItem]:
+    """One entry per file the pipeline ingested — with what got extracted
+    and which attribute verdicts cite it."""
+    ss_by_name = {s.file: s for s in screenshots}
+    xl_by_name = {x.file: x for x in xlsx_facts}
+    tx_by_name = {t.file: t for t in text_evidence}
+    # Map filename → list of attribute IDs that cite it (tolerant match).
+    citation_map: dict[str, list[str]] = {}
+    for a in attributes:
+        for ref in a.evidence_refs:
+            citation_map.setdefault(ref.file.strip(), []).append(a.attribute_id)
+
+    def _cited_by(name: str) -> list[str]:
+        # Case-insensitive/whitespace-tolerant lookup.
+        for k, v in citation_map.items():
+            if k.strip().lower() == name.strip().lower():
+                return v
+        return []
+
+    items: list[EvidenceItem] = []
+    for ef in bundle.files:
+        name = Path(ef.path).name
+        summary: str
+        if ef.kind == "screenshot":
+            sf = ss_by_name.get(name)
+            if sf is not None:
+                summary = f"{sf.inferred_type} · {len(sf.key_facts)} facts extracted"
+                if sf.people_mentioned:
+                    summary += f" · {len(sf.people_mentioned)} people"
+                if sf.ambiguities:
+                    summary += f" · {len(sf.ambiguities)} ambiguity flag(s)"
+            else:
+                summary = "Screenshot detected but extraction did not produce facts."
+        elif ef.kind == "xlsx":
+            xf = xl_by_name.get(name)
+            if xf is not None:
+                total_rows = sum(s.row_count for s in xf.sheets)
+                summary = (
+                    f"Workbook · {len(xf.sheets)} sheet(s), {total_rows} rows total. "
+                    f"Sheets: {', '.join(s.name for s in xf.sheets[:5])}"
+                    + ("…" if len(xf.sheets) > 5 else "")
+                )
+            else:
+                summary = "Workbook detected but no sheet summaries produced."
+        elif ef.kind in ("markdown", "text"):
+            tx = tx_by_name.get(name)
+            if tx is not None:
+                word_count = len(tx.content.split())
+                summary = f"Text · {word_count:,} words, inlined verbatim into the judge prompt"
+            else:
+                summary = "Text detected but was not inlined (empty file?)"
+        elif ef.kind == "pdf":
+            summary = "PDF detected · extractor not yet wired (see limitations)"
+        else:
+            summary = f"File type `{ef.kind}` — not a supported extraction path"
+
+        items.append(
+            EvidenceItem(
+                file=name,
+                kind=ef.kind,
+                bytes_size=ef.bytes_size,
+                extraction_summary=summary,
+                cited_by_attributes=_cited_by(name),
+            )
+        )
+    return items
 
 
 def _compute_evidence_coverage(

@@ -12,27 +12,41 @@ I hand-labelled 15 correct answers across three controls (Bead's two + one I inv
 
 | Model | Independent Code Review | User Access Review | Change Management | **Overall** |
 | --- | :-: | :-: | :-: | :-: |
-| **Claude Opus 4.7** | **6/6 (100%)** | **3/3 (100%)** | 4/6 (67%) | **13/15 · 87%** ✅ |
-| GPT-5.4 | 4/6 (67%) | 3/3 (100%) | 3/6 (50%) | 10/15 · 67% |
+| **Claude Opus 4.7** | 5/6 (83%) | 2/3 (67%) | **6/6 (100%)** | **13/15 · 87%** ✅ |
+| GPT-5.4 | 4/6 (67%) | **3/3 (100%)** | 3/6 (50%) | 10/15 · 67% |
 | Gemini 3.1 Pro Preview | 5/6 (83%) | 1/3 (33%) | 4/6 (67%) | 10/15 · 67% |
 
-Claude gets Bead's two controls perfectly. All three models tie or struggle on my synthetic third control — those attributes are genuinely ambiguous, and reasonable auditors would disagree too.
+**Claude leads overall.** All three models tested single-run — the numbers you see are what the pipeline produces out of the box, not a cherry-picked best-of-many. Claude's two misses are both defensible hedges: it went `FURTHER_EVIDENCE_REQUIRED` on the ICR testing attribute (my golden says SUCCESS because the exception clause applies to test-only PRs) and on the UAR remediation attribute (my golden says FAIL because Kevin Lewis went un-remediated; Claude read the attribute strictly — "identified *during the review*" — and hedged where the golden takes the wider "reperformance found it, so it counts" read). Reasonable auditors could disagree on either.
 
-**One tweak to the prompt lifted Claude from 80% → 87%.** No code change. That's why the prompts live as files you can diff in review.
+GPT-5.4 wins UAR outright — 3/3 including the correct `FAIL` on remediation (0.95 confidence). Gemini and GPT both lose ICR testing on strictness (called `FAIL` where the exception clause meant `SUCCESS`). All three struggle on my synthetic Change Management control where the attributes are genuinely ambiguous.
+
+**Available lift not used for this scoreboard:** `--consistency 3` runs the judge 3× per attribute and takes majority. Because Anthropic prompt caching kicks in after the first call, it costs ~1.2× not 3×. On single-run flake it reliably lifts accuracy but I published the single-run figures so the scoreboard is honest about what happens out of the box.
 
 ---
 
 ## What you get out
 
-Three outputs per run — from raw JSON for machines to a Bead-themed HTML workpaper you can send to a reviewer.
+Three outputs per run — from raw JSON for machines to a Bead-themed HTML workpaper you can hand to a SOX reviewer.
 
 | Format | Best for |
 | --- | --- |
 | `assessment.json` | Machines. Structured verdicts with citations — Bead's requested output. |
 | `assessment.md` | Reading in the terminal or the repo — headline verdict, reperformance summary, evidence coverage, per-attribute detail with citations. |
-| **`report.html`** | **Sharing.** Self-contained single-file HTML report, Bead-themed light mode, opens offline, emailable. Generate with `bead-agent report <run-dir>`. |
+| **`report.html`** | **The workpaper.** Self-contained single-file HTML, Bead-themed light mode, opens offline. Auto-generated at the end of every audit run and shown as a clickable link in the terminal. |
 
-Committed sample outputs live under `output/<control>/<model>/report.html` — open any of them in a browser to see what the pipeline produces.
+**Every `report.html` includes:**
+
+- **Bottom-line-up-front verdict banner** at the top — big CONTROL PASS / FAIL / CANNOT SIGN OFF, with a one-line reason so the reviewer knows the outcome from the first glance.
+- **Executive summary** per sample answering "what happened and why?".
+- **Key findings** — bulleted, colour-coded by severity.
+- **Recommended actions** — numbered, grounded in the failed/hedged verdicts.
+- **Reperformance summary** for UAR — deterministic re-check output.
+- **Per-attribute verdicts** with rationale + citations + policy references, all expandable.
+- **Evidence inventory** — every file the pipeline ingested, its detected type, what got extracted, and whether any verdict cites it.
+- **Decision log** — every LLM call the agent made, with tokens + cost + latency. The audit trail.
+- **Reviewer sign-off area** — Accept / Rework / Reject decision, reviewer name + date + rationale. Human-in-the-loop capture built into the workpaper.
+
+Committed sample reports live under `output/<control>/<model>/report.html` — open any in a browser to see the full artefact.
 
 ## Try it
 

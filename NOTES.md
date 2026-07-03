@@ -34,7 +34,11 @@ I built the `LLMProvider` Protocol before I built the first extractor. Adding a 
 
 ### Ship-then-tune prompts as their own artefact
 
-Prompts live in `src/audit_agent/prompts/*.md`. One tune ("You are judging ONE named attribute. Do not fail this attribute based on issues that belong to a different attribute") moved Claude from 80% → 87% overall accuracy. No code changes. That's the ROI of prompts-as-files.
+Prompts live in `src/audit_agent/prompts/*.md`. One tune ("You are judging ONE named attribute. Do not fail this attribute based on issues that belong to a different attribute") materially lifted Claude's Change Management accuracy. No code changes. That's the ROI of prompts-as-files.
+
+### Honest note on flake and the published number
+
+Every published figure is single-run — no vote-of-three, no cherry-pick. Claude drifted by 1-2 attributes between runs as I iterated; on any given commit, some attributes that landed as SUCCESS one run went to FURTHER_EVIDENCE_REQUIRED the next. That's normal LLM behaviour on the boundary between "clear" and "borderline" evidence. The scoreboard in the README shows the final-commit run so the number matches the assessment.json committed alongside it. `--consistency 3` takes majority across three judge calls per attribute, which smooths this out at ~1.2× cost (Anthropic prompt caching kicks in after call 1). I chose to publish single-run numbers because the scoreboard should reflect what the pipeline does out of the box, not what my best run produced.
 
 ## Post-first-cut critique that lifted the submission
 
