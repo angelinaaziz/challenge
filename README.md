@@ -327,9 +327,11 @@ Bead said cost isn't a factor in the evaluation so I haven't optimised heavily f
 ## Repo hygiene
 
 - **Prompts** live in `src/audit_agent/prompts/` (versioned `.md` files, hashed into the trace log).
-- **Unit tests** in `tests/` — **13 tests** (7 reconciler + 6 narrative builder) with synthetic fixture pairs stressing header/status detection and the deterministic narrative. `pytest tests/ -v`.
+- **Unit tests** in `tests/` — **18 tests** (8 reconciler + 5 narrative + 5 IPE) with synthetic fixture pairs. `pytest tests/ -v`.
 - **CI** at `.github/workflows/ci.yml` — runs `ruff check src/ tests/` + `pytest tests/ -v` on every push and PR.
-- **Session notes** in `NOTES.md` — decisions, tradeoffs, what I'd invest in next, plus a "three questions a Bead engineer will grill me on" section with honest answers to each.
+- **Working-session write-up** in [`SESSION.md`](SESSION.md) — how I directed Claude Code to build this. Bead's brief explicitly asks for "prompts, plans, or threads to show how you work"; this file addresses that ask.
+- **Engineering notes** in [`NOTES.md`](NOTES.md) — design decisions, tradeoffs, what I'd invest in next, plus a "three questions a Bead engineer will grill me on" section with honest answers to each.
+- **Agent-first conventions** in [`AGENTS.md`](AGENTS.md) — how a coding agent should behave in this repo.
 - **Setup** in `src/README.md`.
 - **Fork** of `bead-ai/challenge`; upstream `data/` preserved; my code in `src/`, `tests/`, `evals/`, plus one synthetic control at `data/change-management/`.
 - Planned and iterated with Claude Code — kept scope honest, ran multi-model evals in the background, challenged the design when I was about to over-build.
