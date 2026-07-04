@@ -18,13 +18,13 @@ First move was not to write code. I fanned out three parallel research agents:
 
 - Study `bead-ai/zeitlich` (the reference harness). What patterns should I mirror?
 - Study 2026 SOTA in vision, xlsx ingestion, and audit-AI stacks. What should I build with?
-- Study `daukadolt/challenge` (a candidate believed to have been hired). What did he do, what are his gaps I can close?
+- Study the other public forks of the challenge repo. What did previous candidates do, what patterns worked, what gaps could I close?
 
 By the time I wrote the first line of code I had a concrete architecture (LLM-parsed control, typed evidence extractors, per-attribute judge, deterministic reperformance for UAR), a model recommendation (Claude Opus for judgment, deterministic Python for reconciliation), and a named differentiator (deterministic UAR reperformance, which none of the other forks had).
 
 ### 2. Ship in vertical slices with staff-review gates
 
-I set a rule: no branching into "maybe someday" features until the current slice was shippable. After each slice I explicitly asked Claude Code to grade the submission against Bead's stated criteria and against `daukadolt/challenge`, treating my own agent as an honest reviewer.
+I set a rule: no branching into "maybe someday" features until the current slice was shippable. After each slice I explicitly asked Claude Code to grade the submission against Bead's stated criteria and against the other public forks, treating my own agent as an honest reviewer.
 
 Several such reviews landed in this session. Each surfaced concrete weaknesses I then closed:
 
